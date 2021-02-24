@@ -22,6 +22,7 @@
   "homepage": "https://github.com/sk-merkaly/nuxt-module#readme",
   "devDependencies": {
     "@nuxt/types": "^2.15.2",
+    "@types/auth0-js": "^9.14.2",
     "@types/vue": "^2.0.0",
     "typescript": "^4.2.2",
     "vuex": "^3.6.2"
@@ -30,6 +31,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
+    "auth0-js": "^9.14.3",
     "chalk": "^4.1.0",
     "path": "^0.12.7"
   }
