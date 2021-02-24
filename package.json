@@ -1,0 +1,28 @@
+{
+  "name": "@sk-merkaly/nuxt",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sk-merkaly/nuxt-module.git"
+  },
+  "keywords": [
+    "nuxt-module"
+  ],
+  "author": "Randy Tellez Galan <kronhyx@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sk-merkaly/nuxt-module/issues"
+  },
+  "homepage": "https://github.com/sk-merkaly/nuxt-module#readme",
+  "devDependencies": {
+    "@nuxt/types": "^2.15.2",
+    "@types/vue": "^2.0.0",
+    "vuex": "^3.6.2"
+  },
+  "dependencies": {}
+}
