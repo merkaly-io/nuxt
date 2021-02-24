@@ -4,7 +4,8 @@
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -b",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@nuxt/types": "^2.15.2",
     "@types/vue": "^2.0.0",
+    "typescript": "^4.2.2",
     "vuex": "^3.6.2"
   },
   "dependencies": {
