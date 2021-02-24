@@ -1,8 +1,8 @@
 import { Module } from '@nuxt/types'
 import { ModuleThis } from '@nuxt/types/config/module'
 import chalk from 'chalk'
+import path from 'path'
 import packageJson from '../package.json'
-import pluginPath from './plugins/path'
 
 export interface MerkalyNuxt {
   $path (name: String, params?: Record<string, any>): Object
@@ -28,10 +28,12 @@ declare module 'vuex/types/index' {
 
 const nuxtModule: Module<ModuleThis> = function () {
   const { nuxt, options } = this
-  this.addPlugin(pluginPath)
+  this.addPlugin({
+    src: path.resolve(__dirname, './plugins/path.js')
+  })
 
   nuxt.hook('listen', async () => {
-    options.cli.badgeMessages.push(`Merklay: @v${chalk.underline.redBright(packageJson.version)}`)
+    options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
   })
 
 }
