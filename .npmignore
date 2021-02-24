@@ -1,5 +1,5 @@
 .idea
-./src
-tsconfig.json
-
+node_modules
+/src
 *.tgz
+.env

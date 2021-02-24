@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./dist",
     "baseUrl": "./src",
+    "declarationDir": "./dist/types",
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -14,8 +14,5 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true
-  },
-  "include": [
-    "src"
-  ]
+  }
 }
