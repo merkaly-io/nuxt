@@ -1,32 +1,7 @@
 import { Module } from '@nuxt/types'
-import { WebAuth } from 'auth0-js'
 import chalk from 'chalk'
 import path from 'path'
 import packageJson from '../package.json'
-
-export interface MerkalyNuxt {
-  $path (name: String, params?: Record<string, any>): Object
-
-  $auth0: WebAuth
-}
-
-declare module 'vue/types/vue' {
-  interface Vue extends MerkalyNuxt {
-  }
-}
-
-declare module '@nuxt/types' {
-  interface NuxtAppOptions extends MerkalyNuxt {
-  }
-
-  interface Context extends MerkalyNuxt {
-  }
-}
-
-declare module 'vuex/types/index' {
-  interface Store<S> extends MerkalyNuxt {
-  }
-}
 
 interface MerkalyParams {
   baseURL: string
@@ -39,7 +14,7 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
 
   this.addPlugin(
     { src: path.resolve(__dirname, './plugins/path.js') },
-    { src: path.resolve(__dirname, './plugins/auth0.js') },
+    { src: path.resolve(__dirname, './plugins/auth0.js') }
   )
 
   // @ts-ignore
