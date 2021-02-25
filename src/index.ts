@@ -36,6 +36,16 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
     }
   })
 
+  let middleware = options.router.middleware || []
+
+  if (typeof middleware === 'string'){
+    middleware = middleware.split(' ')
+  }
+
+  middleware.push('auth')
+
+  options.router.middleware = middleware
+
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = {
     AUTH0_DOMAIN: params.AUTH_DOMAIN,
