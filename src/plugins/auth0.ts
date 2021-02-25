@@ -1,12 +1,13 @@
 import { Context } from '@nuxt/types'
-import { Inject } from '@nuxt/types/app'
-import { WebAuth } from 'auth0-js'
+import { AuthOptions, WebAuth } from 'auth0-js'
 
-export default ({ app, $config }: Context, inject: Inject): WebAuth => {
-  app.$auth0 = new WebAuth({
+export default ({ app, $config }: Context, inject: Function) => {
+  const options: AuthOptions = {
     domain: String($config.auth0.AUTH0_DOMAIN),
     clientID: String($config.auth0.AUTH0_CLIENT)
-  })
+  }
+
+  app.$auth0 = new WebAuth(options)
   inject('auth0', app.$auth0)
 
   return app.$auth0
