@@ -8,6 +8,7 @@ interface MerkalyParams {
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
+  SENTRY_DSN?: string
 }
 
 const nuxtModule: Module<MerkalyParams> = function (params) {
@@ -17,6 +18,14 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/auth0.js') })
 
   this.addModule({ src: require.resolve('@nuxtjs/pwa'), options: {} })
+
+  this.addModule({
+    src: require.resolve('@nuxtjs/sentry'),
+    options: {
+      dsn: params.SENTRY_DSN
+    }
+  })
+
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
