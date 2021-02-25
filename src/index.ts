@@ -15,6 +15,8 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: path.resolve(__dirname, './plugins/path.js') })
   this.addPlugin({ src: path.resolve(__dirname, './plugins/auth0.js') })
 
+  this.addModule('@nuxtjs/pwa', {})
+
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = {
     AUTH0_DOMAIN: params.AUTH0_DOMAIN,
