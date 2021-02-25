@@ -8,6 +8,7 @@ interface MerkalyParams {
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
+  AUTH_REDIRECT: Record<string, any>
   SENTRY_DSN?: string
 }
 
@@ -30,6 +31,7 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
       plugins: params.AUTH_PLUGINS || [],
+      redirect: params.AUTH_REDIRECT || {},
       strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } }
     }
   })
