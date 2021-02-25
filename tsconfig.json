@@ -11,6 +11,9 @@
     "skipLibCheck": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "@nuxt/types"
+    ]
   }
 }

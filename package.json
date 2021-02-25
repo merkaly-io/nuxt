@@ -2,7 +2,7 @@
   "name": "@sk-merkaly/nuxt-module",
   "version": "0.1.2",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
-  "main": "dist/src/index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "tsc -b",
     "prepack": "npm run build"
