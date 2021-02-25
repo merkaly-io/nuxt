@@ -16,6 +16,14 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: path.resolve(__dirname, './plugins/auth0.js') })
 
   this.addModule('@nuxtjs/pwa', {})
+  this.addModule('@nuxtjs/auth-next', {
+    strategies: {
+      auth0: {
+        domain: params.AUTH0_DOMAIN,
+        clientId: params.AUTH0_CLIENT
+      }
+    }
+  })
 
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = {
