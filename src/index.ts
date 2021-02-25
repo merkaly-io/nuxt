@@ -12,10 +12,8 @@ interface MerkalyParams {
 const nuxtModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
-  this.addPlugin(
-    { src: path.resolve(__dirname, './plugins/path.js') },
-    { src: path.resolve(__dirname, './plugins/auth0.js') }
-  )
+  this.addPlugin({ src: path.resolve(__dirname, './plugins/path.js') })
+  this.addPlugin({ src: path.resolve(__dirname, './plugins/auth0.js') })
 
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = {
