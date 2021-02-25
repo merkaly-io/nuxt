@@ -17,14 +17,12 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: path.resolve(__dirname, './plugins/path.js') })
   this.addPlugin({ src: path.resolve(__dirname, './plugins/auth0.js') })
 
-  this.addModule('@nuxtjs/pwa', {})
-  this.addModule('@nuxtjs/auth-next', {
-    plugins: params.AUTH_PLUGINS || [],
-    strategies: {
-      auth0: {
-        domain: params.AUTH_DOMAIN,
-        clientId: params.AUTH_CLIENT
-      }
+  this.addModule({ src: '@nuxtjs/pwa', options: {} })
+  this.addModule({
+    src: '@nuxtjs/auth-next',
+    options: {
+      plugins: params.AUTH_PLUGINS || [],
+      strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } }
     }
   })
 
