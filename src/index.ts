@@ -1,12 +1,14 @@
 import { Module } from '@nuxt/types'
+import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
 import path from 'path'
 import packageJson from '../package.json'
 
 interface MerkalyParams {
   baseURL: string
-  AUTH0_DOMAIN: string
-  AUTH0_CLIENT: string
+  AUTH_DOMAIN: string
+  AUTH_CLIENT: string
+  AUTH_PLUGINS: NuxtOptionsPlugin[]
 }
 
 const nuxtModule: Module<MerkalyParams> = function (params) {
@@ -17,18 +19,19 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
 
   this.addModule('@nuxtjs/pwa', {})
   this.addModule('@nuxtjs/auth-next', {
+    plugins: params.AUTH_PLUGINS || [],
     strategies: {
       auth0: {
-        domain: params.AUTH0_DOMAIN,
-        clientId: params.AUTH0_CLIENT
+        domain: params.AUTH_DOMAIN,
+        clientId: params.AUTH_CLIENT
       }
     }
   })
 
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = {
-    AUTH0_DOMAIN: params.AUTH0_DOMAIN,
-    AUTH0_CLIENT: params.AUTH0_CLIENT
+    AUTH0_DOMAIN: params.AUTH_DOMAIN,
+    AUTH0_CLIENT: params.AUTH_CLIENT
   }
 
   nuxt.hook('listen', async () => {
