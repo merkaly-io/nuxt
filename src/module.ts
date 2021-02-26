@@ -7,6 +7,7 @@ interface MerkalyParams {
   baseURL: string
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
+  AUTH_ANONYMOUS: boolean
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
   GOOGLE_TM?: string
@@ -50,15 +51,17 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     }
   })
 
-  let middleware = options.router.middleware || []
+  if (!params.AUTH_ANONYMOUS) {
+    let middleware = options.router.middleware || []
 
-  if (typeof middleware === 'string') {
-    middleware = middleware.split(' ')
+    if (typeof middleware === 'string') {
+      middleware = middleware.split(' ')
+    }
+
+    middleware.push('auth')
+
+    options.router.middleware = middleware
   }
-
-  middleware.push('auth')
-
-  options.router.middleware = middleware
 
   // @ts-ignore
   let auth0Config = options.publicRuntimeConfig.auth0 || {}
