@@ -2,7 +2,8 @@
   "name": "@sk-merkaly/nuxt-module",
   "version": "0.4.5",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
-  "main": "src/index.js",
+  "main": "src/module.js",
+  "types": "./index.d.ts",
   "scripts": {
     "build": "tsc -b",
     "dev": "nuxt",
@@ -32,7 +33,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
-    "@nuxtjs/auth-next": "^5.0.0-1610375166.4d8db9d",
+    "@nuxtjs/auth-next": "^5.0.0-1613647907.37b1156",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.2",
     "auth0-js": "^9.14.3",

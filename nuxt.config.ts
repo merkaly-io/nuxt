@@ -1,4 +1,4 @@
-import MerkalyModule from './src/index'
+import MerkalyModule from './src/module'
 import { NuxtConfig } from '@nuxt/types'
 
 const config: NuxtConfig = {
@@ -10,8 +10,8 @@ const config: NuxtConfig = {
   modules: [
     [MerkalyModule, {
       SENTRY_DSN: process.env.SENTRY_DSN,
-      AUTH_DOMAIN: process.env.AUTH0_DOMAIN,
-      AUTH_CLIENT: process.env.AUTH0_CLIENT_ID,
+      AUTH_DOMAIN: process.env.AUTH_DOMAIN,
+      AUTH_CLIENT: process.env.AUTH_CLIENT,
       AUTH_REDIRECT: {
         login: '/auth/login',
         logout: '/auth/logout',

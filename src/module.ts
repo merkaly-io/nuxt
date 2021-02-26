@@ -18,10 +18,13 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/path') })
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/auth0') })
 
-  this.addModule({ src: require.resolve('@nuxtjs/pwa'), options: {} })
+  this.addModule({
+    src: '@nuxtjs/pwa',
+    options: {}
+  })
 
   this.addModule({
-    src: require.resolve('@nuxtjs/sentry'),
+    src: '@nuxtjs/sentry',
     options: {
       dsn: params.SENTRY_DSN
     }
