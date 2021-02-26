@@ -3,3 +3,4 @@
 *.tgz
 
 nuxt.config.*
+.nuxt
