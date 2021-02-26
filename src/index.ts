@@ -12,7 +12,7 @@ interface MerkalyParams {
   SENTRY_DSN?: string
 }
 
-const nuxtModule: Module<MerkalyParams> = function (params) {
+const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/path') })
@@ -62,4 +62,4 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
 
 }
 
-export default nuxtModule
+export default MerkalyModule

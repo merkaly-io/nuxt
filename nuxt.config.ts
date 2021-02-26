@@ -1,0 +1,26 @@
+import MerkalyModule from './src/index'
+import { NuxtConfig } from '@nuxt/types'
+
+const config: NuxtConfig = {
+
+  target: 'server',
+
+  buildModules: ['@nuxt/typescript-build'],
+
+  modules: [
+    [MerkalyModule, {
+      SENTRY_DSN: process.env.SENTRY_DSN,
+      AUTH_DOMAIN: process.env.AUTH0_DOMAIN,
+      AUTH_CLIENT: process.env.AUTH0_CLIENT_ID,
+      AUTH_REDIRECT: {
+        login: '/auth/login',
+        logout: '/auth/logout',
+        callback: '/auth/callback',
+        home: '/'
+      }
+    }]
+  ]
+
+}
+
+export default config
