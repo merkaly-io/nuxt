@@ -27,15 +27,15 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
     }
   })
 
+  const authPlugins = params.AUTH_PLUGINS || []
+  authPlugins.push({ src: '@/plugins/sentry', ssr: false })
+
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
       redirect: params.AUTH_REDIRECT || {},
       strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } },
-      plugins: [
-        ...[params.AUTH_PLUGINS || []],
-        ...[{ src: '@/plugins/sentry', ssr: false }]
-      ]
+      plugins: authPlugins
     }
   })
 
