@@ -9,6 +9,7 @@ interface MerkalyParams {
   AUTH_CLIENT: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
+  GOOGLE_TM?: string
   SENTRY_DSN?: string
 }
 
@@ -21,6 +22,13 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addModule({
     src: '@nuxtjs/pwa',
     options: {}
+  })
+
+  this.addModule({
+    src: '@nuxtjs/gtm',
+    options: {
+      id: params.GOOGLE_TM
+    }
   })
 
   this.addModule({
