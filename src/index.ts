@@ -50,10 +50,11 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   options.router.middleware = middleware
 
   // @ts-ignore
-  options.publicRuntimeConfig.auth0 = {
-    AUTH0_DOMAIN: params.AUTH_DOMAIN,
-    AUTH0_CLIENT: params.AUTH_CLIENT
-  }
+  let auth0Config = options.publicRuntimeConfig.auth0 || {}
+  auth0Config = { ...{ AUTH0_DOMAIN: params.AUTH_DOMAIN, AUTH0_CLIENT: params.AUTH_CLIENT }, ...auth0Config }
+
+  // @ts-ignore
+  options.publicRuntimeConfig.auth0 = auth0Config
 
   nuxt.hook('listen', async () => {
     options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
