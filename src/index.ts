@@ -28,7 +28,7 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   })
 
   const authPlugins = params.AUTH_PLUGINS || []
-  authPlugins.push({ src: '@/plugins/sentry', ssr: false })
+  authPlugins.push({ src: '/plugins/sentry', ssr: false })
 
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
