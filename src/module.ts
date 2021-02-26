@@ -10,7 +10,7 @@ interface MerkalyParams {
   AUTH_ANONYMOUS: boolean
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
-  GOOGLE_TM?: string
+  GOOGLE_TM?: Record<string, any>
   SENTRY_DSN?: string
 }
 
@@ -27,9 +27,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   this.addModule({
     src: '@nuxtjs/gtm',
-    options: {
-      id: params.GOOGLE_TM
-    }
+    options: params.GOOGLE_TM
   })
 
   this.addModule({
