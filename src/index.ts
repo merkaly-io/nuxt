@@ -17,6 +17,7 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
 
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/path') })
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/auth0') })
+  this.addPlugin({ src: require.resolve(__dirname + '/plugins/sentry') })
 
   this.addModule({ src: require.resolve('@nuxtjs/pwa'), options: {} })
 

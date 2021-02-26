@@ -15,6 +15,7 @@
     "types": [
       "@nuxt/types",
       "@nuxtjs/auth-next",
+      "@nuxtjs/sentry",
       "@types/auth0-js"
     ]
   }
