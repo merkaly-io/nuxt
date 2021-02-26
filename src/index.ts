@@ -17,7 +17,6 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
 
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/path') })
   this.addPlugin({ src: require.resolve(__dirname + '/plugins/auth0') })
-  this.addPlugin({ src: require.resolve(__dirname + '/plugins/sentry') })
 
   this.addModule({ src: require.resolve('@nuxtjs/pwa'), options: {} })
 
@@ -31,15 +30,18 @@ const nuxtModule: Module<MerkalyParams> = function (params) {
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
-      plugins: params.AUTH_PLUGINS || [],
       redirect: params.AUTH_REDIRECT || {},
-      strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } }
+      strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } },
+      plugins: [
+        ...[params.AUTH_PLUGINS || []],
+        ...[{ src: '@/plugins/sentry', ssr: false }]
+      ]
     }
   })
 
   let middleware = options.router.middleware || []
 
-  if (typeof middleware === 'string'){
+  if (typeof middleware === 'string') {
     middleware = middleware.split(' ')
   }
 
