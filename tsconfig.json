@@ -3,12 +3,7 @@
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
+    "baseUrl": "./",
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,

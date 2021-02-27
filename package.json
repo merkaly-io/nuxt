@@ -2,12 +2,14 @@
   "name": "@sk-merkaly/nuxt-module",
   "version": "0.5.0",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
-  "main": "src/module.js",
+  "main": "./module.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "tsc -b",
-    "dev": "nuxt",
-    "prepack": "npm run build"
+    "build": "npm run postpack && tsc -b",
+    "dev": "npm run build && nuxt",
+    "prepack": "npm run build",
+    "postpack": "tsc --build --clean",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",

@@ -4,3 +4,5 @@
 
 nuxt.config.*
 .nuxt
+
+.gitkeep

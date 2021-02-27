@@ -1,7 +1,7 @@
 import { Module } from '@nuxt/types'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
-import packageJson from '../package.json'
+import packageJson from './package.json'
 
 interface MerkalyParams {
   baseURL: string
