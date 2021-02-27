@@ -8,3 +8,4 @@ nuxt.config.*
 .gitkeep
 *.js
 *.d.ts
+!index.d.ts
