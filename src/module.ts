@@ -31,6 +31,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   })
 
   this.addModule({
+    src: 'vue-toastification/nuxt',
+    options: {}
+  })
+
+  this.addModule({
     src: '@nuxtjs/sentry',
     options: {
       dsn: params.SENTRY_DSN
