@@ -6,3 +6,5 @@ nuxt.config.*
 .nuxt
 
 .gitkeep
+*.js
+*.d.ts
