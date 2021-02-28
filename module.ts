@@ -1,6 +1,7 @@
 import { Module } from '@nuxt/types'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
+import * as path from 'path'
 import packageJson from './package.json'
 
 interface MerkalyParams {
@@ -17,8 +18,8 @@ interface MerkalyParams {
 const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
-  this.addPlugin({ src: require.resolve(__dirname + '/plugins/path'), mode: 'all' })
-  this.addPlugin({ src: require.resolve(__dirname + '/plugins/auth0'), mode: 'client' })
+  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/auth0')), mode: 'client' })
 
   this.addModule({
     src: '@nuxtjs/pwa',
@@ -48,7 +49,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   })
 
   const authPlugins = params.AUTH_PLUGINS || []
-  authPlugins.push({ src: require.resolve(__dirname + '/plugins/sentry'), ssr: false })
+  authPlugins.push({ src: require.resolve(path.join(__dirname, '/plugins/sentry')), ssr: false })
 
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
@@ -78,7 +79,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   // @ts-ignore
   options.publicRuntimeConfig.auth0 = auth0Config
 
-  nuxt.hook('listen', async () => {
+  nuxt.hook('listen', () => {
     options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
   })
 }
