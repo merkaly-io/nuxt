@@ -10,7 +10,7 @@
     "lint": "eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore .",
     "prepack": "npm run build",
     "postpack": "tsc -b --clean",
-    "postinstall": "npm run build"
+    "postinstall": "npm install && npm run build"
   },
   "repository": {
     "type": "git",
