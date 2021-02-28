@@ -1,17 +1,9 @@
 {
   "name": "@sk-merkaly/nuxt-module",
-  "version": "0.7.4",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
+  "version": "0.7.4",
   "main": "./module.js",
   "types": "./index.d.ts",
-  "scripts": {
-    "build": "npm run postpack && tsc -b",
-    "dev": "npm run build && nuxt",
-    "lint": "eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore .",
-    "prepack": "npm run build",
-    "postpack": "tsc -b --clean",
-    "postinstall": "npm install && npm run build"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sk-merkaly/nuxt-module.git"
@@ -25,6 +17,14 @@
     "url": "https://github.com/sk-merkaly/nuxt-module/issues"
   },
   "homepage": "https://github.com/sk-merkaly/nuxt-module#readme",
+  "scripts": {
+    "build": "npm run postpack && tsc -b",
+    "dev": "npm run build && nuxt",
+    "lint": "eslint --fix --ext .js,.ts,.vue --ignore-path .gitignore .",
+    "prepack": "npm run build",
+    "postpack": "tsc -b --clean",
+    "postinstall": "npm run build"
+  },
   "devDependencies": {
     "@nuxt/types": "^2.15.2",
     "@nuxtjs/eslint-config": "^4.0.0",
@@ -34,15 +34,9 @@
     "@types/auth0-js": "^9.14.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.21.0",
-    "eslint-plugin-nuxt": "^1.0.0",
-    "husky": "^5.1.1"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "eslint-plugin-nuxt": "^1.0.0"
   },
   "dependencies": {
-    "@commitlint/cli": "^11.0.0",
-    "@commitlint/config-conventional": "^12.0.1",
     "@nuxt/typescript-build": "^2.0.6",
     "@nuxtjs/auth-next": "^5.0.0-1613647907.37b1156",
     "@nuxtjs/axios": "^5.13.1",
@@ -50,6 +44,7 @@
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.2",
     "auth0-js": "^9.14.3",
+    "bootstrap-vue": "^2.21.2",
     "chalk": "^4.1.0",
     "nuxt": "^2.15.2",
     "nuxt-property-decorator": "^2.9.1",
@@ -57,5 +52,8 @@
     "sass-loader": "^10.1.1",
     "typescript": ">=3.3.1 <4.2.0",
     "vue-toastification": "^1.7.11"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }
