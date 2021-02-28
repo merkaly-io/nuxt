@@ -26,23 +26,23 @@
     "postinstall": "npm run build"
   },
   "devDependencies": {
-    "@nuxt/types": "^2.15.2",
     "@nuxtjs/eslint-config": "^4.0.0",
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
-    "@types/auth0": "^3.0.0",
-    "@types/auth0-js": "^9.14.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.21.0",
     "eslint-plugin-nuxt": "^1.0.0"
   },
   "dependencies": {
+    "@nuxt/types": "^2.15.2",
     "@nuxt/typescript-build": "^2.0.6",
     "@nuxtjs/auth-next": "^5.0.0-1613647907.37b1156",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.2",
+    "@types/auth0": "^3.0.0",
+    "@types/auth0-js": "^9.14.2",
     "auth0-js": "^9.14.3",
     "bootstrap-vue": "^2.21.2",
     "chalk": "^4.1.0",
