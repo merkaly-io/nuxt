@@ -1,5 +1,5 @@
-import MerkalyModule from './module'
 import { NuxtConfig } from '@nuxt/types'
+import MerkalyModule from './module'
 
 const config: NuxtConfig = {
 

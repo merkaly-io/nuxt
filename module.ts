@@ -81,7 +81,6 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   nuxt.hook('listen', async () => {
     options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
   })
-
 }
 
 export default MerkalyModule
