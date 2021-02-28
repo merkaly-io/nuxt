@@ -1,8 +1,9 @@
 import { WebAuth } from 'auth0-js'
 
 export * from '@nuxtjs/sentry'
-export * from '@types/auth0-js'
+export * from '@nuxtjs/axios'
 export * from '@nuxtjs/auth-next'
+export * from '@types/auth0-js'
 export * from 'vue-toastification'
 
 export interface MerkalyNuxt {

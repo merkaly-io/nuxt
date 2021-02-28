@@ -36,6 +36,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   })
 
   this.addModule({
+    src: '@nuxtjs/axios',
+    options: {}
+  })
+
+  this.addModule({
     src: '@nuxtjs/sentry',
     options: {
       dsn: params.SENTRY_DSN
