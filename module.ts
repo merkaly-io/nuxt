@@ -1,7 +1,7 @@
-import * as path from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
+import * as path from 'path'
 import packageJson from './package.json'
 
 interface MerkalyParams {
@@ -46,6 +46,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     options: {
       dsn: params.SENTRY_DSN
     }
+  })
+
+  this.addModule({
+    src: 'bootstrap-vue/nuxt',
+    options: { bootstrapCSS: false, bootstrapVueCSS: true }
   })
 
   const authPlugins = params.AUTH_PLUGINS || []
