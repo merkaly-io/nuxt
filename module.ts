@@ -37,6 +37,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   })
 
   this.addModule({
+    src: 'vue-sweetalert2/nuxt',
+    options: {}
+  })
+
+  this.addModule({
     src: '@nuxtjs/axios',
     options: {}
   })
