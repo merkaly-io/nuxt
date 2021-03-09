@@ -9,3 +9,5 @@ nuxt.config.*
 *.js
 *.d.ts
 !index.d.ts
+
+.github
