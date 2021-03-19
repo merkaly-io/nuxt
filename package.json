@@ -35,7 +35,7 @@
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
-    "@nuxtjs/sentry": "^5.0.2",
+    "@nuxtjs/sentry": "^5.0.3",
     "@types/auth0": "^3.0.0",
     "@types/auth0-js": "^9.14.2",
     "auth0-js": "^9.14.3",
