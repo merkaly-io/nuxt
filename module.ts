@@ -1,13 +1,14 @@
-import * as path from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
+import * as path from 'path'
 import packageJson from './package.json'
 
 interface MerkalyParams {
   baseURL: string
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
+  AUTH_ENDPOINT: string
   AUTH_ANONYMOUS: boolean
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
@@ -65,8 +66,14 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
       redirect: params.AUTH_REDIRECT || {},
-      strategies: { auth0: { domain: params.AUTH_DOMAIN, clientId: params.AUTH_CLIENT } },
-      plugins: authPlugins
+      plugins: authPlugins,
+      strategies: {
+        auth0: {
+          domain: params.AUTH_DOMAIN,
+          clientId: params.AUTH_CLIENT,
+          endpoints: { userInfo: params.AUTH_ENDPOINT }
+        }
+      }
     }
   })
 
