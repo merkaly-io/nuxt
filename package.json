@@ -6,7 +6,7 @@
   "types": "./index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sk-merkaly/nuxt-module.git"
+    "url": "https://github.com/sk-merkaly/nuxt-module.git"
   },
   "keywords": [
     "nuxt-module"
@@ -23,7 +23,8 @@
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "prepack": "npm run build",
     "postpack": "tsc -b --clean",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@nuxt/types": "^2.15.4",
@@ -56,6 +57,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
-    "eslint-plugin-vue": "^7.9.0"
+    "eslint-plugin-vue": "^7.9.0",
+    "semantic-release": "^17.4.2"
   }
 }
