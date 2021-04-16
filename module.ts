@@ -4,7 +4,7 @@ import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
 import packageJson from './package.json'
 
-interface MerkalyParams {
+export interface MerkalyParams {
   baseURL: string
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
