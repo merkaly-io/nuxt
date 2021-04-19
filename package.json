@@ -38,7 +38,7 @@
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.3",
     "@types/auth0": "^3.0.0",
-    "@types/auth0-js": "^9.14.3",
+    "@types/auth0-js": "^9.14.4",
     "auth0-js": "^9.15.0",
     "babel-eslint": "^10.1.0",
     "bootstrap-vue": "^2.21.2",
