@@ -4,10 +4,6 @@ on:
   push:
     branches: [ master ]
 
-env:
-  GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
 jobs:
   release:
     runs-on: ubuntu-latest
