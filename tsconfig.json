@@ -19,5 +19,8 @@
       "@types/node",
       "@nuxt/types"
     ]
-  }
+  },
+  "exclude": [
+    "nuxt.config.ts"
+  ]
 }
