@@ -18,12 +18,9 @@
   },
   "homepage": "https://github.com/sk-merkaly/nuxt-module#readme",
   "scripts": {
-    "build": "npm run postpack && tsc -b",
+    "build": "tsc -b",
     "dev": "npm run build && nuxt",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
-    "prepack": "npm run build",
-    "postpack": "tsc -b --clean",
-    "postinstall": "npm run build",
     "semantic-release": "semantic-release"
   },
   "dependencies": {
