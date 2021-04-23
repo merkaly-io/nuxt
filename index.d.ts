@@ -1,4 +1,3 @@
-import { WebAuth } from 'auth0-js'
 import Merkaly from './plugins/merkaly'
 
 export * from '@nuxt/types'
@@ -13,8 +12,6 @@ export * from 'bootstrap-vue'
 
 export interface MerkalyNuxt {
   $path (name: String, params?: Record<string, any>): Object
-
-  $auth0: WebAuth
 
   $merkaly: Merkaly
 }

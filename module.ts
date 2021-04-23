@@ -27,7 +27,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     }
   })
 
-  const build: NuxtOptionsBuild = this.options.build || []
+  const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []
   transpile.push('@sk-merkaly/sdk-js')
   build.transpile = transpile
@@ -89,9 +89,9 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
             autoFetch: true
           },
           endpoints: {
-            login: { url: path.join(params.baseUrl, '/auth/login'), method: 'post' },
-            logout: { url: path.join(params.baseUrl, '/auth/logout'), method: 'post' },
-            user: { url: path.join(params.baseUrl, '/auth/user'), method: 'get' }
+            login: { baseURL: params.baseUrl, url: '/auth/login', method: 'post' },
+            logout: { baseURL: params.baseUrl, url: '/auth/logout', method: 'post' },
+            user: { baseURL: params.baseUrl, url: '/auth/user', method: 'get' }
           }
         }
       }
