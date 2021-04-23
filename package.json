@@ -37,6 +37,7 @@
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.3",
+    "@sk-merkaly/sdk-js": "github:sk-merkaly/sdk-js",
     "@types/auth0": "^3.0.0",
     "@types/auth0-js": "^9.14.4",
     "auth0-js": "^9.15.0",
