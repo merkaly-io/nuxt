@@ -17,7 +17,6 @@ const config: NuxtConfig = {
       AUTH_DOMAIN: process.env.AUTH_DOMAIN,
       AUTH_CLIENT: process.env.AUTH_CLIENT,
       AUTH_ANONYMOUS: true,
-      AUTH_ENDPOINT: 'http://server.merkaly.com/auth/user',
       AUTH_REDIRECT: {
         login: '/auth/login',
         logout: '/auth/logout',
