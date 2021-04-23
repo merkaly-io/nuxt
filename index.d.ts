@@ -1,5 +1,5 @@
 import { WebAuth } from 'auth0-js'
-import { MerkalyInterface } from './plugins/merkaly'
+import Merkaly from './plugins/merkaly'
 
 export * from '@nuxt/types'
 export * from '@nuxtjs/sentry'
@@ -16,7 +16,7 @@ export interface MerkalyNuxt {
 
   $auth0: WebAuth
 
-  $merkaly: MerkalyInterface
+  $merkaly: Merkaly
 }
 
 declare module 'vue/types/vue' {

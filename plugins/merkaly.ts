@@ -1,20 +1,8 @@
 import { Context } from '@nuxt/types'
-import * as Merkaly from '@sk-merkaly/sdk-js/app'
-
-export interface MerkalyInterface {
-  account: Merkaly.Account
-  admin: Merkaly.Admin
-  cloud: Merkaly.Cloud
-  client: Merkaly.MerkalyClient
-}
+import Merkaly from '@sk-merkaly/sdk-js/app'
 
 export default ({ app, $config }: Context, inject: Function) => {
-  app.$merkaly = {
-    account: new Merkaly.Account(),
-    admin: new Merkaly.Admin(),
-    cloud: new Merkaly.Cloud(),
-    client: new Merkaly.MerkalyClient()
-  }
+  app.$merkaly = new Merkaly('')
   inject('merkaly', app.$merkaly)
 
   return app.$merkaly
