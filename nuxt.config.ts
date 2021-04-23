@@ -15,8 +15,6 @@ const config: NuxtConfig = {
         enabled: true
       },
       SENTRY_DSN: process.env.SENTRY_DSN,
-      AUTH_DOMAIN: process.env.AUTH_DOMAIN,
-      AUTH_CLIENT: process.env.AUTH_CLIENT,
       AUTH_ANONYMOUS: true,
       AUTH_REDIRECT: {
         login: '/auth/login',

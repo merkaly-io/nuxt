@@ -7,8 +7,6 @@ import packageJson from './package.json'
 
 export interface MerkalyParams {
   baseUrl: string
-  AUTH_DOMAIN: string
-  AUTH_CLIENT: string
   AUTH_ANONYMOUS: boolean
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
@@ -20,7 +18,6 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/auth0')), mode: 'client' })
   this.addPlugin({
     src: require.resolve(path.join(__dirname, '/plugins/merkaly')),
     mode: 'all',
@@ -81,9 +78,21 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
       redirect: params.AUTH_REDIRECT || {},
       plugins: authPlugins,
       strategies: {
-        auth0: {
-          domain: params.AUTH_DOMAIN,
-          clientId: params.AUTH_CLIENT
+        local: {
+          token: {
+            property: 'accessToken',
+            required: true,
+            type: 'Bearer'
+          },
+          user: {
+            property: false,
+            autoFetch: true
+          },
+          endpoints: {
+            login: { url: path.join(params.baseUrl, '/auth/login'), method: 'post' },
+            logout: { url: path.join(params.baseUrl, '/auth/logout'), method: 'post' },
+            user: { url: path.join(params.baseUrl, '/auth/user'), method: 'get' }
+          }
         }
       }
     }
@@ -100,13 +109,6 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
     options.router.middleware = middleware
   }
-
-  // @ts-ignore
-  let auth0Config = options.publicRuntimeConfig.auth0 || {}
-  auth0Config = { ...{ AUTH0_DOMAIN: params.AUTH_DOMAIN, AUTH0_CLIENT: params.AUTH_CLIENT }, ...auth0Config }
-
-  // @ts-ignore
-  options.publicRuntimeConfig.auth0 = auth0Config
 
   nuxt.hook('listen', () => {
     options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
