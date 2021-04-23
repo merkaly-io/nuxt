@@ -2,6 +2,7 @@ import Merkaly from './plugins/merkaly'
 
 export * from '@nuxt/types'
 export * from '@nuxtjs/sentry'
+export * from '@sk-merkaly/sdk-js'
 export * from '@nuxtjs/axios'
 export * from 'vue-sweetalert2'
 export * from '@nuxtjs/auth-next'
