@@ -19,6 +19,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/merkaly')), mode: 'all' })
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/auth0')), mode: 'client' })
 
   this.addModule({
