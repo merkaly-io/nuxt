@@ -1,4 +1,5 @@
 import { Module } from '@nuxt/types'
+import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
 import * as path from 'path'
@@ -21,6 +22,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/merkaly')), mode: 'all' })
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/auth0')), mode: 'client' })
+
+  const build: NuxtOptionsBuild = this.options.build || []
+  const transpile = build.transpile || []
+  transpile.push('@sk-merkaly/sdk-js')
+  build.transpile = transpile
 
   this.addModule({
     src: '@nuxtjs/pwa',

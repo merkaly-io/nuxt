@@ -1,5 +1,5 @@
 import { Context } from '@nuxt/types'
-import * as Merkaly from '@sk-merkaly/sdk-js/src/app'
+import * as Merkaly from '@sk-merkaly/sdk-js/app'
 
 export interface MerkalyInterface {
   account: Merkaly.Account
