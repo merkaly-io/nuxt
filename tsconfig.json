@@ -7,6 +7,8 @@
     "strict": true,
     "outDir": "./dist",
     "esModuleInterop": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
