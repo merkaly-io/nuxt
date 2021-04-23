@@ -55,6 +55,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
+    "@semantic-release/git": "^9.0.0",
     "eslint-plugin-vue": "^7.9.0",
     "semantic-release": "^17.4.2"
   }
