@@ -9,6 +9,7 @@ const config: NuxtConfig = {
 
   modules: [
     [MerkalyModule, {
+      baseUrl: process.env.baseUrl,
       GOOGLE_TM: {
         id: process.env.GOOGLE_TM,
         enabled: true

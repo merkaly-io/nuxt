@@ -6,7 +6,7 @@ import * as path from 'path'
 import packageJson from './package.json'
 
 export interface MerkalyParams {
-  baseURL: string
+  baseUrl: string
   AUTH_DOMAIN: string
   AUTH_CLIENT: string
   AUTH_ANONYMOUS: boolean
@@ -20,8 +20,15 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/merkaly')), mode: 'all' })
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/auth0')), mode: 'client' })
+  this.addPlugin({
+    src: require.resolve(path.join(__dirname, '/plugins/merkaly')),
+    mode: 'all',
+    options: {
+      dsn: params.baseUrl,
+      debug: process.env.NODE_ENV !== 'production'
+    }
+  })
 
   const build: NuxtOptionsBuild = this.options.build || []
   const transpile = build.transpile || []
