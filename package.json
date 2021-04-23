@@ -37,7 +37,7 @@
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.0.3",
-    "@sk-merkaly/sdk-js": "^1.0.2",
+    "@sk-merkaly/sdk-js": "^1.0.3",
     "babel-eslint": "^10.1.0",
     "bootstrap-vue": "^2.21.2",
     "chalk": "^4.1.1",
