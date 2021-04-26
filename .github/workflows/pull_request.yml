@@ -3,6 +3,9 @@ name: Master Branch
 on:
   pull_request:
     branches: [ master ]
+env:
+  GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
   build:
