@@ -6,8 +6,6 @@ export * from '@sk-merkaly/sdk-js'
 export * from '@nuxtjs/axios'
 export * from 'vue-sweetalert2'
 export * from '@nuxtjs/auth-next'
-export * from '@types/auth0-js'
-export * from '@types/auth0'
 export * from 'vue-toastification'
 export * from 'bootstrap-vue'
 
