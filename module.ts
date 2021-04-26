@@ -1,8 +1,8 @@
+import * as path from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
-import * as path from 'path'
 import packageJson from './package.json'
 
 export interface MerkalyParams {
