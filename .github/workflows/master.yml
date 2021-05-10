@@ -27,6 +27,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Install NodeGYP
+        run: npm install -g node-gyp
+
       - name: Install dependencies
         run: npm install
 
