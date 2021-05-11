@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install NodeGYP
-        run: npm install -g node-gyp
+        run: npm install node-gyp
 
       - name: Install dependencies
         run: npm install
