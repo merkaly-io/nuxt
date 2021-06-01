@@ -26,7 +26,7 @@
   "dependencies": {
     "@nuxt/types": "^2.15.4",
     "@nuxt/typescript-build": "^2.1.0",
-    "@nuxtjs/auth-next": "^5.0.0-1618898588.9655d0e",
+    "@nuxtjs/auth-next": "^5.0.0-1622309801.87126e3",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/eslint-config": "^6.0.0",
     "@nuxtjs/eslint-config-typescript": "^6.0.0",
@@ -54,6 +54,6 @@
   "devDependencies": {
     "@semantic-release/git": "^9.0.0",
     "eslint-plugin-vue": "^7.9.0",
-    "semantic-release": "^17.4.2"
+    "semantic-release": "^17.4.3"
   }
 }
