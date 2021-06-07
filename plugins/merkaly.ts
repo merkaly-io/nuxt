@@ -1,9 +1,7 @@
 import { Context } from '@nuxt/types'
-import Merkaly from '@sk-merkaly/sdk-js/app'
 
-export default ({ app }: Context, inject: Function) => {
-  const dsn = '<%= options.dsn %>'
-  app.$merkaly = new Merkaly(dsn)
+export default ({ app, $config }: Context, inject: Function) => {
+  app.$merkaly = $config.merkaly
   inject('merkaly', app.$merkaly)
 
   return app.$merkaly

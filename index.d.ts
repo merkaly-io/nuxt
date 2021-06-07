@@ -1,3 +1,4 @@
+import { Merkaly as MerkalySDK } from '@sk-merkaly/sdk-js'
 import Merkaly from './plugins/merkaly'
 
 export * from '@nuxt/types'
@@ -25,6 +26,12 @@ declare module '@nuxt/types' {
   }
 
   interface Context extends MerkalyNuxt {
+  }
+}
+
+declare module '@nuxt/types/config/runtime' {
+  interface NuxtRuntimeConfig {
+    merkaly?: MerkalySDK
   }
 }
 

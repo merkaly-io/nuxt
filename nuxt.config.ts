@@ -1,4 +1,5 @@
 import { NuxtConfig } from '@nuxt/types'
+import { Admin as MerkalySDK } from '@sk-merkaly/sdk-js'
 import MerkalyModule from './module'
 
 const config: NuxtConfig = {
@@ -10,10 +11,8 @@ const config: NuxtConfig = {
   modules: [
     [MerkalyModule, {
       baseUrl: process.env.baseUrl,
-      GOOGLE_TM: {
-        id: process.env.GOOGLE_TM,
-        enabled: true
-      },
+      sdk: new MerkalySDK(String(process.env.baseUrl)),
+      GOOGLE_TM: { id: process.env.GOOGLE_TM, enabled: true },
       SENTRY_DSN: process.env.SENTRY_DSN,
       AUTH_ANONYMOUS: true,
       AUTH_REDIRECT: {
