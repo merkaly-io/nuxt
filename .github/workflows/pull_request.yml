@@ -17,18 +17,10 @@ jobs:
         uses: actions/checkout@master
 
       - name: Setup node env 🏗
-        uses: actions/setup-node@v2.1.4
+        uses: actions/setup-node@v2
 
-      - name: Cache node_modules 📦
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install NodeGYP
-        run: npm install -g node-gyp
+      - name: Add Auth Token to .npmrc file 💢
+        run: echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> .npmrc
 
       - name: Install dependencies
         run: npm install

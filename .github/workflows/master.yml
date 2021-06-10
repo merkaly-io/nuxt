@@ -11,33 +11,26 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@master
-
-      - name: Setup node env 🏗
-        uses: actions/setup-node@v2.1.4
-
-      - name: Cache node_modules 📦
-        uses: actions/cache@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Install NodeGYP
-        run: npm install node-gyp
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build package
-        run: npm run build
-
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: 12
+#
+#      - name: Install dependencies
+#        run: npm ci
+#
+#      - name: Build package
+#        run: npm run build
+#
+#      - name: Release
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
+#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#        run: npx semantic-release
