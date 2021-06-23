@@ -5,7 +5,7 @@
   "main": "./module.js",
   "files": [
     "plugins",
-    "module.ts",
+    "module.*",
     "index.d.ts"
   ],
   "types": "./index.d.ts",
