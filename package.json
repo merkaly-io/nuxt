@@ -42,7 +42,7 @@
     "chalk": "^4.1.1",
     "eslint": "^7.29.0",
     "eslint-plugin-nuxt": "^2.0.0",
-    "nuxt": "^2.15.6",
+    "nuxt": "^2.15.7",
     "nuxt-property-decorator": "^2.9.1",
     "sass": "^1.35.1",
     "sass-loader": "^10.1.1",
