@@ -1,9 +1,9 @@
+import * as path from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
-import { Merkaly as MerkalySDK } from '@sk-merkaly/sdk-js'
+import { SDK as MerkalySDK } from '@merkaly/sdk-js'
 import chalk from 'chalk'
-import * as path from 'path'
 import packageJson from './package.json'
 
 export interface MerkalyParams {
@@ -19,7 +19,7 @@ export interface MerkalyParams {
 const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
-  options.publicRuntimeConfig['merkaly'] = params.sdk
+  // options.publicRuntimeConfig['merkaly'] = params.sdk
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
   this.addPlugin({
@@ -30,7 +30,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []
 
-  transpile.push('@sk-merkaly/sdk-js')
+  transpile.push('@merkaly/sdk-js')
   build.transpile = transpile
 
   this.addModule({ src: '@nuxtjs/pwa', options: {} })

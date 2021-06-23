@@ -1,5 +1,5 @@
 {
-  "name": "@sk-merkaly/nuxt-module",
+  "name": "@merkaly/nuxt-module",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
   "version": "0.0.0",
   "main": "./module.js",
@@ -36,7 +36,7 @@
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.1.0",
-    "@sk-merkaly/sdk-js": "^0.0.2",
+    "@merkaly/sdk-js": "^0.0.3",
     "babel-eslint": "^10.1.0",
     "bootstrap-vue": "^2.21.2",
     "chalk": "^4.1.1",

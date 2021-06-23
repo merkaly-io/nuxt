@@ -1,5 +1,5 @@
 import { NuxtConfig } from '@nuxt/types'
-import { Admin as MerkalySDK } from '@sk-merkaly/sdk-js'
+import { Admin as MerkalySDK } from '@merkaly/sdk-js'
 import MerkalyModule from './module'
 
 const config: NuxtConfig = {
