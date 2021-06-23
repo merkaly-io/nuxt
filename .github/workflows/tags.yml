@@ -21,9 +21,6 @@ jobs:
         with:
           node-version: 12
 
-      - name: Add Auth Token to .npmrc file 💢
-        run: echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> .npmrc
-
       - name: Install dependencies 🛠️
         run: npm install
 
