@@ -19,13 +19,7 @@ export interface MerkalyParams {
 const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
-  // options.publicRuntimeConfig['merkaly'] = params.sdk
-
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({
-    src: require.resolve(path.join(__dirname, '/plugins/merkaly')),
-    mode: 'all'
-  })
 
   const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []

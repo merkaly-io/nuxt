@@ -3,6 +3,11 @@
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
   "version": "0.0.0",
   "main": "./module.js",
+  "files": [
+    "plugins",
+    "module.ts",
+    "index.d.ts"
+  ],
   "types": "./index.d.ts",
   "repository": {
     "type": "git",
@@ -21,7 +26,7 @@
     "prebuild": "tsc -b --clean",
     "build": "tsc -b",
     "prepack": "npm run build",
-    "dev": "npm run build && nuxt",
+    "dev": "nuxt",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "semantic-release": "semantic-release"
   },
@@ -51,7 +56,7 @@
     "vue-toastification": "^1.7.11"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "devDependencies": {
     "@semantic-release/git": "^9.0.0",
