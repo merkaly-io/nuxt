@@ -2,13 +2,11 @@ import * as path from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
-import { SDK as MerkalySDK } from '@merkaly/sdk-js'
 import chalk from 'chalk'
 import packageJson from './package.json'
 
 export interface MerkalyParams {
   baseUrl: string
-  sdk: MerkalySDK
   AUTH_ANONYMOUS: boolean
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
