@@ -1,5 +1,5 @@
 {
-  "name": "@merkaly/nuxt-module",
+  "name": "@merkaly/nuxt",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
   "version": "0.0.0-dev",
   "main": "./module.js",
