@@ -1,6 +1,7 @@
 import { MerkalyParams } from './module'
 
 export * from '@nuxt/types'
+export * from '@types/auth0-lock'
 export * as sentry from '@nuxtjs/sentry'
 export * from '@nuxtjs/axios'
 export * as sweetalert from 'vue-sweetalert2'
