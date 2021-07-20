@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "types": [
       "@types/node",
+      "@merkaly/sdk-js",
       "@nuxt/types",
       "@types/auth0-lock"
     ]

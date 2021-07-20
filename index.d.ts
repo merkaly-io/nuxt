@@ -1,6 +1,8 @@
 import { MerkalyParams } from './module'
 
 export * from '@nuxt/types'
+export * from '@merkaly/api'
+export * from '@types/auth0'
 export * from '@types/auth0-lock'
 export * as sentry from '@nuxtjs/sentry'
 export * from '@nuxtjs/axios'
@@ -30,6 +32,7 @@ declare module '@nuxt/types/config/runtime' {
   interface NuxtRuntimeConfig {
     merkaly?: MerkalyParams
   }
+
   interface NuxtOptionsRuntimeConfig {
     merkaly?: MerkalyParams
   }
