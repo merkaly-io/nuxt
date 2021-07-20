@@ -8,7 +8,9 @@ declare module '@nuxtjs/auth-next' {
 }
 
 export default function ({ $auth, $config: { merkaly } }: Context) {
-  $auth.$lock = new Auth0Lock(merkaly.AUTH_CLIENT_ID, merkaly.AUTH_DOMAIN)
+  if (merkaly?.AUTH_DOMAIN && merkaly.AUTH_DOMAIN) {
+    $auth.$lock = new Auth0Lock(merkaly.AUTH_CLIENT_ID, merkaly.AUTH_DOMAIN)
+  }
 
   return $auth
 }
