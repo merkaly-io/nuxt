@@ -1,7 +1,7 @@
 {
   "name": "@merkaly/nuxt",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "./module.js",
   "files": [
     "plugins",
@@ -31,7 +31,7 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@merkaly/sdk-js": "^0.0.0",
+    "@merkaly/sdk-js": "^0.0.1",
     "@nuxt/types": "^2.15.7",
     "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/auth-next": "^5.0.0-1622918202.e815752",
