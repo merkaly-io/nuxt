@@ -50,21 +50,9 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
       redirect: params.AUTH_REDIRECT || {},
       plugins: authPlugins,
       strategies: {
-        local: {
-          token: {
-            property: 'accessToken',
-            required: true,
-            type: 'Bearer'
-          },
-          user: {
-            property: false,
-            autoFetch: true
-          },
-          endpoints: {
-            login: { baseURL: params.baseUrl, url: '/auth/login', method: 'post' },
-            logout: { baseURL: params.baseUrl, url: '/auth/logout', method: 'post' },
-            user: { baseURL: params.baseUrl, url: '/auth/user', method: 'get' }
-          }
+        auth0: {
+          domain: params.AUTH_DOMAIN,
+          clientId: params.AUTH_CLIENT_ID
         }
       }
     }
