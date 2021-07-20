@@ -8,6 +8,8 @@ import packageJson from './package.json'
 export interface MerkalyParams {
   baseUrl: string
   AUTH_ANONYMOUS: boolean
+  AUTH_DOMAIN: string
+  AUTH_CLIENT_ID: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
   GOOGLE_TM?: Record<string, any>
@@ -16,6 +18,9 @@ export interface MerkalyParams {
 
 const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
+
+  // @ts-ignore
+  options.publicRuntimeConfig.merkaly = params
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
 
@@ -27,14 +32,17 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
   this.addModule({ src: '@nuxtjs/gtm', options: params.GOOGLE_TM })
-  this.addModule({ src: 'vue-toastification/nuxt', options: {} })
-  this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
   this.addModule({ src: '@nuxtjs/sentry', options: { dsn: params.SENTRY_DSN } })
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
+  this.addModule({ src: 'vue-toastification/nuxt', options: {} })
+  this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
 
   const authPlugins = params.AUTH_PLUGINS || []
-  authPlugins.push({ src: require.resolve(path.join(__dirname, '/plugins/sentry')), ssr: false })
+  authPlugins.push(...[
+    { src: require.resolve(path.join(__dirname, '/plugins/sentry')), ssr: false },
+    { src: require.resolve(path.join(__dirname, '/plugins/lock')), ssr: false }
+  ])
 
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),

@@ -10,6 +10,8 @@ const config: NuxtConfig = {
   modules: [
     [MerkalyModule, {
       baseUrl: process.env.baseUrl,
+      AUTH_DOMAIN: process.env.AUTH_DOMAIN,
+      AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
       GOOGLE_TM: { id: process.env.GOOGLE_TM, enabled: true },
       SENTRY_DSN: process.env.SENTRY_DSN,
       AUTH_ANONYMOUS: true,

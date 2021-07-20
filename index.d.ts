@@ -1,3 +1,5 @@
+import { MerkalyParams } from './module'
+
 export * from '@nuxt/types'
 export * as sentry from '@nuxtjs/sentry'
 export * from '@nuxtjs/axios'
@@ -25,6 +27,10 @@ declare module '@nuxt/types' {
 
 declare module '@nuxt/types/config/runtime' {
   interface NuxtRuntimeConfig {
+    merkaly: MerkalyParams
+  }
+  interface NuxtOptionsRuntimeConfig {
+    merkaly: MerkalyParams
   }
 }
 
