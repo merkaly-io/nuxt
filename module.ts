@@ -69,7 +69,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
     options.router.middleware = middleware
   }
-  options.build.corejs = 'auto'
+  options.build.corejs = 3
 
   nuxt.hook('listen', () => {
     options.cli.badgeMessages.push(chalk.underline.redBright('Merklay') + `: @v${packageJson.version}`)
