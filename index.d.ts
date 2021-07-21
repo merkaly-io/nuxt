@@ -2,6 +2,7 @@ import { MerkalyParams } from './module'
 
 export * from '@nuxt/types'
 export * from '@merkaly/api'
+export * from 'http-status-codes'
 export * from '@types/auth0'
 export * from '@types/auth0-lock'
 export * as sentry from '@nuxtjs/sentry'
