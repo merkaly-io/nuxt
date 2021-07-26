@@ -55,7 +55,6 @@
     "nuxt-property-decorator": "^2.9.1",
     "sass": "^1.35.1",
     "sass-loader": "^10.1.1",
-    "typescript": "^4.3.5",
     "vue-sweetalert2": "^5.0.2",
     "vue-toastification": "^1.7.11"
   },
