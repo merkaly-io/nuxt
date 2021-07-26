@@ -28,6 +28,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const transpile = build.transpile || []
 
   transpile.push('@merkaly/sdk-js')
+  transpile.push('@merkaly/api')
   build.transpile = transpile
 
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
