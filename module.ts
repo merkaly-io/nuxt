@@ -1,4 +1,5 @@
 import * as path from 'path'
+import SDK from '@merkaly/sdk-js'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
@@ -20,7 +21,11 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
   // @ts-ignore
-  options.publicRuntimeConfig.merkaly = params
+  const runtimeVars: MerkalyParams = { ...params, ...(options.publicRuntimeConfig.merkaly || {}) }
+  // @ts-ignore
+  options.publicRuntimeConfig.merkaly = runtimeVars
+
+  SDK.setBaseUrl(runtimeVars.baseUrl)
 
   this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
 
@@ -32,14 +37,14 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   build.transpile = transpile
 
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
-  this.addModule({ src: '@nuxtjs/gtm', options: params.GOOGLE_TM })
+  this.addModule({ src: '@nuxtjs/gtm', options: runtimeVars.GOOGLE_TM })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
-  this.addModule({ src: '@nuxtjs/sentry', options: { dsn: params.SENTRY_DSN } })
+  this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
   this.addModule({ src: 'vue-toastification/nuxt', options: {} })
   this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
 
-  const authPlugins = params.AUTH_PLUGINS || []
+  const authPlugins = runtimeVars.AUTH_PLUGINS || []
   authPlugins.push(...[
     { src: require.resolve(path.join(__dirname, '/plugins/sentry')), ssr: false },
     { src: require.resolve(path.join(__dirname, '/plugins/lock')), ssr: false }
@@ -48,18 +53,18 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addModule({
     src: require.resolve('@nuxtjs/auth-next'),
     options: {
-      redirect: params.AUTH_REDIRECT || {},
+      redirect: runtimeVars.AUTH_REDIRECT || {},
       plugins: authPlugins,
       strategies: {
         auth0: {
-          domain: params.AUTH_DOMAIN,
-          clientId: params.AUTH_CLIENT_ID
+          domain: runtimeVars.AUTH_DOMAIN,
+          clientId: runtimeVars.AUTH_CLIENT_ID
         }
       }
     }
   })
 
-  if (!params.AUTH_ANONYMOUS) {
+  if (!runtimeVars.AUTH_ANONYMOUS) {
     let middleware = options.router.middleware || []
 
     if (typeof middleware === 'string') {
