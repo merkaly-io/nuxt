@@ -7,6 +7,10 @@ const config: NuxtConfig = {
 
   buildModules: ['@nuxt/typescript-build'],
 
+  plugins: [
+    '@/plugins/merkaly'
+  ],
+
   modules: [
     [MerkalyModule, {
       baseUrl: process.env.baseUrl,
