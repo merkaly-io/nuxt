@@ -3,6 +3,12 @@ import MerkalyModule from './module'
 
 const config: NuxtConfig = {
 
+  publicRuntimeConfig: {
+    axios: {
+      baseURL: process.env.baseURL
+    }
+  },
+
   target: 'server',
 
   buildModules: ['@nuxt/typescript-build'],
