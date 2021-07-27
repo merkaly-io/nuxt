@@ -19,13 +19,10 @@ jobs:
       - name: Setup node env 🏗️
         uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 14
 
       - name: Install dependencies 🛠️
         run: npm install
-
-      - name: Packing files 📦
-        run: npm pack
 
       - name: Publish new version ✍
         run: npm publish --access public
