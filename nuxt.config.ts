@@ -11,12 +11,6 @@ const config: NuxtConfig = {
 
   target: 'server',
 
-  buildModules: ['@nuxt/typescript-build'],
-
-  plugins: [
-    '@/plugins/merkaly'
-  ],
-
   modules: [
     [MerkalyModule, {
       baseUrl: process.env.baseUrl,

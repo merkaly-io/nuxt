@@ -1,5 +1,4 @@
-import * as path from 'path'
-import SDK from '@merkaly/sdk-js'
+import { join } from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
 import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
@@ -25,10 +24,10 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   // @ts-ignore
   options.publicRuntimeConfig.merkaly = runtimeVars
 
-  SDK.setBaseUrl(runtimeVars.baseUrl)
+  options.buildModules.push('@nuxt/typescript-build')
 
-  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(path.join(__dirname, '/plugins/merkaly')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/merkaly')), mode: 'all' })
 
   const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []
@@ -47,8 +46,8 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
   authPlugins.push(...[
-    { src: require.resolve(path.join(__dirname, '/plugins/sentry')), ssr: false },
-    { src: require.resolve(path.join(__dirname, '/plugins/lock')), ssr: false }
+    { src: require.resolve(join(__dirname, '/plugins/sentry')), ssr: false },
+    { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
   ])
 
   this.addModule({
