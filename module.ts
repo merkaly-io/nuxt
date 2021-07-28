@@ -24,8 +24,6 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   // @ts-ignore
   options.publicRuntimeConfig.merkaly = runtimeVars
 
-  options.buildModules.push('@nuxt/typescript-build')
-
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/merkaly')), mode: 'all' })
 
@@ -36,6 +34,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   transpile.push('@merkaly/api')
   build.transpile = transpile
 
+  this.addModule({ src: '@nuxt/typescript-build' })
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
   this.addModule({ src: '@nuxtjs/gtm', options: runtimeVars.GOOGLE_TM })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
@@ -46,6 +45,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
   authPlugins.push(...[
+    { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
     { src: require.resolve(join(__dirname, '/plugins/sentry')), ssr: false },
     { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
   ])

@@ -31,7 +31,7 @@ declare module '@nuxt/types' {
 
 declare module '@nuxt/types/config/runtime' {
   interface NuxtRuntimeConfig {
-    merkaly?: MerkalyParams
+    merkaly: MerkalyParams
   }
 
   interface NuxtOptionsRuntimeConfig {
