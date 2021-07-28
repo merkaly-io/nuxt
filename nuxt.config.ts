@@ -10,7 +10,7 @@ const config: NuxtConfig = {
       baseUrl: process.env.baseUrl,
       AUTH_DOMAIN: process.env.AUTH_DOMAIN,
       AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
-      GOOGLE_TM: { id: process.env.GOOGLE_TM, enabled: true },
+      TAG_MANAGER_ID: process.env.TAG_MANAGER_ID,
       SENTRY_DSN: process.env.SENTRY_DSN,
       AUTH_ANONYMOUS: true,
       AUTH_REDIRECT: {

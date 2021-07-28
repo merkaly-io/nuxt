@@ -7,12 +7,12 @@ import packageJson from './package.json'
 
 export interface MerkalyParams {
   baseUrl: string
-  AUTH_ANONYMOUS: boolean
   AUTH_DOMAIN: string
   AUTH_CLIENT_ID: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
   AUTH_REDIRECT: Record<string, any>
-  GOOGLE_TM?: Record<string, any>
+  AUTH_ANONYMOUS?: boolean
+  TAG_MANAGER_ID?: string
   SENTRY_DSN?: string
 }
 
@@ -29,8 +29,15 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     // @ts-ignore
     ...options.publicRuntimeConfig.axios
   }
+  // @ts-ignore
+  options.publicRuntimeConfig.gtm = {
+    id: runtimeVars.TAG_MANAGER_ID,
+    // @ts-ignore
+    ...options.publicRuntimeConfig.gtm
+  }
 
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/merkaly')), mode: 'all' })
 
   const build: NuxtOptionsBuild = options.build || []
@@ -42,7 +49,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   this.addModule({ src: '@nuxt/typescript-build' })
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
-  this.addModule({ src: '@nuxtjs/gtm', options: runtimeVars.GOOGLE_TM })
+  this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
   this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
