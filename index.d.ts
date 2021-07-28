@@ -1,3 +1,4 @@
+import { AxiosOptions } from '@nuxtjs/axios'
 import { MerkalyParams } from './module'
 
 export * from '@nuxt/types'
@@ -31,11 +32,12 @@ declare module '@nuxt/types' {
 
 declare module '@nuxt/types/config/runtime' {
   interface NuxtRuntimeConfig {
-    merkaly: MerkalyParams
+    merkaly: MerkalyParams,
   }
 
   interface NuxtOptionsRuntimeConfig {
     merkaly?: MerkalyParams
+    axios?: AxiosOptions
   }
 }
 

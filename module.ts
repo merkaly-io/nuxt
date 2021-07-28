@@ -23,6 +23,12 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   const runtimeVars: MerkalyParams = { ...params, ...(options.publicRuntimeConfig.merkaly || {}) }
   // @ts-ignore
   options.publicRuntimeConfig.merkaly = runtimeVars
+  // @ts-ignore
+  options.publicRuntimeConfig.axios = {
+    baseURL: runtimeVars.baseUrl,
+    // @ts-ignore
+    ...options.publicRuntimeConfig.axios
+  }
 
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/merkaly')), mode: 'all' })
