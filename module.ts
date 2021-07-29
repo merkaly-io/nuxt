@@ -58,6 +58,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
   authPlugins.push(...[
+    { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
     { src: require.resolve(join(__dirname, '/plugins/sentry')), ssr: false },
     { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
   ])
