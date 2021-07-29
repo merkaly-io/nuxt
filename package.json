@@ -41,6 +41,7 @@
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/pwa": "^3.3.5",
+    "@nuxtjs/robots": "^2.5.0",
     "@nuxtjs/sentry": "^5.1.0",
     "@nuxtjs/sitemap": "^2.4.0",
     "@types/auth0-lock": "^11.27.3",
