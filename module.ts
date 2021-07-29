@@ -55,7 +55,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
   this.addModule({ src: 'vue-toastification/nuxt', options: {} })
   this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
-  this.addModule({ src: '@nuxtjs/sitemap', options: {} })
+  this.addModule({ src: '@nuxtjs/sitemap', options: { gzip: true } })
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
   authPlugins.push(...[
@@ -93,13 +93,17 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   nuxt.hook('listen', () => {
     const merkaly = chalk.underline.redBright('Merklay')
-    const arrow = chalk.redBright('>')
+    const arrow = chalk.redBright('->')
 
-    options.cli.badgeMessages.push(`
-      ${merkaly}: @v${packageJson.version}    
-        ${arrow} API: ${runtimeVars.baseUrl}
-        ${arrow} AUTH0: https://${runtimeVars.AUTH_DOMAIN}
-    `)
+    options.cli.badgeMessages.push(`${merkaly}: @v${packageJson.version}`)
+
+    if (runtimeVars.baseUrl) {
+      options.cli.badgeMessages.push(`${arrow} API: ${runtimeVars.baseUrl}`)
+    }
+
+    if (runtimeVars.AUTH_DOMAIN) {
+      options.cli.badgeMessages.push(`${arrow} AUTH0: https://${runtimeVars.AUTH_DOMAIN}`)
+    }
   })
 }
 
