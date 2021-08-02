@@ -38,7 +38,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/merkaly')), mode: 'all' })
+  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/sdk')), mode: 'all' })
 
   const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []
