@@ -5,6 +5,10 @@ const config: NuxtConfig = {
 
   target: 'server',
 
+  plugins: [
+    '@/plugins/merkaly'
+  ],
+
   modules: [
     [MerkalyModule, {
       baseUrl: process.env.baseUrl,
