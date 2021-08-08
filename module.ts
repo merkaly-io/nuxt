@@ -47,11 +47,14 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   transpile.push('@merkaly/api')
   build.transpile = transpile
 
+  if (runtimeVars.SENTRY_DSN) {
+    this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
+  }
+
   this.addModule({ src: '@nuxt/typescript-build' })
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
   this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
-  this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
   this.addModule({ src: 'vue-toastification/nuxt', options: {} })
   this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
@@ -59,37 +62,40 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addModule({ src: '@nuxtjs/robots', options: { sitemap: './sitemap.xml' } })
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
-  authPlugins.push(...[
-    { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
-    { src: require.resolve(join(__dirname, '/plugins/sentry')), ssr: false },
-    { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
-  ])
 
-  this.addModule({
-    src: require.resolve('@nuxtjs/auth-next'),
-    options: {
-      redirect: runtimeVars.AUTH_REDIRECT || {},
-      plugins: authPlugins,
-      strategies: {
-        auth0: {
-          domain: runtimeVars.AUTH_DOMAIN,
-          clientId: runtimeVars.AUTH_CLIENT_ID
+  if (runtimeVars.AUTH_DOMAIN) {
+    authPlugins.push(...[
+      { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
+      { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
+    ])
+
+    this.addModule({
+      src: require.resolve('@nuxtjs/auth-next'),
+      options: {
+        redirect: runtimeVars.AUTH_REDIRECT || {},
+        plugins: authPlugins,
+        strategies: {
+          auth0: {
+            domain: runtimeVars.AUTH_DOMAIN,
+            clientId: runtimeVars.AUTH_CLIENT_ID
+          }
         }
       }
+    })
+
+    if (!runtimeVars.AUTH_ANONYMOUS) {
+      let middleware = options.router.middleware || []
+
+      if (typeof middleware === 'string') {
+        middleware = middleware.split(' ')
+      }
+
+      middleware.push('auth')
+
+      options.router.middleware = middleware
     }
-  })
-
-  if (!runtimeVars.AUTH_ANONYMOUS) {
-    let middleware = options.router.middleware || []
-
-    if (typeof middleware === 'string') {
-      middleware = middleware.split(' ')
-    }
-
-    middleware.push('auth')
-
-    options.router.middleware = middleware
   }
+
   options.build.corejs = 3
 
   nuxt.hook('listen', () => {

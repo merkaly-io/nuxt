@@ -1,6 +1,6 @@
 import { Context } from '@nuxt/types'
 
-export default ({ $auth, $config: { merkaly } }: Context) => {
+export default ({ $auth, $sentry, $config: { merkaly } }: Context) => {
   const options: any = $auth.strategy.options
 
   options.clientId = merkaly.AUTH_CLIENT_ID
@@ -10,5 +10,9 @@ export default ({ $auth, $config: { merkaly } }: Context) => {
     logout: `https://${merkaly.AUTH_DOMAIN}/v2/logout`,
     token: `https://${merkaly.AUTH_DOMAIN}/oauth/token`,
     userInfo: `https://${merkaly.AUTH_DOMAIN}/userinfo`
+  }
+
+  if ($auth.loggedIn) {
+    $sentry.setUser({ email: String($auth.user?.name), id: String($auth.user?.sub) })
   }
 }
