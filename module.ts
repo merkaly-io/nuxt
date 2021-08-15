@@ -53,6 +53,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   }
 
   this.addModule({ src: '@nuxt/typescript-build' })
+  this.addModule({ src: '@nuxtjs/stylelint-module' })
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
   this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
