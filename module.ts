@@ -7,6 +7,7 @@ import packageJson from './package.json'
 
 export interface MerkalyParams {
   baseUrl: string
+  BASE_DOMAIN: string
   AUTH_DOMAIN: string
   AUTH_CLIENT_ID: string
   AUTH_PLUGINS: NuxtOptionsPlugin[]
@@ -59,7 +60,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   this.addModule({ src: 'vue-toastification/nuxt', options: {} })
   this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
   this.addModule({ src: '@nuxtjs/sitemap', options: { gzip: true } })
-  this.addModule({ src: '@nuxtjs/robots', options: { sitemap: './sitemap.xml' } })
+  this.addModule({ src: '@nuxtjs/robots', options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` } })
 
   const authPlugins = runtimeVars.AUTH_PLUGINS || []
 
