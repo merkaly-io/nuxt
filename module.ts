@@ -101,13 +101,17 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   options.build.corejs = 3
 
   nuxt.hook('listen', () => {
-    const merkaly = chalk.underline.redBright('Merklay')
+    const merkaly = chalk.underline.redBright('Merkaly')
     const arrow = chalk.redBright('->')
 
     options.cli.badgeMessages.push(`${merkaly}: @v${packageJson.version}`)
 
     if (runtimeVars.baseUrl) {
       options.cli.badgeMessages.push(`${arrow} API: ${runtimeVars.baseUrl}`)
+    }
+
+    if (runtimeVars.BASE_DOMAIN) {
+      options.cli.badgeMessages.push(`${arrow} DOMAIN: https://${runtimeVars.BASE_DOMAIN}`)
     }
 
     if (runtimeVars.AUTH_DOMAIN) {
