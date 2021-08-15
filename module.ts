@@ -38,7 +38,6 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   }
 
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
   this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/sdk')), mode: 'all' })
 
   const build: NuxtOptionsBuild = options.build || []
@@ -52,20 +51,27 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
   }
 
-  this.addModule({ src: '@nuxt/typescript-build' })
-  this.addModule({ src: '@nuxtjs/stylelint-module' })
+  if (runtimeVars.TAG_MANAGER_ID) {
+    this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
+    this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
+  }
+
+  if (runtimeVars.BASE_DOMAIN) {
+    this.addModule({ src: '@nuxtjs/sitemap', options: { gzip: true } })
+    this.addModule({ src: '@nuxtjs/robots', options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` } })
+  }
+
+  this.addModule({ src: '@nuxt/typescript-build', options: {} })
+  this.addModule({ src: '@nuxtjs/stylelint-module', options: {} })
   this.addModule({ src: '@nuxtjs/pwa', options: {} })
-  this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
   this.addModule({ src: '@nuxtjs/axios', options: {} })
   this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
   this.addModule({ src: 'vue-toastification/nuxt', options: {} })
   this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
-  this.addModule({ src: '@nuxtjs/sitemap', options: { gzip: true } })
-  this.addModule({ src: '@nuxtjs/robots', options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` } })
-
-  const authPlugins = runtimeVars.AUTH_PLUGINS || []
 
   if (runtimeVars.AUTH_DOMAIN) {
+    const authPlugins = runtimeVars.AUTH_PLUGINS || []
+
     authPlugins.push(...[
       { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
       { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }

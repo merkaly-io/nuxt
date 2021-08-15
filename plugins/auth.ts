@@ -12,7 +12,7 @@ export default ({ $auth, $sentry, $config: { merkaly } }: Context) => {
     userInfo: `https://${merkaly.AUTH_DOMAIN}/userinfo`
   }
 
-  if ($auth.loggedIn) {
+  if ($auth.loggedIn && merkaly.SENTRY_DSN) {
     $sentry.setUser({ email: String($auth.user?.name), id: String($auth.user?.sub) })
   }
 }
