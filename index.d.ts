@@ -1,6 +1,7 @@
 import { AxiosOptions } from '@nuxtjs/axios'
 import { MerkalyParams } from './module'
 
+export * from 'vue-meta'
 export * from '@nuxt/types'
 export * from '@merkaly/api'
 export * from '@merkaly/sdk-js'

@@ -1,6 +1,10 @@
 import { Context } from '@nuxt/types'
 
 export default ({ $auth, $sentry, $config: { merkaly } }: Context) => {
+  if (!merkaly) {
+    return
+  }
+
   const options: any = $auth.strategy.options
 
   options.clientId = merkaly.AUTH_CLIENT_ID
