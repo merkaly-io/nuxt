@@ -3,12 +3,14 @@ import { MerkalyParams } from './module'
 
 export * from '@nuxt/types'
 export * from '@merkaly/api'
+export * from '@merkaly/sdk-js'
 export * from 'http-status-codes'
 export * from '@types/auth0'
 export * from '@types/auth0-lock'
 export * as sentry from '@nuxtjs/sentry'
 export * from '@nuxtjs/axios'
-export * as sweetalert from 'vue-sweetalert2'
+export * from 'vue-sweetalert2'
+export * from 'sweetalert2'
 export * from '@nuxtjs/auth-next'
 export * from 'vue-toastification'
 export * from 'bootstrap-vue'
@@ -32,7 +34,7 @@ declare module '@nuxt/types' {
 
 declare module '@nuxt/types/config/runtime' {
   interface NuxtRuntimeConfig {
-    merkaly: MerkalyParams,
+    merkaly?: MerkalyParams,
   }
 
   interface NuxtOptionsRuntimeConfig {
