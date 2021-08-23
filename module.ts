@@ -20,6 +20,8 @@ export interface MerkalyParams {
 const MerkalyModule: Module<MerkalyParams> = function (params) {
   const { nuxt, options } = this
 
+  options.build.transpile?.push('@merkaly/sdk-js')
+
   // @ts-ignore
   const runtimeVars: MerkalyParams = { ...params, ...(options.publicRuntimeConfig.merkaly || {}) }
   // @ts-ignore
@@ -52,8 +54,8 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   }
 
   if (runtimeVars.TAG_MANAGER_ID) {
-    this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
     this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
+    this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
   }
 
   if (runtimeVars.BASE_DOMAIN) {

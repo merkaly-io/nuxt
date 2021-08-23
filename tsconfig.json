@@ -17,7 +17,6 @@
     "types": [
       "@types/node",
       "@merkaly/sdk-js",
-      "@merkaly/api",
       "@nuxt/types",
       "@types/auth0-lock"
     ]

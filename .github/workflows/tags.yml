@@ -1,7 +1,7 @@
 name: Publish NPM Package
 
 env:
-  NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 on:
   push:
@@ -16,13 +16,17 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@master
 
-      - name: Setup node env 🏗️
+      - name: Setup node env 🏗
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 14.x
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies 🛠️
         run: npm install
 
       - name: Publish new version ✍
         run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
