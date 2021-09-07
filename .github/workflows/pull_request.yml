@@ -24,6 +24,7 @@ jobs:
 
       - name: Run linter 👀
         run: npm run lint
+        continue-on-error: true
 
       - name: Run builder ✍
         run: npm run build
