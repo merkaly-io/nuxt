@@ -12,6 +12,6 @@ updates:
   assignees:
     - kronhyx
   commit-message:
-    prefix: fix
+    prefix: chore
     prefix-development: chore
     include: scope
