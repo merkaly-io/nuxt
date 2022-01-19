@@ -74,6 +74,6 @@
   },
   "devDependencies": {
     "@semantic-release/git": "^10.0.0",
-    "semantic-release": "^18.0.0"
+    "semantic-release": "^19.0.2"
   }
 }
