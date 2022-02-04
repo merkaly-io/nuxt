@@ -1,37 +1,23 @@
-import { join } from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
-import { NuxtOptionsPlugin } from '@nuxt/types/config/plugin'
 import chalk from 'chalk'
+import { join } from 'path'
 import packageJson from './package.json'
 
 export interface MerkalyParams {
-  baseUrl: string
   BASE_DOMAIN: string
-  AUTH_DOMAIN: string
-  AUTH_CLIENT_ID: string
-  AUTH_PLUGINS: NuxtOptionsPlugin[]
-  AUTH_REDIRECT: Record<string, any>
-  AUTH_ANONYMOUS?: boolean
   TAG_MANAGER_ID?: string
   SENTRY_DSN?: string
 }
 
-const MerkalyModule: Module<MerkalyParams> = function (params) {
+const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
   const { nuxt, options } = this
-
-  options.build.transpile?.push('@merkaly/sdk-js')
 
   // @ts-ignore
   const runtimeVars: MerkalyParams = { ...params, ...(options.publicRuntimeConfig.merkaly || {}) }
   // @ts-ignore
   options.publicRuntimeConfig.merkaly = runtimeVars
-  // @ts-ignore
-  options.publicRuntimeConfig.axios = {
-    baseURL: runtimeVars.baseUrl,
-    // @ts-ignore
-    ...options.publicRuntimeConfig.axios
-  }
+
   // @ts-ignore
   options.publicRuntimeConfig.gtm = {
     id: runtimeVars.TAG_MANAGER_ID,
@@ -39,8 +25,10 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
     ...options.publicRuntimeConfig.gtm
   }
 
-  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/path')), mode: 'all' })
-  this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/sdk')), mode: 'all' })
+  this.addPlugin({
+    src: require.resolve(join(__dirname, '/plugins/path')),
+    mode: 'all'
+  })
 
   const build: NuxtOptionsBuild = options.build || []
   const transpile = build.transpile || []
@@ -49,62 +37,43 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
   transpile.push('@merkaly/api')
   build.transpile = transpile
 
-  if (runtimeVars.SENTRY_DSN) {
-    this.addModule({ src: '@nuxtjs/sentry', options: { dsn: runtimeVars.SENTRY_DSN } })
-  }
+  this.addModule({
+    src: '@nuxtjs/sentry',
+    options: {
+      dsn: runtimeVars.SENTRY_DSN,
+      disabled: Boolean(runtimeVars.SENTRY_DSN)
+    }
+  })
 
   if (runtimeVars.TAG_MANAGER_ID) {
-    this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')), mode: 'all' })
-    this.addModule({ src: '@nuxtjs/gtm', options: { id: runtimeVars.TAG_MANAGER_ID, respectDoNotTrack: false } })
+    this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')) })
+    this.addModule({
+      src: '@nuxtjs/gtm',
+      options: {
+        id: runtimeVars.TAG_MANAGER_ID,
+        respectDoNotTrack: false
+      }
+    })
   }
 
   if (runtimeVars.BASE_DOMAIN) {
-    this.addModule({ src: '@nuxtjs/sitemap', options: { gzip: true } })
-    this.addModule({ src: '@nuxtjs/robots', options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` } })
-  }
-
-  this.addModule({ src: '@nuxt/typescript-build', options: {} })
-  this.addModule({ src: '@nuxtjs/stylelint-module', options: {} })
-  this.addModule({ src: '@nuxtjs/pwa', options: {} })
-  this.addModule({ src: '@nuxtjs/axios', options: {} })
-  this.addModule({ src: 'bootstrap-vue/nuxt', options: { bootstrapCSS: false, bootstrapVueCSS: true } })
-  this.addModule({ src: 'vue-toastification/nuxt', options: {} })
-  this.addModule({ src: 'vue-sweetalert2/nuxt', options: {} })
-
-  if (runtimeVars.AUTH_DOMAIN) {
-    const authPlugins = runtimeVars.AUTH_PLUGINS || []
-
-    authPlugins.push(...[
-      { src: require.resolve(join(__dirname, '/plugins/auth')), ssr: false },
-      { src: require.resolve(join(__dirname, '/plugins/lock')), ssr: false }
-    ])
-
     this.addModule({
-      src: require.resolve('@nuxtjs/auth-next'),
-      options: {
-        redirect: runtimeVars.AUTH_REDIRECT || {},
-        plugins: authPlugins,
-        strategies: {
-          auth0: {
-            domain: runtimeVars.AUTH_DOMAIN,
-            clientId: runtimeVars.AUTH_CLIENT_ID
-          }
-        }
-      }
+      src: '@nuxtjs/sitemap',
+      options: { gzip: true }
     })
 
-    if (!runtimeVars.AUTH_ANONYMOUS) {
-      let middleware = options.router.middleware || []
-
-      if (typeof middleware === 'string') {
-        middleware = middleware.split(' ')
-      }
-
-      middleware.push('auth')
-
-      options.router.middleware = middleware
-    }
+    this.addModule({
+      src: '@nuxtjs/robots',
+      options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` }
+    })
   }
+
+  this.addModule({ src: '@nuxt/typescript-build' })
+  this.addModule({ src: '@nuxtjs/stylelint-module' })
+  this.addModule({ src: '@nuxtjs/pwa' })
+  this.addModule({ src: '@nuxtjs/axios' })
+  this.addModule({ src: 'vue-toastification/nuxt' })
+  this.addModule({ src: 'vue-sweetalert2/nuxt' })
 
   options.build.corejs = 3
 
@@ -114,16 +83,8 @@ const MerkalyModule: Module<MerkalyParams> = function (params) {
 
     options.cli.badgeMessages.push(`${merkaly}: @v${packageJson.version}`)
 
-    if (runtimeVars.baseUrl) {
-      options.cli.badgeMessages.push(`${arrow} API: ${runtimeVars.baseUrl}`)
-    }
-
     if (runtimeVars.BASE_DOMAIN) {
       options.cli.badgeMessages.push(`${arrow} DOMAIN: https://${runtimeVars.BASE_DOMAIN}`)
-    }
-
-    if (runtimeVars.AUTH_DOMAIN) {
-      options.cli.badgeMessages.push(`${arrow} AUTH0: https://${runtimeVars.AUTH_DOMAIN}`)
     }
   })
 }

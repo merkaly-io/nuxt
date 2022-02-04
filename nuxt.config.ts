@@ -5,25 +5,13 @@ const config: NuxtConfig = {
 
   target: 'server',
 
-  plugins: [
-    '@/plugins/merkaly'
-  ],
+  plugins: [],
 
   modules: [
     [MerkalyModule, {
-      baseUrl: process.env.baseUrl,
       BASE_DOMAIN: process.env.BASE_DOMAIN,
-      AUTH_DOMAIN: process.env.AUTH_DOMAIN,
-      AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
       TAG_MANAGER_ID: process.env.TAG_MANAGER_ID,
-      SENTRY_DSN: process.env.SENTRY_DSN,
-      AUTH_ANONYMOUS: true,
-      AUTH_REDIRECT: {
-        login: '/auth/login',
-        logout: '/auth/logout',
-        callback: '/auth/callback',
-        home: '/'
-      }
+      SENTRY_DSN: process.env.SENTRY_DSN
     }]
   ]
 
