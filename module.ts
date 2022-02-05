@@ -1,8 +1,6 @@
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
-import chalk from 'chalk'
 import { join } from 'path'
-import packageJson from './package.json'
 
 export interface MerkalyParams {
   BASE_DOMAIN: string
@@ -11,16 +9,14 @@ export interface MerkalyParams {
 }
 
 const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
-  const { nuxt, options } = this
-
-  // @ts-ignore
-  const runtimeVars: MerkalyParams = { ...params, ...(options.publicRuntimeConfig.merkaly || {}) }
-  // @ts-ignore
-  options.publicRuntimeConfig.merkaly = runtimeVars
+  const {
+    nuxt,
+    options
+  } = this
 
   // @ts-ignore
   options.publicRuntimeConfig.gtm = {
-    id: runtimeVars.TAG_MANAGER_ID,
+    id: params.TAG_MANAGER_ID,
     // @ts-ignore
     ...options.publicRuntimeConfig.gtm
   }
@@ -40,23 +36,23 @@ const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
   this.addModule({
     src: '@nuxtjs/sentry',
     options: {
-      dsn: runtimeVars.SENTRY_DSN,
-      disabled: Boolean(runtimeVars.SENTRY_DSN)
+      dsn: params.SENTRY_DSN,
+      disabled: Boolean(params.SENTRY_DSN)
     }
   })
 
-  if (runtimeVars.TAG_MANAGER_ID) {
+  if (params.TAG_MANAGER_ID) {
     this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')) })
     this.addModule({
       src: '@nuxtjs/gtm',
       options: {
-        id: runtimeVars.TAG_MANAGER_ID,
+        id: params.TAG_MANAGER_ID,
         respectDoNotTrack: false
       }
     })
   }
 
-  if (runtimeVars.BASE_DOMAIN) {
+  if (params.BASE_DOMAIN) {
     this.addModule({
       src: '@nuxtjs/sitemap',
       options: { gzip: true }
@@ -64,27 +60,22 @@ const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
 
     this.addModule({
       src: '@nuxtjs/robots',
-      options: { sitemap: `https://${runtimeVars.BASE_DOMAIN}/sitemap.xml` }
+      options: { sitemap: `https://${params.BASE_DOMAIN}/sitemap.xml` }
     })
   }
 
   this.addModule({ src: '@nuxt/typescript-build' })
-  this.addModule({ src: '@nuxtjs/stylelint-module' })
+  // this.addModule({ src: '@nuxtjs/stylelint-module' })
   this.addModule({ src: '@nuxtjs/pwa' })
-  this.addModule({ src: '@nuxtjs/axios' })
   this.addModule({ src: 'vue-toastification/nuxt' })
   this.addModule({ src: 'vue-sweetalert2/nuxt' })
 
   options.build.corejs = 3
+  options.build.standalone = true
 
   nuxt.hook('listen', () => {
-    const merkaly = chalk.underline.redBright('Merkaly')
-    const arrow = chalk.redBright('->')
-
-    options.cli.badgeMessages.push(`${merkaly}: @v${packageJson.version}`)
-
-    if (runtimeVars.BASE_DOMAIN) {
-      options.cli.badgeMessages.push(`${arrow} DOMAIN: https://${runtimeVars.BASE_DOMAIN}`)
+    if (params.BASE_DOMAIN) {
+      options.cli.badgeMessages.push(`-> DOMAIN: https://${params.BASE_DOMAIN}`)
     }
   })
 }

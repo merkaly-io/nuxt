@@ -1,12 +1,7 @@
-import { AxiosOptions } from '@nuxtjs/axios'
-import { MerkalyParams } from './module'
-
 export * from 'vue-meta'
 export * from '@nuxt/types'
-export * from '@merkaly/api'
 export * from 'http-status-codes'
 export * as sentry from '@nuxtjs/sentry'
-export * from '@nuxtjs/axios'
 export * from 'vue-sweetalert2'
 export * from 'sweetalert2'
 export * from 'vue-toastification'
@@ -25,17 +20,6 @@ declare module '@nuxt/types' {
   }
 
   interface Context extends MerkalyNuxt {
-  }
-}
-
-declare module '@nuxt/types/config/runtime' {
-  interface NuxtRuntimeConfig {
-    merkaly?: MerkalyParams,
-  }
-
-  interface NuxtOptionsRuntimeConfig {
-    merkaly?: MerkalyParams
-    axios?: AxiosOptions
   }
 }
 
