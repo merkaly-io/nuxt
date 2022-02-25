@@ -55,7 +55,7 @@
     "sass": "^1.35.1",
     "sass-loader": "^10.1.1",
     "stylelint": "^14.1.0",
-    "stylelint-config-standard": "^24.0.0",
+    "stylelint-config-standard": "^25.0.0",
     "vue-sweetalert2": "^5.0.2",
     "vue-toastification": "^1.7.11"
   },
