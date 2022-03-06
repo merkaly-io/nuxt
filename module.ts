@@ -74,7 +74,7 @@ const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
   this.addModule({
     src: '@nuxtjs/stylelint-module',
     options: {
-      configFile: './stylelint.config.js',
+      configFile: './.nuxt/stylelint.config.js',
       fix: true
     }
   })
