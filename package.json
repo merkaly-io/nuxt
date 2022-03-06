@@ -6,6 +6,7 @@
   "files": [
     "plugins",
     "module.*",
+    "stylelint.config.js",
     "index.d.ts"
   ],
   "types": "./index.d.ts",
