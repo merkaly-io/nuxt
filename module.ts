@@ -1,6 +1,6 @@
+import { join, resolve } from 'path'
 import { Module } from '@nuxt/types'
 import { NuxtOptionsBuild } from '@nuxt/types/config/build'
-import { join } from 'path'
 
 export interface MerkalyParams {
   BASE_DOMAIN: string
@@ -65,7 +65,19 @@ const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
   }
 
   this.addModule({ src: '@nuxt/typescript-build' })
-  // this.addModule({ src: '@nuxtjs/stylelint-module' })
+
+  this.addTemplate({
+    src: resolve(__dirname, './stylelint.config.js'),
+    filename: './stylelint.config.js'
+  })
+
+  this.addModule({
+    src: '@nuxtjs/stylelint-module',
+    options: {
+      configFile: './stylelint.config.js',
+      fix: true
+    }
+  })
   this.addModule({ src: '@nuxtjs/pwa' })
   this.addModule({ src: 'vue-toastification/nuxt' })
   this.addModule({ src: 'vue-sweetalert2/nuxt' })

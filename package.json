@@ -56,8 +56,11 @@
     "sass-loader": "^10.1.1",
     "stylelint": "^14.1.0",
     "stylelint-config-standard": "^25.0.0",
+    "vue": "^2.6",
     "vue-sweetalert2": "^5.0.2",
-    "vue-toastification": "^1.7.11"
+    "vue-toastification": "^1.7.11",
+    "vuex": "^3",
+    "webpack": "^4.36.0"
   },
   "publishConfig": {
     "access": "public"
@@ -67,6 +70,8 @@
   },
   "devDependencies": {
     "@semantic-release/git": "^10.0.0",
+    "consola": "*",
+    "eslint-plugin-import": "*",
     "semantic-release": "^19.0.2"
   }
 }
