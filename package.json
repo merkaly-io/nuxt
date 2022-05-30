@@ -5,9 +5,10 @@
   "main": "./index.ts",
   "files": [
     "plugins",
-    "module.*",
+    "nuxt.*",
     "stylelint.config.js",
-    "index.d.ts"
+    "index.*",
+    "!nuxt.config.ts"
   ],
   "types": "./index.d.ts",
   "repository": {
@@ -26,11 +27,11 @@
   "scripts": {
     "prebuild": "tsc -b --clean",
     "build": "tsc -b",
-    "prepack": "npm run build",
+    "prepack": "yarn build",
     "dev": "nuxt",
     "lint:js": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:style": "stylelint ./**/*.{vue,css} --ignore-path .gitignore",
-    "lint": "npm run lint:js && npm run lint:style",
+    "lint": "yarn run lint:js && yarn run lint:style",
     "semantic-release": "semantic-release"
   },
   "dependencies": {
