@@ -1,0 +1,1 @@
+export { MerkalyNuxt } from './nuxt'

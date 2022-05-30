@@ -1,5 +1,5 @@
-import { NuxtConfig } from '@nuxt/types'
-import MerkalyModule from './module'
+import { NuxtConfig } from '@nuxt/types/config'
+import { MerkalyNuxt } from './nuxt'
 
 const config: NuxtConfig = {
 
@@ -8,7 +8,7 @@ const config: NuxtConfig = {
   plugins: [],
 
   modules: [
-    [MerkalyModule, {
+    [MerkalyNuxt, {
       BASE_DOMAIN: process.env.BASE_DOMAIN,
       TAG_MANAGER_ID: process.env.TAG_MANAGER_ID,
       SENTRY_DSN: process.env.SENTRY_DSN

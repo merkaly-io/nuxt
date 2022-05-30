@@ -8,7 +8,7 @@ export interface MerkalyParams {
   SENTRY_DSN?: string
 }
 
-const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
+export const MerkalyNuxt: Module<MerkalyParams> = function (params: MerkalyParams) {
   const {
     nuxt,
     options
@@ -91,5 +91,3 @@ const MerkalyModule: Module<MerkalyParams> = function (params: MerkalyParams) {
     }
   })
 }
-
-export default MerkalyModule
