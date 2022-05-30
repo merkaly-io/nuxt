@@ -2,7 +2,7 @@
   "name": "@merkaly/nuxt",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
   "version": "0.1.2-5",
-  "main": "./index.ts",
+  "main": "./index.js",
   "types": "./index.d.ts",
   "repository": {
     "type": "git",

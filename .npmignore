@@ -127,3 +127,4 @@ tsconfig.json
 nuxt.config.ts
 
 **/*.js
+!stylelint.config.js
