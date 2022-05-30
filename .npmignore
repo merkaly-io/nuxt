@@ -120,6 +120,7 @@ dist
 .pnp.*
 
 .idea
+.nuxt
 .github
 .releaserc.json
 .eslintrc.js
