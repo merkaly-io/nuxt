@@ -1,7 +1,7 @@
 {
   "name": "@merkaly/nuxt",
   "description": "A nuxt module to encapsulating all the necessary components and plugins",
-  "version": "0.1.2",
+  "version": "0.1.3-0",
   "main": "./index.js",
   "types": "./index.d.ts",
   "repository": {
