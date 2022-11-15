@@ -120,10 +120,8 @@ dist
 .pnp.*
 
 .idea
-.nuxt
 .github
 .releaserc.json
-.eslintrc.js
 tsconfig.json
 nuxt.config.ts
 

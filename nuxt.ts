@@ -1,93 +1,66 @@
-import { join, resolve } from 'path'
-import { Module } from '@nuxt/types'
-import { NuxtOptionsBuild } from '@nuxt/types/config/build'
+import { NuxtConfig } from '@nuxt/types/config'
 
-export interface MerkalyParams {
-  BASE_DOMAIN: string
-  TAG_MANAGER_ID?: string
-  SENTRY_DSN?: string
-}
+export function defineConfig (config: NuxtConfig): NuxtConfig {
+  return {
+    ...config,
+    // Global page headers: https://go.nuxtjs.dev/config-head
+    head: {
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { hid: 'description', name: 'description', content: '' },
+        { name: 'format-detection', content: 'telephone=no' }
+      ]
+    },
 
-export const MerkalyNuxt: Module<MerkalyParams> = function (params: MerkalyParams) {
-  const {
-    nuxt,
-    options
-  } = this
+    // Global CSS: https://go.nuxtjs.dev/config-css
+    css: [],
 
-  // @ts-ignore
-  options.publicRuntimeConfig.gtm = {
-    id: params.TAG_MANAGER_ID,
-    // @ts-ignore
-    ...options.publicRuntimeConfig.gtm
-  }
+    // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
+    plugins: [],
 
-  this.addPlugin({
-    src: require.resolve(join(__dirname, '/plugins/path')),
-    mode: 'all'
-  })
+    // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
+    buildModules: [
+      // https://go.nuxtjs.dev/typescript
+      ['@nuxt/typescript-build', {}],
+      // https://go.nuxtjs.dev/stylelint
+      ['@nuxtjs/stylelint-module', {}]
+    ],
 
-  const build: NuxtOptionsBuild = options.build || []
-  const transpile = build.transpile || []
+    // Modules: https://go.nuxtjs.dev/config-modules
+    modules: [
+      // https://axios.nuxtjs.org/
+      ['@nuxtjs/axios', {}],
+      // https://pwa.nuxtjs.org/
+      ['@nuxtjs/pwa', {}],
+      // https://content.nuxtjs.org/
+      ['@nuxt/content', {}],
+      // https://sentry.nuxtjs.org/
+      ['@nuxtjs/sentry', { disabled: Boolean(!process.env.SENTRY_DSN) }]
+    ],
 
-  transpile.push('@merkaly/sdk-js')
-  transpile.push('@merkaly/api')
-  build.transpile = transpile
+    // Axios module configuration: https://go.nuxtjs.dev/config-axios
+    axios: {
+      // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
+      baseURL: '/'
+    },
 
-  this.addModule({
-    src: '@nuxtjs/sentry',
-    options: {
-      dsn: params.SENTRY_DSN,
-      disabled: Boolean(params.SENTRY_DSN)
-    }
-  })
-
-  if (params.TAG_MANAGER_ID) {
-    this.addPlugin({ src: require.resolve(join(__dirname, '/plugins/gtm')) })
-    this.addModule({
-      src: '@nuxtjs/gtm',
-      options: {
-        id: params.TAG_MANAGER_ID,
-        respectDoNotTrack: false
+    // PWA module configuration: https://go.nuxtjs.dev/pwa
+    pwa: {
+      manifest: {
+        lang: 'en'
       }
-    })
-  }
+    },
 
-  if (params.BASE_DOMAIN) {
-    this.addModule({
-      src: '@nuxtjs/sitemap',
-      options: { gzip: true }
-    })
+    // Content module configuration: https://go.nuxtjs.dev/config-content
+    content: {},
 
-    this.addModule({
-      src: '@nuxtjs/robots',
-      options: { sitemap: `https://${params.BASE_DOMAIN}/sitemap.xml` }
-    })
-  }
-
-  this.addModule({ src: '@nuxt/typescript-build' })
-
-  this.addTemplate({
-    src: resolve(__dirname, './stylelint.config.js'),
-    filename: './stylelint.config.js'
-  })
-
-  this.addModule({
-    src: resolve(__dirname, 'node_modules/@nuxtjs/stylelint-module'),
-    options: {
-      configFile: './.nuxt/stylelint.config.js',
-      fix: true
+    // Build Configuration: https://go.nuxtjs.dev/config-build
+    build: {
+      standalone: true,
+      babel: {
+        compact: true
+      }
     }
-  })
-  this.addModule({ src: '@nuxtjs/pwa' })
-  this.addModule({ src: 'vue-toastification/nuxt' })
-  this.addModule({ src: 'vue-sweetalert2/nuxt' })
-
-  options.build.corejs = 3
-  options.build.standalone = true
-
-  nuxt.hook('listen', () => {
-    if (params.BASE_DOMAIN) {
-      options.cli.badgeMessages.push(`-> DOMAIN: https://${params.BASE_DOMAIN}`)
-    }
-  })
+  }
 }

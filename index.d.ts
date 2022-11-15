@@ -1,5 +1,4 @@
 interface Merkaly {
-  $path (name: String, params?: Record<string, any>): Object
 }
 
 declare module 'vue/types/vue' {
@@ -15,9 +14,9 @@ declare module '@nuxt/types' {
   }
 }
 
-export { MerkalyNuxt } from './nuxt'
 export * from 'vue-meta'
 export * from '@nuxt/types'
+export * from '@nuxtjs/content'
 export * from 'http-status-codes'
 export * as sentry from '@nuxtjs/sentry'
 export * as VueSweetAlert2 from 'vue-sweetalert2'
