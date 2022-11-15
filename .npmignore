@@ -122,7 +122,6 @@ dist
 .idea
 .github
 .releaserc.json
-tsconfig.json
 nuxt.config.ts
 
 **/*.js
