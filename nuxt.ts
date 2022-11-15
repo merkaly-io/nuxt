@@ -1,8 +1,8 @@
 import { NuxtConfig } from '@nuxt/types/config'
+import merge from 'lodash.merge'
 
 export function defineConfig (config: NuxtConfig): NuxtConfig {
-  return {
-    ...config,
+  const main = {
     // Global page headers: https://go.nuxtjs.dev/config-head
     head: {
       meta: [
@@ -63,4 +63,6 @@ export function defineConfig (config: NuxtConfig): NuxtConfig {
       }
     }
   }
+
+  return merge(config, main)
 }
