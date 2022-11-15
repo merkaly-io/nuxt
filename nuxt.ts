@@ -1,6 +1,4 @@
 import { NuxtConfig } from '@nuxt/types/config'
-// eslint-disable-next-line import/named
-import { merge } from 'lodash'
 
 export const defineConfig = (extendedConfig: NuxtConfig): NuxtConfig => {
   const mainConfig: NuxtConfig = ({
@@ -34,10 +32,10 @@ export const defineConfig = (extendedConfig: NuxtConfig): NuxtConfig => {
 
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [
-      // https://axios.nuxtjs.org/
-      ['@nuxtjs/axios', {}],
       // https://pwa.nuxtjs.org/
       ['@nuxtjs/pwa', {}],
+      // https://axios.nuxtjs.org/
+      ['@nuxtjs/axios', {}],
       // https://content.nuxtjs.org/
       ['@nuxt/content', {}],
       // https://sentry.nuxtjs.org/
@@ -73,5 +71,9 @@ export const defineConfig = (extendedConfig: NuxtConfig): NuxtConfig => {
     }
   })
 
-  return merge<NuxtConfig, NuxtConfig>(mainConfig, extendedConfig)
+  mainConfig.head = { ...extendedConfig.head, ...mainConfig.head }
+  extendedConfig.modules && mainConfig.modules?.push(...extendedConfig.modules)
+  extendedConfig.buildModules && mainConfig.buildModules?.push(...extendedConfig.buildModules)
+
+  return mainConfig
 }
