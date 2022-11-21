@@ -42,7 +42,7 @@
     "@nuxtjs/gtm": "^2.4.0",
     "@nuxtjs/moment": "^1.6.1",
     "@nuxtjs/pwa": "^3.3.5",
-    "@nuxtjs/robots": "^2.5.0",
+    "@nuxtjs/robots": "^3.0.0",
     "@nuxtjs/sentry": "^5.1.0",
     "@nuxtjs/sitemap": "^2.4.0",
     "@nuxtjs/stylelint-module": "^4.0.0",
