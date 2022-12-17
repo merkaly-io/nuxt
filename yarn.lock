@@ -2616,9 +2616,9 @@
     h3 "^1.0.1"
 
 "@nuxtjs/sentry@^6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@nuxtjs/sentry/-/sentry-6.0.1.tgz#5a1c804696ed61bce91ad68f8003a5f18308c05a"
-  integrity sha512-mvkzwYpRz6KzyrlR9QC7380xjAUGfBDI58QOSrv4BawZUHDcCH3TIbJBtcq6PEfczm5cbG1xG+K4MR401bNt9A==
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/sentry/-/sentry-6.0.3.tgz#c36e6cbcbd7c3d7a7cd6f15c543fa61031607aff"
+  integrity sha512-udGb1PWAzrZCe4jsb4KbUpvnvGLoOJkZUJ9UPsNdjOggRjLuJ0BZT04eA3DID3RC9M/a672O5vMm0/Ckm9yVYA==
   dependencies:
     "@sentry/browser" "^6.19.7"
     "@sentry/integrations" "^6.19.7"
