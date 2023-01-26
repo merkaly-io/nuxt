@@ -43,7 +43,7 @@
     "@nuxtjs/moment": "^1.6.1",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/robots": "^3.0.0",
-    "@nuxtjs/sentry": "^6.0.1",
+    "@nuxtjs/sentry": "^7.0.3",
     "@nuxtjs/sitemap": "^2.4.0",
     "@nuxtjs/stylelint-module": "^4.0.0",
     "babel-eslint": "^10.1.0",
