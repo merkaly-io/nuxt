@@ -21,7 +21,6 @@
       "@nuxtjs/auth-next",
       "@nuxtjs/moment",
       "@nuxtjs/sentry",
-      "@types/auth0",
       "nuxt-property-decorator",
       "@nuxt/types"
     ]
