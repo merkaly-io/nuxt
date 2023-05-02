@@ -29,8 +29,6 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@merkaly/api": "^0.2.2-32",
-    "@merkaly/components": "^0.0.6-13",
     "@nuxt/content": "^2.2.2",
     "@nuxt/types": "^2.15.8",
     "@nuxt/typescript-build": "^2.1.0",
@@ -72,7 +70,7 @@
     "@types/lodash": "^4.14.189"
   },
   "engines": {
-    "node": "16"
+    "node": "^16"
   },
   "publishConfig": {
     "access": "public"
