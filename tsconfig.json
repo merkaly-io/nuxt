@@ -17,7 +17,6 @@
     "types": [
       "@types/node",
       "@types/lodash",
-      "@elastic/elasticsearch",
       "@nuxtjs/axios",
       "@nuxtjs/auth-next",
       "@nuxtjs/moment",
