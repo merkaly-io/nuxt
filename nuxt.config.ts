@@ -1,5 +1,10 @@
-import { defineConfig } from './nuxt'
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  compatibilityDate: '2025-05-29',
 
-export default defineConfig({
-  target: 'server'
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  modules: ['@nuxt/eslint'],
 })

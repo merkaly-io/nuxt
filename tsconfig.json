@@ -1,33 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
-    "baseUrl": "./",
-    "strict": true,
-    "esModuleInterop": true,
-    "strictPropertyInitialization": false,
-    "noImplicitAny": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
-    "removeComments": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "types": [
-      "@types/node",
-      "@types/lodash",
-      "@nuxtjs/axios",
-      "@nuxtjs/auth-next",
-      "@nuxtjs/moment",
-      "@nuxtjs/sentry",
-      "nuxt-property-decorator",
-      "@nuxt/types"
-    ]
-  },
+  "extends": "./.nuxt/tsconfig.json",
   "exclude": [
-    "nuxt.config.ts",
-    "index.ts",
-    ".nuxt"
+    "dist",
+    "node_modules",
+    "playground"
   ]
 }
