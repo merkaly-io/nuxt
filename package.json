@@ -48,7 +48,7 @@
     "eslint": "^9.27.0",
     "nuxt": "npm:nuxt-nightly",
     "typescript": "~5.8.3",
-    "vitest": "^3.1.4",
+    "vitest": "^3.2.4",
     "vue-tsc": "^2.2.10"
   }
 }
