@@ -45,7 +45,7 @@
     "@nuxt/test-utils": "^3.19.1",
     "@types/node": "latest",
     "changelogen": "^0.6.1",
-    "eslint": "^9.27.0",
+    "eslint": "^9.34.0",
     "nuxt": "npm:nuxt-nightly",
     "typescript": "~5.8.3",
     "vitest": "^3.1.4",
