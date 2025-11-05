@@ -1,15 +1,9 @@
-<script lang="ts" setup>
-import { useApi } from '../src/runtime/composables/useApi.js'
-
-const { data, loading, execute } = useApi<unknown[]>('https://jsonplaceholder.typicode.com/posts')
-</script>
+<script setup />
 
 <template>
-  <div>
-    <pre v-text="{ data: data.length, loading }" />
+  <main>
+    <h1>Nuxt module playground!</h1>
 
-    <button @click="execute">
-      <span>Fetch Posts</span>
-    </button>
-  </div>
+    <NuxtPage />
+  </main>
 </template>
