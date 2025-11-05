@@ -33,5 +33,5 @@ jobs:
       #      - name: Run tests 🧪
       #        run: pnpm test
 
-      - name: Build code 🛠️
-        run: pnpm build
+      - name: Prepack code 🛠️
+        run: pnpm prepack
