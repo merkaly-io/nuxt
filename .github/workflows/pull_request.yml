@@ -2,9 +2,9 @@ name: PullRequest & Push master
 
 on:
   push:
-    branches: [ master, release ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, release ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Setup node env 🏗
         uses: actions/setup-node@v2
@@ -26,12 +26,12 @@ jobs:
       - name: Install dependencies 🛠️
         run: pnpm install
 
+      - name: Run Prepare 🛠️
+        run: pnpm dev:prepare
+
       - name: Lint code 👀️
         run: pnpm lint
         continue-on-error: true
 
-      #      - name: Run tests 🧪
-      #        run: pnpm test
-
-      - name: Prepack code 🛠️
+      - name: Prepack code 🧪
         run: pnpm prepack
