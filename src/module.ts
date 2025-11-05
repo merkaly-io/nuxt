@@ -1,23 +1,28 @@
-import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit';
+import { defineNuxtModule, addPlugin, addImportsDir, createResolver } from '@nuxt/kit';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 
-// Module options TypeScript interface definition
 export interface MerkalyModuleOptions {
   auth0: {
-    client: string;
-    domain: string;
-    callback: string;
+    client: string
+    domain: string
+    callback: string
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
   };
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
-  defaults: {},
-  // Default configuration options of the Nuxt module
   meta: {
-    compatibility: { nuxt: '>=3.0.0' },
-    configKey: 'merkaly',
     name: '@merkaly/nuxt',
+    configKey: 'merkaly',
+    compatibility: { nuxt: '>=3.0.0' },
+  },
+
+  defaults: {
+    auth0: {
+      client: '',
+      domain: '',
+      callback: '/callback',
+    },
   },
 
   moduleDependencies: {
@@ -30,17 +35,29 @@ export default defineNuxtModule<MerkalyModuleOptions>({
   },
 
   setup(options, nuxt) {
-    // Guardar las opciones del módulo dentro del runtimeConfig
+    const resolver = createResolver(import.meta.url);
+
+    /**
+     * 🧩 1. Merge de configuración en runtimeConfig
+     *    (esto permite acceder desde el plugin via useRuntimeConfig().public.merkaly)
+     */
     nuxt.options.runtimeConfig.public.merkaly = {
       ...(nuxt.options.runtimeConfig.public.merkaly || {}),
       ...options,
     };
 
-    const resolver = createResolver(import.meta.url);
+    /**
+     * 🧩 2. Plugins
+     *    Usa addPlugin({ src, mode }) en lugar de addPlugin(src)
+     *    porque es más explícito y mantiene tipado correcto.
+     */
+    addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
 
-    // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve('./runtime/plugins/auth0.client'));
+    addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
 
+    /**
+     * 🧩 3. Composables (auto-imports)
+     */
     addImportsDir(resolver.resolve('./runtime/composables'));
   },
 });
