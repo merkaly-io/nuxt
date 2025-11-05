@@ -30,8 +30,8 @@ jobs:
         run: pnpm lint
         continue-on-error: true
 
-      #      - name: Run tests 🧪
-      #        run: pnpm test
+     - name: Run Build 🛠️
+       run: pnpm dev:prepare
 
-      - name: Prepack code 🛠️
+      - name: Prepack code 🧪
         run: pnpm prepack
