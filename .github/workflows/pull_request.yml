@@ -26,12 +26,12 @@ jobs:
       - name: Install dependencies 🛠️
         run: pnpm install
 
+      - name: Run Prepare 🛠️
+        run: pnpm dev:prepare
+
       - name: Lint code 👀️
         run: pnpm lint
         continue-on-error: true
-
-      - name: Run Build 🛠️
-        run: pnpm dev:prepare
 
       - name: Prepack code 🧪
         run: pnpm prepack
