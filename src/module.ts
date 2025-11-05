@@ -12,6 +12,17 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     configKey: 'merkaly',
     name: '@merkaly/nuxt',
   },
+
+  moduleDependencies: {
+    '@bootstrap-vue-next/nuxt': {},
+    '@nuxt/eslint': {},
+    '@nuxt/fonts': {},
+    '@nuxt/image': {},
+    '@nuxtjs/plausible': {},
+    '@pinia/nuxt': {},
+    '@vueuse/nuxt': {},
+  },
+
   setup(_options, _nuxt) {
     const resolver = createResolver(import.meta.url);
 

@@ -3,5 +3,5 @@
 </script>
 
 <template>
-  <div>la page</div>
+  <BButton>Page 1</BButton>
 </template>
