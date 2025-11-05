@@ -1,8 +1,14 @@
 import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
+import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 
 // Module options TypeScript interface definition
 export interface MerkalyModuleOptions {
-  auth0ClientId?: string;
+  auth0: {
+    client: string;
+    domain: string;
+    callback: string;
+    params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
+  };
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
@@ -23,10 +29,16 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     '@vueuse/nuxt': {},
   },
 
-  setup(_options, _nuxt) {
+  setup(options, nuxt) {
+    // Guardar las opciones del módulo dentro del runtimeConfig
+    nuxt.options.runtimeConfig.public.merkaly = {
+      ...(nuxt.options.runtimeConfig.public.merkaly || {}),
+      ...options,
+    };
+
     const resolver = createResolver(import.meta.url);
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve('./runtime/plugin'));
+    addPlugin(resolver.resolve('./runtime/plugins/auth0.client'));
   },
 });

@@ -4,7 +4,14 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
-  merkaly: {},
-
   modules: ['../src/module'],
+
+  merkaly: {
+    auth0: {
+      client: 'randomAuth0Client',
+      domain: 'randomAuth0Domain',
+      callback: '/auth',
+      params: {},
+    },
+  },
 });
