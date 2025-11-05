@@ -1,12 +1,10 @@
-name: Pull Request to Master
+name: PullRequest & Push master
 
 on:
+  push:
+    branches: [ master, release ]
   pull_request:
-    branches: [ master ]
-
-env:
-  GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    branches: [ master, release ]
 
 jobs:
   build:
@@ -19,14 +17,21 @@ jobs:
       - name: Setup node env 🏗
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 22
 
-      - name: Install dependencies
-        run: yarn
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
-      - name: Run linter 👀
-        run: yarn run lint
+      - name: Install dependencies 🛠️
+        run: pnpm install
+
+      - name: Lint code 👀️
+        run: pnpm lint
         continue-on-error: true
 
-      - name: Run builder ✍
-        run: yarn build
+      #      - name: Run tests 🧪
+      #        run: pnpm test
+
+      - name: Build code 🛠️
+        run: pnpm build
