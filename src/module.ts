@@ -1,4 +1,4 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
+import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 
 // Module options TypeScript interface definition
@@ -40,5 +40,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
     addPlugin(resolver.resolve('./runtime/plugins/auth0.client'));
+
+    addImportsDir(resolver.resolve('./runtime/composables'));
   },
 });
