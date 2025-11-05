@@ -2,6 +2,7 @@ import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
 
 // Module options TypeScript interface definition
 export interface MerkalyModuleOptions {
+  auth0ClientId?: string;
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
@@ -19,7 +20,6 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     '@nuxt/fonts': {},
     '@nuxt/image': {},
     '@nuxtjs/plausible': {},
-    '@pinia/nuxt': {},
     '@vueuse/nuxt': {},
   },
 
