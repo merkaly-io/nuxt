@@ -2,7 +2,6 @@
 const { $api } = useNuxtApp();
 
 function log() {
-  console.log('$api', $api);
   return $api();
 }
 </script>

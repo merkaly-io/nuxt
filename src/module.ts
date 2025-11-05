@@ -8,6 +8,8 @@ export interface MerkalyModuleOptions {
     callback: string
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
   };
+  baseUrl: string;
+  baseUrlPrefix: string;
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
@@ -23,6 +25,8 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       domain: '',
       callback: '/callback',
     },
+    baseUrl: '/',
+    baseUrlPrefix: '/',
   },
 
   moduleDependencies: {
