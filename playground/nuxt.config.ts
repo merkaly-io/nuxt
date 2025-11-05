@@ -8,9 +8,9 @@ export default defineNuxtConfig({
 
   merkaly: {
     auth0: {
-      client: 'randomAuth0Client',
-      domain: 'randomAuth0Domain',
       callback: '/auth',
+      client: process.env.AUTH0_CLIENT,
+      domain: process.env.AUTH0_DOMAIN,
       params: {},
     },
   },
