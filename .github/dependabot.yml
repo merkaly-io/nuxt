@@ -1,17 +1,15 @@
 version: 2
 updates:
-# Fetch and update latest `npm` packages
-- package-ecosystem: npm
-  directory: '/'
-  schedule:
-    interval: daily
-    time: '00:00'
-  open-pull-requests-limit: 3
-  reviewers:
-    - kronhyx
-  assignees:
-    - kronhyx
-  commit-message:
-    prefix: chore
-    prefix-development: chore
-    include: scope
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    versioning-strategy: "increase"
+    target-branch: "master"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-patch" ]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
