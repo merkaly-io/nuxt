@@ -1,42 +1,43 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app';
-import type { TypedHeaders } from 'h3';
+import type { FetchOptions, FetchResponse } from 'ofetch';
 
-interface ResponseError extends Error {
-  error: string,
-  statusCode: number
-}
+type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
+type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
+type OnSuccessArgs = { data: unknown, meta: Record<string, unknown>, headers: FetchOptions['headers'] }
+type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
-interface InvokeOptions {
-  body?: RequestInit['body'];
+export interface ApiOptions {
+  body?: FetchOptions['body'];
 
-  headers?: RequestInit['headers'];
+  headers?: FetchOptions['headers'];
 
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-  timeout?: number;
+  query?: FetchOptions['query'];
 
-  onBeforeSend?(): void;
+  timeout?: FetchOptions['timeout'];
 
-  onComplete?(): void;
+  onBeforeSend?(args: OnBeforeSendArgs): Promise<void> | void;
 
-  onError?(reason: ResponseError, headers: TypedHeaders): void;
+  onComplete?(args: OnCompleteArgs): Promise<void> | void;
 
-  onFatal?(reason: ResponseError, headers: TypedHeaders): void;
+  onError?(reason: Error): Promise<void> | void;
 
-  onResponse?(): void;
+  onFatal?(reason: Error): Promise<void> | void;
 
-  onSuccess?(args: { data: unknown, headers: TypedHeaders, meta: unknown, params: unknown }): void;
+  onResponse?(args: OnResponseArgs): Promise<void> | void;
+
+  onSuccess?(args: OnSuccessArgs): Promise<void> | void;
 }
 
-export default defineNuxtPlugin(async (nuxtApp) => {
-  nuxtApp.provide('api', invoke);
-});
-
-async function invoke(options?: InvokeOptions) {
+export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
 
-  return $fetch('/aaael', {
-    baseURL: new URL($config.merkaly.baseUrlPrefix, $config.merkaly.baseUrl).toString(), // Determine the base URL
+  const controller = new AbortController();
+
+  return $fetch(url, {
+    // Determine the base URL
+    baseURL: new URL($config.merkaly.baseUrlPrefix, $config.merkaly.baseUrl).href,
 
     body: options?.body,
 
@@ -44,22 +45,47 @@ async function invoke(options?: InvokeOptions) {
 
     method: options?.method,
 
-    onRequest: () => {
+    onRequest: async () => {
+      const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
+        .then((res) => res)
+        .catch(() => false); // si lanza excepción, tratamos como false
 
+      if (result === false) {
+        controller.abort('Request aborted by onBeforeSend');
+      }
     },
 
-    onRequestError: async () => {
+    onRequestError: async ({ error, response, request }) => {
+      await options.onFatal?.(error);
+      await options?.onComplete?.({ response, request });
     },
 
-    onResponse: async () => {
+    onResponse: async ({ response, request }) => {
+      const { status, _data, headers } = response;
+      const { data, meta } = (_data || {});
+
+      await options?.onResponse?.({ response, request });
+
+      // ignorar errores
+      if (status >= 400) return;
+
+      await options?.onSuccess?.({ data, meta, headers });
+      await options?.onComplete?.({ response, request });
     },
 
-    onResponseError: () => {
+    onResponseError: async ({ response, request }) => {
+      const { _data } = response;
+
+      await options.onError?.(_data);
+      await options?.onComplete?.({ response, request });
     },
 
-    query: {},
+    query: options.query,
+
+    retry: false,
 
     // Hook for request handling before sending
-    retry: false,
-  });
-}
+    signal: controller.signal,
+  })
+    .catch((reason) => reason);
+}));
