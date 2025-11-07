@@ -37,7 +37,9 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
   const controller = new AbortController();
 
-  return $fetch(url, {
+  const loading = ref(false);
+
+  $fetch(url, {
     // Determine the base URL
     baseURL: new URL(options.prefix || $config.merkaly.basePrefix || '/', $config.merkaly.baseUrl).href,
 
@@ -48,6 +50,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     method: options?.method,
 
     onRequest: async () => {
+      loading.value = true;
+
       const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
         .then((res) => res)
         .catch(() => false); // si lanza excepción, tratamos como false
@@ -60,6 +64,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     onRequestError: async ({ error, response, request }) => {
       await options.onFatal?.(error);
       await options?.onComplete?.({ response, request });
+
+      loading.value = false;
     },
 
     onResponse: async ({ response, request }) => {
@@ -73,6 +79,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
       await options?.onSuccess?.({ data, meta, headers });
       await options?.onComplete?.({ response, request });
+
+      loading.value = false;
     },
 
     onResponseError: async ({ response, request }) => {
@@ -80,6 +88,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
       await options.onError?.(_data);
       await options?.onComplete?.({ response, request });
+
+      loading.value = false;
     },
 
     query: options.query,
@@ -88,6 +98,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     // Hook for request handling before sending
     signal: controller.signal,
-  })
-    .catch((reason) => reason);
+  });
+
+  return loading;
 }));
