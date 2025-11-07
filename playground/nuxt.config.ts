@@ -8,10 +8,11 @@ export default defineNuxtConfig({
 
   merkaly: {
     baseUrl: process.env.BASE_URL,
+    basePrefix: process.env.BASE_URL,
     auth0: {
       callback: '/auth',
-      client: process.env.AUTH0_CLIENT,
-      domain: process.env.AUTH0_DOMAIN,
+      client: process.env.AUTH0_CLIENT as string,
+      domain: process.env.AUTH0_DOMAIN as string,
       params: {},
     },
   },

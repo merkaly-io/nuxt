@@ -16,7 +16,7 @@ export interface MerkalyModuleOptions {
     localhost: string,
   },
   baseUrl: string;
-  baseUrlPrefix: string;
+  basePrefix: string;
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
@@ -31,7 +31,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       localhost: '',
     },
     baseUrl: '/',
-    baseUrlPrefix: '/',
+    basePrefix: '/',
   },
 
   meta: { name: '@merkaly/nuxt', configKey: 'merkaly', compatibility: { nuxt: '>=3.0.0' } },
@@ -67,18 +67,18 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     }, nuxt.options.plausible || {});
 
     const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');
-    let bootstrapConfig: BvnComponentProps;
+    let BootstrapConfig: BvnComponentProps;
 
     if (existsSync(bootstrapConfigPath)) {
-      bootstrapConfig = await import(bootstrapConfigPath) || {};
+      BootstrapConfig = await import(bootstrapConfigPath) || {};
     }
 
-    if (!bootstrapConfig) {
+    if (!BootstrapConfig) {
       $logger.warn('bootstrap.config.ts not found in root directory. Skipping');
-      bootstrapConfig = {};
+      BootstrapConfig = {};
     }
 
-    nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), bootstrapConfig);
+    nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), { plugin: { components: BootstrapConfig } });
 
     // 3️⃣ Plugins
     addPlugin({ src: moduleResolver.resolve('./runtime/plugins/api.global') });
@@ -86,5 +86,8 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     // 4️⃣ Composables
     addImportsDir(moduleResolver.resolve('./runtime/composables'));
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    nuxt.options['vite'] = defu((nuxt.options['vite'] || {}), { plugins: [require('vite-svg-loader')()] });
   },
 });
