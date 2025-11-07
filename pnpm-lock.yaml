@@ -12,7 +12,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.0
       '@bootstrap-vue-next/nuxt':
-        specifier: ^0.40.6
+        specifier: ^0.40.7
         version: 0.40.7(bootstrap-vue-next@0.40.7(@vueuse/core@14.0.0(vue@3.5.22(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.22(typescript@5.9.3)))(vue@3.5.22(typescript@5.9.3)))(magicast@0.5.1)
       '@nuxt/devtools':
         specifier: ^3.0.1

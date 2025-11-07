@@ -1,7 +1,13 @@
 {
   "name": "@merkaly/nuxt",
   "version": "0.0.0-1",
-  "repository": "merkaly-io/nuxt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merkaly-io/nuxt.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {
