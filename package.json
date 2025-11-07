@@ -1,6 +1,6 @@
 {
   "name": "@merkaly/nuxt",
-  "version": "0.0.0-2",
+  "version": "0.0.0-3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/merkaly-io/nuxt.git"
@@ -33,6 +33,7 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "lint": "eslint .",
     "prepack": "nuxt-module-build build",
+    "prepare": "nuxt-module-build build",
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "test": "vitest run",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
