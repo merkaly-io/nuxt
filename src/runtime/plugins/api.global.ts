@@ -15,6 +15,8 @@ export interface ApiOptions {
 
   query?: FetchOptions['query'];
 
+  prefix?: string;
+
   timeout?: FetchOptions['timeout'];
 
   onBeforeSend?(args: OnBeforeSendArgs): Promise<void> | void;
@@ -37,7 +39,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
   return $fetch(url, {
     // Determine the base URL
-    baseURL: new URL($config.merkaly.baseUrlPrefix, $config.merkaly.baseUrl).href,
+    baseURL: new URL(options.prefix || $config.merkaly.basePrefix || '/', $config.merkaly.baseUrl).href,
 
     body: options?.body,
 
