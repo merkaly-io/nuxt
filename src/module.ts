@@ -2,6 +2,8 @@ import { addPlugin, addImportsDir, defineNuxtModule, createResolver, useLogger }
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
+
+// @ts-expect-error Types aren't exposed but they exists
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
 
 export interface MerkalyModuleOptions {

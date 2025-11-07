@@ -28,14 +28,15 @@
     "dist"
   ],
   "scripts": {
-    "dev": "npm run dev:prepare && nuxi dev playground",
+    "build": "nuxt-module-build build --stub",
+    "dev": "pnpm dev:prepare && nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "dev:prepare": "pnpm build && nuxi prepare playground",
     "lint": "eslint .",
     "prepack": "pnpm dev:prepare",
-    "prepare": "pnpm dev:prepare",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
-    "test": "vitest r un",
+    "prepare": "nuxt-module-build prepare",
+    "release": "pnpm lint && pnpm test && pnpm build && changelogen --release && npm publish --access public && git push --follow-tags",
+    "test": "vitest run",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
     "test:watch": "vitest watch"
   },
