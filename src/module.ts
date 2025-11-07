@@ -1,6 +1,8 @@
-import { defineNuxtModule, addPlugin, addImportsDir, createResolver } from '@nuxt/kit';
+import { addPlugin, addImportsDir, defineNuxtModule, createResolver, useLogger } from '@nuxt/kit';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
+import { existsSync } from 'node:fs';
+import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
 
 export interface MerkalyModuleOptions {
   auth0: {
@@ -18,17 +20,11 @@ export interface MerkalyModuleOptions {
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
-  meta: {
-    name: '@merkaly/nuxt',
-    configKey: 'merkaly',
-    compatibility: { nuxt: '>=3.0.0' },
-  },
-
   defaults: {
     auth0: {
       client: '',
       domain: '',
-      callback: '/callback',
+      callback: '/auth',
     },
     plausible: {
       domain: '',
@@ -37,6 +33,8 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     baseUrl: '/',
     baseUrlPrefix: '/',
   },
+
+  meta: { name: '@merkaly/nuxt', configKey: 'merkaly', compatibility: { nuxt: '>=3.0.0' } },
 
   moduleDependencies: {
     '@bootstrap-vue-next/nuxt': {},
@@ -47,8 +45,10 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     '@vueuse/nuxt': {},
   },
 
-  setup(options, nuxt) {
-    const resolver = createResolver(import.meta.url);
+  async setup(options, nuxt) {
+    const $logger = useLogger('@merkaly/nuxt');
+    const moduleResolver = createResolver(import.meta.url);
+    const rootResolver = createResolver(nuxt.options.rootDir);
 
     /**
      * 🧩 1. Merge de configuración en runtimeConfig
@@ -56,7 +56,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
      */
     nuxt.options.runtimeConfig.public.merkaly = defu(options, nuxt.options.runtimeConfig.public.merkaly || {});
 
-    // 2️⃣ Configurar plausible
+    // 2️⃣ Configurar modulos
     nuxt.options.plausible = defu({
       apiHost: 'https://analytics.merkaly.io',
       domain: options.plausible.domain,
@@ -66,11 +66,25 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       ignoredHostnames: ['localhost'].concat(options.plausible.localhost).filter(Boolean),
     }, nuxt.options.plausible || {});
 
+    const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');
+    let bootstrapConfig: BvnComponentProps;
+
+    if (existsSync(bootstrapConfigPath)) {
+      bootstrapConfig = await import(bootstrapConfigPath) || {};
+    }
+
+    if (!bootstrapConfig) {
+      $logger.warn('bootstrap.config.ts not found in root directory. Skipping');
+      bootstrapConfig = {};
+    }
+
+    nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), bootstrapConfig);
+
     // 3️⃣ Plugins
-    addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
-    addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
+    addPlugin({ src: moduleResolver.resolve('./runtime/plugins/api.global') });
+    addPlugin({ src: moduleResolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
 
     // 4️⃣ Composables
-    addImportsDir(resolver.resolve('./runtime/composables'));
+    addImportsDir(moduleResolver.resolve('./runtime/composables'));
   },
 });
