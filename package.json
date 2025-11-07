@@ -1,6 +1,6 @@
 {
   "name": "@merkaly/nuxt",
-  "version": "0.0.0-1",
+  "version": "0.0.0-2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/merkaly-io/nuxt.git"
@@ -32,7 +32,6 @@
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "lint": "eslint .",
-    "prepack": "nuxt-module-build build",
     "prepare": "nuxt-module-build build",
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "test": "vitest run",
@@ -47,7 +46,9 @@
     "@nuxt/eslint-config": "^1.10.0",
     "@nuxt/fonts": "0.11.4",
     "@nuxt/image": "^2.0.0",
+    "@nuxt/kit": "^4.2.0",
     "@nuxtjs/plausible": "^2.0.1",
+    "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
     "@vueuse/components": "^14.0.0",
     "@vueuse/core": "^14.0.0",
@@ -65,11 +66,9 @@
     "vue-select": "4.0.0-beta.6"
   },
   "devDependencies": {
-    "@nuxt/kit": "^4.2.0",
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/schema": "^4.2.0",
     "@nuxt/test-utils": "^3.20.1",
-    "@types/node": "latest",
     "changelogen": "^0.6.2",
     "vitest": "^4.0.6",
     "vue-tsc": "^3.1.3"
