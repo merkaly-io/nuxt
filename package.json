@@ -27,6 +27,7 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "lint": "eslint .",
     "prepack": "nuxt-module-build build",
+    "prepare": "nuxt-module-build build",
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "test": "vitest run",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
@@ -35,7 +36,6 @@
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.8.0",
     "@bootstrap-vue-next/nuxt": "^0.40.7",
-    "@bootstrap-vue-next/nuxt": "^0.40.6",
     "@nuxt/devtools": "^3.0.1",
     "@nuxt/eslint": "1.10.0",
     "@nuxt/eslint-config": "^1.10.0",
