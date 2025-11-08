@@ -1,18 +1,17 @@
 <script lang="ts" setup>
+import { useApi } from '#imports';
+
 const { $api } = useNuxtApp();
 
 const url = ref('/');
 
-const { data, loading, execute } = useApi(() => ({
+const { data, loading, execute } = useApi((params) => ({
   default: () => [],
-  onBeforeSend: (request) => console.log('useApi onBeforeSend', request),
-  onComplete: (response) => console.log('useApi onComplete', response),
-  onError: (reason) => console.log('useApi onError', reason),
-  onFatal: (reason) => console.log('useApi onFatal', reason),
-  onResponse: (response) => console.log('useApi onResponse', response),
-  onSuccess: (result) => console.log('useApi onSuccess', result),
+  onBeforeSend: () => console.log('useApi onBeforeSend', params),
   prefix: '/www',
   uri: '/stripe/plans',
+  method: 'GET',
+  query: params,
 }));
 
 function fastApi() {
@@ -33,6 +32,8 @@ function fastApi() {
 
     <BButton @click="fastApi()">fastApi</BButton>
 
-    <BButton :disabled="loading" @click="execute()">useApi</BButton>
+    <BButton :disabled="loading" @click="execute({ id: 'con_id123' })">useApi</BButton>
+
+    <pre v-text="{ data, loading }" />
   </BContainer>
 </template>

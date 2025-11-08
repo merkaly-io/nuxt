@@ -8,14 +8,18 @@ type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
 type OnSuccessArgs = { data: unknown, meta: Record<string, unknown>, headers: FetchOptions['headers'] }
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
-export interface ApiOptions {
+interface ExposedOptions {
+  loading?: Ref<boolean>;
+
+  data?: Ref<unknown>;
+}
+
+export interface ApiOptions extends ExposedOptions {
   body?: FetchOptions['body'];
 
   controller?: AbortController;
 
   headers?: FetchOptions['headers'];
-
-  loading?: Ref<boolean>;
 
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -54,7 +58,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     method: options?.method,
 
     onRequest: async () => {
-      loading.value = true;
+      if (options.loading) options.loading.value = true;
 
       const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
         .then((res) => res)
@@ -69,7 +73,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       await options.onFatal?.(error);
       await options?.onComplete?.({ response, request });
 
-      loading.value = false;
+      if (options.loading) options.loading.value = false;
     },
 
     onResponse: async ({ response, request }) => {
@@ -82,9 +86,11 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       if (status >= 400) return;
 
       await options?.onSuccess?.({ data, meta, headers });
+      if (options.data) options.data.value = data;
+
       await options?.onComplete?.({ response, request });
 
-      loading.value = false;
+      if (options.loading) options.loading.value = false;
     },
 
     onResponseError: async ({ response, request }) => {
@@ -93,7 +99,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       await options.onError?.(_data);
       await options?.onComplete?.({ response, request });
 
-      loading.value = false;
+      if (options.loading) options.loading.value = false;
     },
 
     query: options.query,

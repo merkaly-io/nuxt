@@ -1,32 +1,38 @@
-import { ref, useNuxtApp } from '#imports';
+import { ref, reactive, useNuxtApp } from '#imports';
+import type { Reactive } from 'vue';
 import type { ApiOptions } from '~/src/runtime/plugins/api.global';
 
 interface ComposableOptions extends ApiOptions {
-  default?: () => any;
+  default?: () => unknown;
   immediate?: boolean;
   uri: string;
 }
 
-type CallbackArgs = () => ComposableOptions
+type CallbackArgs = (args?: Reactive<unknown>) => ComposableOptions
 
 export function useApi(callback: CallbackArgs) {
   const { $api } = useNuxtApp();
 
-  const { default: defaultData, uri, immediate, ...options } = callback();
-
   const controller = new AbortController();
+
+  const params = reactive({});
+  const { default: defaultData, uri, immediate, ...options }: ComposableOptions = callback(params);
 
   const loading = ref(false);
   const data = ref(defaultData?.());
   const meta = ref({});
-  const params = ref({});
   const error = ref<Error>();
 
-  const execute = () => $api(uri, {
-    controller,
-    loading,
-    ...options,
-  });
+  const execute = (args: Record<string, unknown> = {}) => {
+    Object.assign(params, args);
+
+    return $api(uri, {
+      ...options,
+      controller,
+      data,
+      loading,
+    });
+  };
 
   return {
     abort: controller.abort,
