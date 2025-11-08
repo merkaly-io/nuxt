@@ -15,7 +15,10 @@ export function useApi(callback: CallbackArgs) {
   const controller = new AbortController();
 
   const params = reactive({});
-  const { default: defaultData, uri, immediate, ...options }: ComposableOptions = callback(params);
+  const { default: defaultData, uri, ...options }: ComposableOptions = callback(params);
+
+  options.method ||= 'GET';
+  options.immediate = options.immediate ?? options.method === 'GET'; // Por defecto será true solo si el méthod es GET.
 
   const loading = ref(false);
   const data = ref(defaultData?.());
@@ -34,6 +37,11 @@ export function useApi(callback: CallbackArgs) {
       loading,
     });
   };
+
+  // 🧩 Nueva lógica de ejecución inmediata
+  if (options.immediate) {
+    void execute();
+  }
 
   return {
     abort: controller.abort,
