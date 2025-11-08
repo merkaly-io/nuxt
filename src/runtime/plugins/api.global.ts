@@ -1,4 +1,6 @@
-import { defineNuxtPlugin, useRuntimeConfig } from '#app';
+import { defineNuxtPlugin } from '#app';
+import type { Ref } from '#imports';
+import { ref, useRuntimeConfig } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
@@ -9,13 +11,17 @@ type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo 
 export interface ApiOptions {
   body?: FetchOptions['body'];
 
+  controller?: AbortController;
+
   headers?: FetchOptions['headers'];
+
+  loading?: Ref<boolean>;
 
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-  query?: FetchOptions['query'];
-
   prefix?: string;
+
+  query?: FetchOptions['query'];
 
   timeout?: FetchOptions['timeout'];
 
@@ -35,11 +41,9 @@ export interface ApiOptions {
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
 
-  const controller = new AbortController();
+  const loading = options.loading || ref(false);
 
-  const loading = ref(false);
-
-  $fetch(url, {
+  void $fetch(url, {
     // Determine the base URL
     baseURL: new URL(options.prefix || $config.merkaly.basePrefix || '/', $config.merkaly.baseUrl).href,
 
@@ -57,7 +61,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
         .catch(() => false); // si lanza excepción, tratamos como false
 
       if (result === false) {
-        controller.abort('Request aborted by onBeforeSend');
+        options.controller?.abort?.('Request aborted by onBeforeSend');
       }
     },
 
@@ -96,8 +100,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     retry: false,
 
-    // Hook for request handling before sending
-    signal: controller.signal,
+    signal: options.controller?.signal,
   });
 
   return loading;
