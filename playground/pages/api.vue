@@ -5,9 +5,8 @@ const { $api } = useNuxtApp();
 
 const url = ref('/');
 
-const { data, loading, execute } = useApi((params) => ({
+const { data, error, loading, meta, execute } = useApi((params) => ({
   default: () => [],
-  onBeforeSend: () => console.log('useApi onBeforeSend', params),
   prefix: '/www',
   uri: '/stripe/plans',
   method: 'GET',
@@ -34,6 +33,6 @@ function fastApi() {
 
     <BButton :disabled="loading" @click="execute({ id: 'con_id123' })">useApi</BButton>
 
-    <pre v-text="{ data, loading }" />
+    <pre v-text="{ loading, error, meta, data }" />
   </BContainer>
 </template>

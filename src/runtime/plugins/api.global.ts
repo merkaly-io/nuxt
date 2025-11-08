@@ -1,6 +1,5 @@
-import { defineNuxtPlugin } from '#app';
+import { defineNuxtPlugin, useRuntimeConfig } from '#app';
 import type { Ref } from '#imports';
-import { ref, useRuntimeConfig } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
@@ -9,9 +8,15 @@ type OnSuccessArgs = { data: unknown, meta: Record<string, unknown>, headers: Fe
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
 interface ExposedOptions {
+  data?: Ref<unknown>;
+
+  default?: () => unknown;
+
+  error?: Ref<unknown>;
+
   loading?: Ref<boolean>;
 
-  data?: Ref<unknown>;
+  meta?: Ref<Record<string, unknown>>;
 }
 
 export interface ApiOptions extends ExposedOptions {
@@ -45,9 +50,7 @@ export interface ApiOptions extends ExposedOptions {
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
 
-  const loading = options.loading || ref(false);
-
-  void $fetch(url, {
+  return $fetch(url, {
     // Determine the base URL
     baseURL: new URL(options.prefix || $config.merkaly.basePrefix || '/', $config.merkaly.baseUrl).href,
 
@@ -58,6 +61,9 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     method: options?.method,
 
     onRequest: async () => {
+      if (options.data) options.data.value = options.default?.();
+      if (options.meta) options.meta.value = {};
+      if (options.error) options.error.value = undefined;
       if (options.loading) options.loading.value = true;
 
       const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
@@ -71,6 +77,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     onRequestError: async ({ error, response, request }) => {
       await options.onFatal?.(error);
+      if (options.error) options.error.value = error;
+
       await options?.onComplete?.({ response, request });
 
       if (options.loading) options.loading.value = false;
@@ -87,6 +95,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
       await options?.onSuccess?.({ data, meta, headers });
       if (options.data) options.data.value = data;
+      if (options.meta) options.meta.value = meta;
 
       await options?.onComplete?.({ response, request });
 
@@ -97,6 +106,8 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       const { _data } = response;
 
       await options.onError?.(_data);
+      if (options.error) options.error.value = _data;
+
       await options?.onComplete?.({ response, request });
 
       if (options.loading) options.loading.value = false;
@@ -108,6 +119,4 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     signal: options.controller?.signal,
   });
-
-  return loading;
 }));

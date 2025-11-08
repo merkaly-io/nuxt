@@ -3,7 +3,6 @@ import type { Reactive } from 'vue';
 import type { ApiOptions } from '~/src/runtime/plugins/api.global';
 
 interface ComposableOptions extends ApiOptions {
-  default?: () => unknown;
   immediate?: boolean;
   uri: string;
 }
@@ -30,6 +29,8 @@ export function useApi(callback: CallbackArgs) {
       ...options,
       controller,
       data,
+      default: defaultData,
+      error,
       loading,
     });
   };
