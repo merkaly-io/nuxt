@@ -2,43 +2,40 @@ import { ref, reactive, useNuxtApp } from '#imports';
 import type { Reactive } from 'vue';
 import type { ApiOptions } from '~/src/runtime/plugins/api.global';
 
-interface ComposableOptions extends ApiOptions {
+export interface ComposableOptions extends ApiOptions {
   immediate?: boolean;
   uri: string;
 }
 
-type CallbackArgs = (args?: Reactive<unknown>) => ComposableOptions
+export type CallbackArgs<T> = (args: Reactive<T>) => ComposableOptions;
 
-export function useApi(callback: CallbackArgs) {
+function useApi<D extends object>(callback: CallbackArgs<D>) {
   const { $api } = useNuxtApp();
 
   const controller = new AbortController();
 
-  const params = reactive({});
-  const { default: defaultData, uri, ...options }: ComposableOptions = callback(params);
+  const params = reactive<D>({} as D);
 
-  options.method ||= 'GET';
-  options.immediate = options.immediate ?? options.method === 'GET'; // Por defecto será true solo si el méthod es GET.
+  const options: ComposableOptions = callback(params);
 
   const loading = ref(false);
-  const data = ref(defaultData?.());
+  const data = ref(options.default?.());
   const meta = ref({});
   const error = ref<Error>();
 
   const execute = (args: Record<string, unknown> = {}) => {
     Object.assign(params, args);
 
-    return $api(uri, {
+    return $api(options.uri, {
       ...options,
       controller,
       data,
-      default: defaultData,
+      default: options.default,
       error,
       loading,
     });
   };
 
-  // 🧩 Nueva lógica de ejecución inmediata
   if (options.immediate) {
     void execute();
   }
@@ -52,3 +49,5 @@ export function useApi(callback: CallbackArgs) {
     meta,
   };
 }
+
+export { useApi };

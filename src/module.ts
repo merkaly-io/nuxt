@@ -88,6 +88,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     // 4️⃣ Composables
     addImportsDir(moduleResolver.resolve('./runtime/composables'));
+    addImportsDir(moduleResolver.resolve('./runtime/utils'));
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     nuxt.options['vite'] = defu((nuxt.options['vite'] || {}), { plugins: [require('vite-svg-loader')()] });

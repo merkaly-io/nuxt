@@ -7,10 +7,8 @@ type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
 type OnSuccessArgs = { data: unknown, meta: Record<string, unknown>, headers: FetchOptions['headers'] }
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
-interface ExposedOptions {
+export interface RefOptions {
   data?: Ref<unknown>;
-
-  default?: () => unknown;
 
   error?: Ref<unknown>;
 
@@ -19,21 +17,7 @@ interface ExposedOptions {
   meta?: Ref<Record<string, unknown>>;
 }
 
-export interface ApiOptions extends ExposedOptions {
-  body?: FetchOptions['body'];
-
-  controller?: AbortController;
-
-  headers?: FetchOptions['headers'];
-
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-
-  prefix?: string;
-
-  query?: FetchOptions['query'];
-
-  timeout?: FetchOptions['timeout'];
-
+export interface HooksOptions {
   onBeforeSend?(args: OnBeforeSendArgs): Promise<void> | void;
 
   onComplete?(args: OnCompleteArgs): Promise<void> | void;
@@ -46,6 +30,26 @@ export interface ApiOptions extends ExposedOptions {
 
   onSuccess?(args: OnSuccessArgs): Promise<void> | void;
 }
+
+export interface ParamsOptions {
+  body?: FetchOptions['body'];
+
+  controller?: AbortController;
+
+  default?: () => unknown;
+
+  headers?: FetchOptions['headers'];
+
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+  prefix?: string;
+
+  query?: FetchOptions['query'];
+
+  timeout?: FetchOptions['timeout'];
+}
+
+export type ApiOptions = ParamsOptions & HooksOptions & RefOptions
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
@@ -113,7 +117,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       if (options.loading) options.loading.value = false;
     },
 
-    query: options.query,
+    query: options?.query,
 
     retry: false,
 
