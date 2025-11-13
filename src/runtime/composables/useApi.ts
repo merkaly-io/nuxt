@@ -36,6 +36,9 @@ function useApi<D extends object>(callback: CallbackArgs<D>) {
     });
   };
 
+  options.method ||= 'GET';
+  options.immediate ??= options.method === 'GET';
+
   if (options.immediate) {
     void execute();
   }
