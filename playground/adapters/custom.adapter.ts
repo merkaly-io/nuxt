@@ -1,11 +1,18 @@
 import { withAdapter } from '#imports';
+import type { AdapterOptions } from '../../src/runtime/utils/withAdapter';
 
-interface MyCustomAdapterParams {
-  isOk: boolean,
-  isDanger: boolean,
+interface MyCustomAdapter extends AdapterOptions {
+  data: boolean[];
+  meta: {
+    pagination: string[]
+  };
+  params: {
+    isOk: boolean,
+    isDanger: boolean,
+  };
 }
 
-const MyCustomAdapter = withAdapter<MyCustomAdapterParams>((options) => ({
+const MyCustomAdapter = withAdapter<MyCustomAdapter>((options) => ({
   default: () => [],
   immediate: false,
   method: 'GET',

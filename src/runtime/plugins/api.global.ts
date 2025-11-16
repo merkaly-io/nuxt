@@ -122,5 +122,5 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     retry: false,
 
     signal: options.controller?.signal,
-  });
+  }).catch(reason => reason);
 }));
