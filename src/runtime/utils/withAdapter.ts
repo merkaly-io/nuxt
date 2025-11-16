@@ -11,9 +11,13 @@ export interface AdapterOptions {
   params: object;
 }
 
-export const withAdapter = <T extends AdapterOptions>(callback: (params: T['params']) => ComposableOptions) => (args: ReturnParams<T>) => useApi<T>((fullParams) => {
-  const { params, ...rest } = (args?.() || {});
-  const result = callback(params);
+export const withAdapter = <T extends AdapterOptions>(callback: (params: T['params']) => ComposableOptions) => (args: ReturnParams<T>) => {
+  const getOptions = () => {
+    const { params, ...rest } = (args?.() || {});
+    const result = callback(params);
 
-  return defu(rest, result) as ComposableOptions;
-});
+    return defu(rest, result) as ComposableOptions;
+  };
+
+  return useApi<T>((fullParams) => getOptions());
+};

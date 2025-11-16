@@ -15,30 +15,36 @@ function useApi<D extends object>(callback: CallbackArgs<D>) {
 
   const params = reactive({}) as D;
 
-  const options: ComposableOptions = callback(params);
+  const getOptions = (): ComposableOptions => {
+    const options = callback(params);
+    options.method ||= 'GET';
+    options.immediate ??= options.method === 'GET';
+    return options;
+  };
+
+  const initialOptions = getOptions();
 
   const loading = ref(false);
-  const data = ref(options.default?.());
+  const data = ref(initialOptions.default?.());
   const meta = ref({});
   const error = ref<Error>();
 
   const execute = (args: Record<string, unknown> = {}) => {
     Object.assign(params, args);
 
-    return $api(options.uri, {
-      ...options,
+    const currentOptions = getOptions();
+
+    return $api(currentOptions.uri, {
+      ...currentOptions,
       controller,
       data,
-      default: options.default,
+      default: currentOptions.default,
       error,
       loading,
     });
   };
 
-  options.method ||= 'GET';
-  options.immediate ??= options.method === 'GET';
-
-  if (options.immediate) {
+  if (initialOptions.immediate) {
     void execute();
   }
 
