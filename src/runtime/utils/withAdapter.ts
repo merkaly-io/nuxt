@@ -1,5 +1,5 @@
-import type { CallbackArgs } from '../composables/useApi';
 import { useApi } from '../composables/useApi';
+import type { ComposableOptions } from '../composables/useApi';
 import type { HooksOptions } from '../plugins/api.global';
 import { defu } from 'defu';
 
@@ -11,9 +11,9 @@ export interface AdapterOptions {
   params: object;
 }
 
-export const withAdapter = <T extends AdapterOptions>(callback: CallbackArgs<T>) => (args: ReturnParams<T>) => useApi<T>(() => {
+export const withAdapter = <T extends AdapterOptions>(callback: (params: T['params']) => ComposableOptions) => (args: ReturnParams<T>) => useApi<T>((fullParams) => {
   const { params, ...rest } = (args?.() || {});
-  const result = callback?.(params);
+  const result = callback(params);
 
-  return defu(rest, result);
+  return defu(rest, result) as ComposableOptions;
 });
