@@ -56,7 +56,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
   return $fetch(url, {
     // Determine the base URL
-    baseURL: new URL(options.prefix || $config.merkaly.basePrefix || '/', $config.merkaly.baseUrl).href,
+    baseURL: new URL(options.prefix || $config.merkaly.api.prefix || '/', $config.merkaly.api.url).href,
 
     body: options?.body,
 

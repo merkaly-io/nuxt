@@ -13,12 +13,14 @@ export interface MerkalyModuleOptions {
     callback: string
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
   };
-  plausible: {
+  plausible?: {
     domain: string,
     localhost: string,
   },
-  baseUrl: string;
-  basePrefix: string;
+  api: {
+    url: string;
+    prefix?: string;
+  };
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
@@ -32,8 +34,10 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       domain: '',
       localhost: '',
     },
-    baseUrl: '/',
-    basePrefix: '/',
+    api : {
+      url: '/',
+      prefix: '/',
+    },
   },
 
   meta: { name: '@merkaly/nuxt', configKey: 'merkaly', compatibility: { nuxt: '>=3.0.0' } },
@@ -58,14 +62,15 @@ export default defineNuxtModule<MerkalyModuleOptions>({
      */
     nuxt.options.runtimeConfig.public.merkaly = defu(options, nuxt.options.runtimeConfig.public.merkaly || {});
 
+    
     // 2️⃣ Configurar modulos
     nuxt.options.plausible = defu({
       apiHost: 'https://analytics.merkaly.io',
-      domain: options.plausible.domain,
+      domain: options.plausible?.domain,
       enableAutoOutboundTracking: true,
       enableAutoPageviews: true,
       enabled: process.env.NODE_ENV === 'production', // ✅ Solo en producción
-      ignoredHostnames: ['localhost'].concat(options.plausible.localhost).filter(Boolean),
+      ignoredHostnames: ['localhost'].concat(options.plausible?.localhost || '').filter(Boolean),
     }, nuxt.options.plausible || {});
 
     const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');

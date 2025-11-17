@@ -17,7 +17,7 @@ const MyCustomAdapter = withAdapter<MyCustomAdapter>((options) => ({
   immediate: false,
   method: 'GET',
   query: options,
-  uri: '/users/octocat',
+  uri: '/stripe/plans',
 }));
 
 export { MyCustomAdapter };
