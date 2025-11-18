@@ -41,7 +41,7 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@auth0/auth0-spa-js": "^2.8.0",
+    "@auth0/auth0-spa-js": "^2.9.0",
     "@bootstrap-vue-next/nuxt": "^0.40.7",
     "@nuxt/devtools": "^3.1.0",
     "@nuxt/eslint": "1.10.0",
