@@ -52,7 +52,7 @@
     "@nuxtjs/plausible": "^2.0.1",
     "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
-    "@vueuse/components": "^14.0.0",
+    "@vueuse/components": "^14.1.0",
     "@vueuse/core": "^14.0.0",
     "@vueuse/integrations": "^14.0.0",
     "@vueuse/nuxt": "^14.0.0",
