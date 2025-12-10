@@ -45,7 +45,7 @@
     "@bootstrap-vue-next/nuxt": "^0.40.7",
     "@nuxt/devtools": "^3.1.0",
     "@nuxt/eslint": "1.10.0",
-    "@nuxt/eslint-config": "^1.10.0",
+    "@nuxt/eslint-config": "^1.11.0",
     "@nuxt/fonts": "0.12.1",
     "@nuxt/image": "^2.0.0",
     "@nuxt/kit": "^4.2.0",
