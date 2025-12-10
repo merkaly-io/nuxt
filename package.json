@@ -55,7 +55,7 @@
     "@vueuse/components": "^14.1.0",
     "@vueuse/core": "^14.1.0",
     "@vueuse/integrations": "^14.0.0",
-    "@vueuse/nuxt": "^14.0.0",
+    "@vueuse/nuxt": "^14.1.0",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.40.7",
     "eslint": "^9.39.1",
