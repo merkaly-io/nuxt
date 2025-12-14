@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@auth0/auth0-spa-js':
-        specifier: ^2.9.0
-        version: 2.9.0
+        specifier: ^2.11.0
+        version: 2.11.0
       '@bootstrap-vue-next/nuxt':
         specifier: ^0.40.7
         version: 0.40.7(bootstrap-vue-next@0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.1)
@@ -114,8 +114,8 @@ packages:
     peerDependencies:
       '@types/json-schema': ^7.0.15
 
-  '@auth0/auth0-spa-js@2.9.0':
-    resolution: {integrity: sha512-HmV9zaV3kpTHoVsdQCrHSisIUWxGDyVECcXg94Ky5uKU/Q03h68x0mkwSoz3JEmNIflg5xeZSn2m75BTkcFORw==}
+  '@auth0/auth0-spa-js@2.11.0':
+    resolution: {integrity: sha512-MZuUkB6cYAWm2uswWhEj8aMS7sw6zx8cs5YyPbrHCF+MlScLgfOkUnGe0tbnv7592xQ6M2h4lB66WyemFQEmPA==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -4907,7 +4907,7 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.1
 
-  '@auth0/auth0-spa-js@2.9.0':
+  '@auth0/auth0-spa-js@2.11.0':
     dependencies:
       browser-tabs-lock: 1.3.0
       dpop: 2.1.1
