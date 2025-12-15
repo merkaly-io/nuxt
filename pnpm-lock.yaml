@@ -12,8 +12,8 @@ importers:
         specifier: ^2.11.0
         version: 2.11.0
       '@bootstrap-vue-next/nuxt':
-        specifier: ^0.40.7
-        version: 0.40.7(bootstrap-vue-next@0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.1)
+        specifier: ^0.41.0
+        version: 0.41.0(bootstrap-vue-next@0.41.0(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.1)
       '@nuxt/devtools':
         specifier: ^3.1.0
         version: 3.1.0(vite@7.2.1(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.96.0)(terser@5.44.1)(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
@@ -57,8 +57,8 @@ importers:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       bootstrap-vue-next:
-        specifier: ^0.40.7
-        version: 0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
+        specifier: ^0.41.0
+        version: 0.41.0(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -237,10 +237,10 @@ packages:
   '@barbapapazes/plausible-tracker@0.5.6':
     resolution: {integrity: sha512-GRZxn3ZngYQ1+QbdP8d66D/lQg+T2oEevG8kBGfNwVbt9VZB67sgMx/gkRo/Ww2lH7QelgjUNzvOeG+DsJX2HQ==}
 
-  '@bootstrap-vue-next/nuxt@0.40.7':
-    resolution: {integrity: sha512-EDExNiwOK5xuFbiKpncbXagS44U8YmQPWvsV8ZY5oDgTTFBjaMEeyZKbwgUM4JL/ybk6KvBt0iEB84JNSBJdxw==}
+  '@bootstrap-vue-next/nuxt@0.41.0':
+    resolution: {integrity: sha512-JtBiI60GeYlE1h+YIn8K5UzLYU0NkubRvkgDWAwwbU3Qgwe+NIHtiFa4IVjNQ1vdDPpysXpLISLZcte1eMhHDQ==}
     peerDependencies:
-      bootstrap-vue-next: ^0.40.7
+      bootstrap-vue-next: ^0.41.0
 
   '@capsizecss/unpack@3.0.0':
     resolution: {integrity: sha512-+ntATQe1AlL7nTOYjwjj6w3299CgRot48wL761TUGYpYgAou3AaONZazp0PKZyCyWhudWsjhq1nvRHOvbMzhTA==}
@@ -941,10 +941,6 @@ packages:
   '@nuxt/image@2.0.0':
     resolution: {integrity: sha512-otHi6gAoYXKLrp8m27ZjX1PjxOPaltQ4OiUs/BhkW995mF/vXf8SWQTw68fww+Uric0v+XgoVrP9icDi+yT6zw==}
     engines: {node: '>=18.20.6'}
-
-  '@nuxt/kit@3.20.1':
-    resolution: {integrity: sha512-TIslaylfI5kd3AxX5qts0qyrIQ9Uq3HAA1bgIIJ+c+zpDfK338YS+YrCWxBBzDMECRCbAS58mqAd2MtJfG1ENA==}
-    engines: {node: '>=18.12.0'}
 
   '@nuxt/kit@3.20.2':
     resolution: {integrity: sha512-laqfmMcWWNV1FsVmm1+RQUoGY8NIJvCRl0z0K8ikqPukoEry0LXMqlQ+xaf8xJRvoH2/78OhZmsEEsUBTXipcw==}
@@ -2197,8 +2193,8 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
-  bootstrap-vue-next@0.40.7:
-    resolution: {integrity: sha512-v85RRFZK2I6nXemYmxJXHeQv2jyxpfjNmqI8dbMQEC1VyT3+ygeei9oONpccF7qFVs5wzl1qQN3DASj8rxIanQ==}
+  bootstrap-vue-next@0.41.0:
+    resolution: {integrity: sha512-anYJ0eekk631Rc5cbdFjvQTK1kydDjG6ELvaS24ewgNKcFEt8O2J1+h8kZoaz9lBQan+DPh/c17EGPo1vYFBFA==}
     peerDependencies:
       '@floating-ui/vue': '*'
       '@vueuse/core': '*'
@@ -5122,10 +5118,10 @@ snapshots:
 
   '@barbapapazes/plausible-tracker@0.5.6': {}
 
-  '@bootstrap-vue-next/nuxt@0.40.7(bootstrap-vue-next@0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.1)':
+  '@bootstrap-vue-next/nuxt@0.41.0(bootstrap-vue-next@0.41.0(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.1)':
     dependencies:
-      '@nuxt/kit': 3.20.1(magicast@0.5.1)
-      bootstrap-vue-next: 0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
+      '@nuxt/kit': 3.20.2(magicast@0.5.1)
+      bootstrap-vue-next: 0.41.0(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
     transitivePeerDependencies:
       - magicast
 
@@ -5873,32 +5869,6 @@ snapshots:
       - ioredis
       - magicast
       - uploadthing
-
-  '@nuxt/kit@3.20.1(magicast@0.5.1)':
-    dependencies:
-      c12: 3.3.2(magicast@0.5.1)
-      consola: 3.4.2
-      defu: 6.1.4
-      destr: 2.0.5
-      errx: 0.1.0
-      exsolve: 1.0.8
-      ignore: 7.0.5
-      jiti: 2.6.1
-      klona: 2.0.6
-      knitwork: 1.2.0
-      mlly: 1.8.0
-      ohash: 2.0.11
-      pathe: 2.0.3
-      pkg-types: 2.3.0
-      rc9: 2.1.2
-      scule: 1.3.0
-      semver: 7.7.3
-      tinyglobby: 0.2.15
-      ufo: 1.6.1
-      unctx: 2.4.1
-      untyped: 2.0.0
-    transitivePeerDependencies:
-      - magicast
 
   '@nuxt/kit@3.20.2(magicast@0.5.1)':
     dependencies:
@@ -7221,7 +7191,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-vue-next@0.40.7(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)):
+  bootstrap-vue-next@0.41.0(@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3)))(vue-router@4.6.3(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)):
     dependencies:
       vue: 3.5.23(typescript@5.9.3)
     optionalDependencies:
@@ -8673,7 +8643,7 @@ snapshots:
       '@rollup/plugin-terser': 0.4.4(rollup@4.52.5)
       '@vercel/nft': 0.30.3(rollup@4.52.5)
       archiver: 7.0.1
-      c12: 3.3.2(magicast@0.5.1)
+      c12: 3.3.1(magicast@0.5.1)
       chokidar: 4.0.3
       citty: 0.1.6
       compatx: 0.2.0
@@ -8698,7 +8668,7 @@ snapshots:
       ioredis: 5.8.2
       jiti: 2.6.1
       klona: 2.0.6
-      knitwork: 1.3.0
+      knitwork: 1.2.0
       listhen: 1.9.0
       magic-string: 0.30.21
       magicast: 0.5.1
@@ -9980,7 +9950,7 @@ snapshots:
 
   unwasm@0.3.11:
     dependencies:
-      knitwork: 1.3.0
+      knitwork: 1.2.0
       magic-string: 0.30.21
       mlly: 1.8.0
       pathe: 2.0.3
