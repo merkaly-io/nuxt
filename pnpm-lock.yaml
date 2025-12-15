@@ -48,8 +48,8 @@ importers:
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.23(typescript@5.9.3))
       '@vueuse/integrations':
-        specifier: ^14.0.0
-        version: 14.0.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))
+        specifier: ^14.1.0
+        version: 14.1.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))
       '@vueuse/nuxt':
         specifier: ^14.1.0
         version: 14.1.0(magicast@0.5.1)(nuxt@4.2.1(@parcel/watcher@2.5.1)(@types/node@25.0.2)(@vue/compiler-sfc@3.5.25)(db0@0.3.4)(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.52.5)(sass@1.96.0)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.1(@types/node@25.0.2)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.96.0)(terser@5.44.1)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
@@ -1983,18 +1983,13 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
-  '@vueuse/core@14.0.0':
-    resolution: {integrity: sha512-d6tKRWkZE8IQElX2aHBxXOMD478fHIYV+Dzm2y9Ag122ICBpNKtGICiXKOhWU3L1kKdttDD9dCMS4bGP3jhCTQ==}
-    peerDependencies:
-      vue: ^3.5.0
-
   '@vueuse/core@14.1.0':
     resolution: {integrity: sha512-rgBinKs07hAYyPF834mDTigH7BtPqvZ3Pryuzt1SD/lg5wEcWqvwzXXYGEDb2/cP0Sj5zSvHl3WkmMELr5kfWw==}
     peerDependencies:
       vue: ^3.5.0
 
-  '@vueuse/integrations@14.0.0':
-    resolution: {integrity: sha512-5A0X7q9qyLtM3xyghq5nK/NEESf7cpcZlkQgXTMuW4JWiAMYxc1ImdhhGrk4negFBsq3ejvAlRmLdNrkcTzk1Q==}
+  '@vueuse/integrations@14.1.0':
+    resolution: {integrity: sha512-eNQPdisnO9SvdydTIXnTE7c29yOsJBD/xkwEyQLdhDC/LKbqrFpXHb3uS//7NcIrQO3fWVuvMGp8dbK6mNEMCA==}
     peerDependencies:
       async-validator: ^4
       axios: ^1
@@ -2035,9 +2030,6 @@ packages:
       universal-cookie:
         optional: true
 
-  '@vueuse/metadata@14.0.0':
-    resolution: {integrity: sha512-6yoGqbJcMldVCevkFiHDBTB1V5Hq+G/haPlGIuaFZHpXC0HADB0EN1ryQAAceiW+ryS3niUwvdFbGiqHqBrfVA==}
-
   '@vueuse/metadata@14.1.0':
     resolution: {integrity: sha512-7hK4g015rWn2PhKcZ99NyT+ZD9sbwm7SGvp7k+k+rKGWnLjS/oQozoIZzWfCewSUeBmnJkIb+CNr7Zc/EyRnnA==}
 
@@ -2045,11 +2037,6 @@ packages:
     resolution: {integrity: sha512-zw8WSgRrdtsA1daqlFl5ojoTJnvWad/IbMIcHw4EN8Wci09koeFfh5/oKbkKeIQ3gzihvr9x0bu8BVz8Z2auSg==}
     peerDependencies:
       nuxt: ^3.0.0 || ^4.0.0-0
-      vue: ^3.5.0
-
-  '@vueuse/shared@14.0.0':
-    resolution: {integrity: sha512-mTCA0uczBgurRlwVaQHfG0Ja7UdGe4g9mwffiJmvLiTtp1G4AQyIjej6si/k8c8pUwTfVpNufck+23gXptPAkw==}
-    peerDependencies:
       vue: ^3.5.0
 
   '@vueuse/shared@14.1.0':
@@ -7028,13 +7015,6 @@ snapshots:
       '@vueuse/shared': 14.1.0(vue@3.5.23(typescript@5.9.3))
       vue: 3.5.23(typescript@5.9.3)
 
-  '@vueuse/core@14.0.0(vue@3.5.23(typescript@5.9.3))':
-    dependencies:
-      '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 14.0.0
-      '@vueuse/shared': 14.0.0(vue@3.5.23(typescript@5.9.3))
-      vue: 3.5.23(typescript@5.9.3)
-
   '@vueuse/core@14.1.0(vue@3.5.23(typescript@5.9.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.21
@@ -7042,16 +7022,14 @@ snapshots:
       '@vueuse/shared': 14.1.0(vue@3.5.23(typescript@5.9.3))
       vue: 3.5.23(typescript@5.9.3)
 
-  '@vueuse/integrations@14.0.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))':
+  '@vueuse/integrations@14.1.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3))':
     dependencies:
-      '@vueuse/core': 14.0.0(vue@3.5.23(typescript@5.9.3))
-      '@vueuse/shared': 14.0.0(vue@3.5.23(typescript@5.9.3))
+      '@vueuse/core': 14.1.0(vue@3.5.23(typescript@5.9.3))
+      '@vueuse/shared': 14.1.0(vue@3.5.23(typescript@5.9.3))
       vue: 3.5.23(typescript@5.9.3)
     optionalDependencies:
       change-case: 5.4.4
       fuse.js: 7.1.0
-
-  '@vueuse/metadata@14.0.0': {}
 
   '@vueuse/metadata@14.1.0': {}
 
@@ -7065,10 +7043,6 @@ snapshots:
       vue: 3.5.23(typescript@5.9.3)
     transitivePeerDependencies:
       - magicast
-
-  '@vueuse/shared@14.0.0(vue@3.5.23(typescript@5.9.3))':
-    dependencies:
-      vue: 3.5.23(typescript@5.9.3)
 
   '@vueuse/shared@14.1.0(vue@3.5.23(typescript@5.9.3))':
     dependencies:
