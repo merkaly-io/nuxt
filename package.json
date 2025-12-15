@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.11.0",
-    "@bootstrap-vue-next/nuxt": "^0.40.7",
+    "@bootstrap-vue-next/nuxt": "^0.41.0",
     "@nuxt/devtools": "^3.1.0",
     "@nuxt/eslint": "1.12.1",
     "@nuxt/eslint-config": "^1.12.1",
@@ -57,7 +57,7 @@
     "@vueuse/integrations": "^14.0.0",
     "@vueuse/nuxt": "^14.1.0",
     "bootstrap": "^5.3.8",
-    "bootstrap-vue-next": "^0.40.7",
+    "bootstrap-vue-next": "^0.41.0",
     "eslint": "^9.39.1",
     "nuxt": "^4.2.0",
     "sass": "^1.96.0",
