@@ -1,4 +1,4 @@
-import { addPlugin, addImportsDir, defineNuxtModule, createResolver, useLogger } from '@nuxt/kit';
+import { addPlugin, addImportsDir, defineNuxtModule, createResolver, useLogger, addComponentsDir } from '@nuxt/kit';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
@@ -34,7 +34,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       domain: '',
       localhost: '',
     },
-    api : {
+    api: {
       url: '/',
       prefix: '/',
     },
@@ -62,7 +62,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
      */
     nuxt.options.runtimeConfig.public.merkaly = defu(options, nuxt.options.runtimeConfig.public.merkaly || {});
 
-    
+
     // 2️⃣ Configurar modulos
     nuxt.options.plausible = defu({
       apiHost: 'https://analytics.merkaly.io',
@@ -94,6 +94,11 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     // 4️⃣ Composables
     addImportsDir(moduleResolver.resolve('./runtime/composables'));
     addImportsDir(moduleResolver.resolve('./runtime/utils'));
+
+    addComponentsDir({
+      path: moduleResolver.resolve('./runtime/components'),
+      prefix: 'MK',
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     nuxt.options['vite'] = defu((nuxt.options['vite'] || {}), { plugins: [require('vite-svg-loader')()] });

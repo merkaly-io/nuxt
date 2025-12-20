@@ -3,5 +3,8 @@
 </script>
 
 <template>
-  <BButton>Page 1</BButton>
+  <BButtonGroup>
+    <BButton to="/auth">Auth Page</BButton>
+    <BButton to="/composables">Composables Page</BButton>
+  </BButtonGroup>
 </template>
