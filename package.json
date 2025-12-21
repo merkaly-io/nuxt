@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "build": "nuxt-module-build build --stub",
-    "dev": "pnpm dev:prepare && nuxi dev playground",
+    "dev": "pnpm dev:prepare && cd playground && pnpm storybook",
     "dev:build": "nuxi build playground",
     "dev:prepare": "pnpm build && nuxi prepare playground",
     "lint": "eslint .",

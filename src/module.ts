@@ -81,7 +81,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     }
 
     if (!BootstrapConfig) {
-      $logger.warn('bootstrap.config.ts not found in root directory. Skipping');
+      // $logger.warn('bootstrap.config.ts not found in root directory. Skipping');
       BootstrapConfig = {};
     }
 

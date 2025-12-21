@@ -4,7 +4,7 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
-  modules: ['../src/module'],
+  modules: ['../src/module', '@nuxtjs/storybook'],
 
   merkaly: {
     api: {

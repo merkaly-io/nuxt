@@ -47,3 +47,6 @@ coverage
 Network Trash Folder
 Temporary Items
 .apdisk
+
+*storybook.log
+storybook-static
