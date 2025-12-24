@@ -12,8 +12,7 @@ const config: StorybookConfig = {
     options: {},
   },
   stories: [
-    '../components/**/*.mdx',
-    '../components/**/*.stories.@(js|jsx|ts|tsx|mdx)',
+    '../components/**/*.story.@(js|jsx|ts|tsx|mdx)',
   ],
 };
 
