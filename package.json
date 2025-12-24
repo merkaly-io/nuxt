@@ -62,6 +62,7 @@
     "nuxt": "^4.2.0",
     "sass": "^1.97.0",
     "typescript": "~5.9.3",
+    "v-money3": "^3.24.1",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
