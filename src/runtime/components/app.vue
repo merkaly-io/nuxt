@@ -8,7 +8,9 @@ onBeforeMount(() => callOnce(() => $auth0.checkSession()));
 </script>
 
 <template>
-  <slot v-if="!isLoading">
-    <NuxtPage />
-  </slot>
+  <main>
+    <slot v-if="!isLoading">
+      <NuxtPage />
+    </slot>
+  </main>
 </template>

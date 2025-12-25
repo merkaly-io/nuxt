@@ -24,13 +24,16 @@ export default defineNuxtPlugin(async () => {
   const self0 = Object.assign(Object.create(Object.getPrototypeOf(auth0)), auth0);
 
   auth0.getUser = () => self0.getUser()
-    .then((result: User) => (user.value = result));
+    .then((result: User) => (user.value = result))
+    .catch(() => ({}));
 
   auth0.getTokenSilently = () => self0.getTokenSilently()
-    .then((result: string) => (token.value = result));
+    .then((result: string) => (token.value = result))
+    .catch(() => ({}));
 
   auth0.checkSession = () => self0.checkSession()
     .then(async () => Promise.all([auth0.getUser(), auth0.getTokenSilently()]))
+    .catch(() => ({}))
     .finally(() => (isLoading.value = false));
 
   return { provide: { auth0 } };
