@@ -8,9 +8,10 @@ import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/Bootst
 
 export interface MerkalyModuleOptions {
   auth0: {
+    callbackUrl: string
     client: string
     domain: string
-    callback: string
+    logoutUrl?: string
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
   };
   plausible?: {
@@ -26,9 +27,10 @@ export interface MerkalyModuleOptions {
 export default defineNuxtModule<MerkalyModuleOptions>({
   defaults: {
     auth0: {
+      callbackUrl: '/auth',
       client: '',
       domain: '',
-      callback: '/auth',
+      logoutUrl: '/',
     },
     plausible: {
       domain: '',

@@ -6,13 +6,6 @@ export default defineNuxtPlugin(async () => {
   const { public: $config } = useRuntimeConfig();
 
   const auth0 = await createAuth0Client({
-
-    authorizationParams: {
-      audience: $config.auth0Audience,
-      redirect_uri: URL.canParse($config.merkaly.auth0.callback)
-        ? $config.merkaly.auth0.callback
-        : location.origin.concat($config.merkaly.auth0.callback),
-    },
     cacheLocation: 'localstorage',
     clientId: $config.merkaly.auth0.client,
     domain: $config.merkaly.auth0.domain,
@@ -28,8 +21,8 @@ export default defineNuxtPlugin(async () => {
     .then((result: User) => (user.value = result))
     .catch(() => undefined);
 
-  auth0.getIdTokenClaims = () => self0.getIdTokenClaims()
-    .then((result) => (token.value = result?.__raw))
+  auth0.getTokenSilently = () => self0.getTokenSilently()
+    .then((result: string) => (token.value = result))
     .catch(() => undefined);
 
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
@@ -37,9 +30,24 @@ export default defineNuxtPlugin(async () => {
     .catch(() => location.href = '/');
 
   auth0.checkSession = () => self0.checkSession()
-    .then(async () => Promise.all([auth0.getUser(), auth0.getIdTokenClaims()]))
+    .then(async () => Promise.all([auth0.getUser(), auth0.getTokenSilently()]))
     .catch(() => ({}))
     .finally(() => (isLoading.value = false));
+
+  auth0.loginWithRedirect = () => self0.loginWithRedirect({
+    authorizationParams: {
+      audience: `https://${$config.merkaly.auth0.domain}/api/v2/`,
+      redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
+        ? $config.merkaly.auth0.callbackUrl
+        : location.origin.concat($config.merkaly.auth0.callbackUrl),
+    },
+  });
+
+  auth0.logout = () => self0.logout({
+    logoutParams: {
+      returnTo: $config.merkaly.auth0.logoutUrl,
+    },
+  });
 
   return { provide: { auth0 } };
 });
