@@ -9,6 +9,9 @@ onBeforeMount(() => callOnce(() => $auth0.checkSession()));
 
 <template>
   <main>
+    <NuxtRouteAnnouncer />
+    <BOrchestrator />
+
     <slot v-if="!isLoading">
       <NuxtPage />
     </slot>

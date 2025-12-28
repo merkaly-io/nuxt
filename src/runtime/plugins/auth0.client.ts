@@ -9,8 +9,9 @@ export default defineNuxtPlugin(async () => {
 
     authorizationParams: {
       audience: $config.auth0Audience,
-      prompt: 'login',
-      redirect_uri: location.origin.concat($config.merkaly.auth0.callback),
+      redirect_uri: URL.canParse($config.merkaly.auth0.callback)
+        ? $config.merkaly.auth0.callback
+        : location.origin.concat($config.merkaly.auth0.callback),
     },
     cacheLocation: 'localstorage',
     clientId: $config.merkaly.auth0.client,
@@ -25,14 +26,18 @@ export default defineNuxtPlugin(async () => {
 
   auth0.getUser = () => self0.getUser()
     .then((result: User) => (user.value = result))
-    .catch(() => ({}));
+    .catch(() => undefined);
 
-  auth0.getTokenSilently = () => self0.getTokenSilently()
-    .then((result: string) => (token.value = result))
-    .catch(() => ({}));
+  auth0.getIdTokenClaims = () => self0.getIdTokenClaims()
+    .then((result) => (token.value = result?.__raw))
+    .catch(() => undefined);
+
+  auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
+    .then(({ appState }) => location.href = (appState.target || '/'))
+    .catch(() => location.href = '/');
 
   auth0.checkSession = () => self0.checkSession()
-    .then(async () => Promise.all([auth0.getUser(), auth0.getTokenSilently()]))
+    .then(async () => Promise.all([auth0.getUser(), auth0.getIdTokenClaims()]))
     .catch(() => ({}))
     .finally(() => (isLoading.value = false));
 

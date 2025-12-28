@@ -40,7 +40,8 @@ function useApi<D extends object>(callback: CallbackArgs<D>) {
       data,
       default: currentOptions.default,
       error,
-      loading,
+      loading
+      ,
     });
   };
 

@@ -1,5 +1,5 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app';
-import type { Ref } from '#imports';
+import { type Ref, useAuth } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
@@ -18,17 +18,17 @@ export interface RefOptions {
 }
 
 export interface HooksOptions {
-  onBeforeSend?(args: OnBeforeSendArgs): Promise<void> | void;
+  onBeforeSend?(args: OnBeforeSendArgs): Promise<unknown> | unknown;
 
-  onComplete?(args: OnCompleteArgs): Promise<void> | void;
+  onComplete?(args: OnCompleteArgs): Promise<unknown> | unknown;
 
-  onError?(reason: Error): Promise<void> | void;
+  onError?(reason: Error): Promise<unknown> | unknown;
 
-  onFatal?(reason: Error): Promise<void> | void;
+  onFatal?(reason: Error): Promise<unknown> | unknown;
 
-  onResponse?(args: OnResponseArgs): Promise<void> | void;
+  onResponse?(args: OnResponseArgs): Promise<unknown> | unknown;
 
-  onSuccess?(args: OnSuccessArgs): Promise<void> | void;
+  onSuccess?(args: OnSuccessArgs): Promise<unknown> | unknown;
 }
 
 export interface ParamsOptions {
@@ -53,6 +53,7 @@ export type ApiOptions = ParamsOptions & HooksOptions & RefOptions
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
+  const { tenant, token, user } = useAuth();
 
   return $fetch(url, {
     // Determine the base URL
@@ -60,7 +61,11 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     body: options?.body,
 
-    headers: options?.headers,
+    headers: {
+      authorization: token.value ? `Bearer ${token.value}` : '',
+      identity: tenant.value as string,
+      ...options?.headers,
+    },
 
     method: options?.method,
 
