@@ -12,6 +12,7 @@ export interface MerkalyModuleOptions {
     client: string
     domain: string
     logoutUrl?: string
+    requiresAuth: boolean
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
   };
   plausible?: {
@@ -31,6 +32,8 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       client: '',
       domain: '',
       logoutUrl: '/',
+      params: {},
+      requiresAuth: false,
     },
     plausible: {
       domain: '',
