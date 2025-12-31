@@ -1,6 +1,7 @@
 import type { User } from '@auth0/auth0-spa-js';
 import { createAuth0Client } from '@auth0/auth0-spa-js';
 import { useAuth, defineNuxtPlugin, useRuntimeConfig } from '#imports';
+import { defu } from 'defu';
 
 export default defineNuxtPlugin(async () => {
   const { public: $config } = useRuntimeConfig();
@@ -21,9 +22,10 @@ export default defineNuxtPlugin(async () => {
     .then((result: User) => (user.value = result))
     .catch(() => undefined);
 
-  auth0.getTokenSilently = () => self0.getTokenSilently()
-    .then((result: string) => (token.value = result))
-    .catch(() => undefined);
+  auth0.getTokenSilently = (options: any = {}) =>
+    self0.getTokenSilently(defu(options, { authorizationParams: { audience: $config.merkaly.auth0.audience } }))
+      .then((result: string) => (token.value = result))
+      .catch((reason) => console.error('[Auth0] getTokenSilently failed', reason));
 
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
     .then(({ appState }) => location.href = (appState.target || '/'))
@@ -36,10 +38,11 @@ export default defineNuxtPlugin(async () => {
 
   auth0.loginWithRedirect = () => self0.loginWithRedirect({
     authorizationParams: {
-      audience: `https://${$config.merkaly.auth0.domain}/api/v2/`,
+      audience: $config.merkaly.auth0.audience,
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
         ? $config.merkaly.auth0.callbackUrl
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
+      scope: 'openid profile email offline_access',
     },
   });
 

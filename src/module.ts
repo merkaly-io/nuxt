@@ -15,12 +15,13 @@ import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/Bootst
 
 export interface MerkalyModuleOptions {
   auth0: {
+    audience: string
     callbackUrl: string
     client: string
     domain: string
     logoutUrl?: string
-    requiresAuth: boolean
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
+    requiresAuth: boolean
   };
   plausible?: {
     domain: string,
@@ -35,6 +36,7 @@ export interface MerkalyModuleOptions {
 export default defineNuxtModule<MerkalyModuleOptions>({
   defaults: {
     auth0: {
+      audience: '',
       callbackUrl: '/auth',
       client: '',
       domain: '',
