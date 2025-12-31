@@ -23,8 +23,13 @@ jobs:
         with:
           version: 10
 
-      - name: Install dependencies 🛠️
+      - name: Install Module deps 🛠️
         run: pnpm install
+        working-directory: ./
+
+      - name: Install Playground deps 🛠️
+        run: pnpm install
+        working-directory: ./playground
 
       - name: Run Prepare 🛠️
         run: pnpm dev:prepare
