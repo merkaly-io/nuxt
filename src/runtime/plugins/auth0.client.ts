@@ -1,8 +1,9 @@
-import type { User } from '@auth0/auth0-spa-js';
-import { createAuth0Client } from '@auth0/auth0-spa-js';
-import { useAuth, defineNuxtPlugin, useRuntimeConfig } from '#imports';
-import { defu } from 'defu';
+// plugins/auth0.client.ts
+import { createAuth0Client, type User } from '@auth0/auth0-spa-js';
+import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 import { navigateTo } from '#app';
+import { defu } from 'defu';
+import { useAuth } from '../composables/useAuth';
 
 export default defineNuxtPlugin(async () => {
   const { public: $config } = useRuntimeConfig();
@@ -21,30 +22,27 @@ export default defineNuxtPlugin(async () => {
 
   auth0.getUser = () => self0.getUser()
     .then((result: User) => (user.value = result))
-    .catch(() => undefined);
+    .catch((reason: Error) => console.error('[Auth0] getUser failed', reason));
 
   auth0.getTokenSilently = (options: any = {}) =>
     self0.getTokenSilently(defu(options, { authorizationParams: { audience: $config.merkaly.auth0.audience } }))
       .then((result: string) => (token.value = result))
-      .catch((reason) => console.error('[Auth0] getTokenSilently failed', reason));
+      .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));
 
+  // ---------- Callback ----------
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
-    .then(async ({ appState }) => auth0.checkSession()
-      .then(() => navigateTo(appState.target || '/')))
+    .then(({ appState }) => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
+      .then(() => void navigateTo(appState?.target || '/')))
     .catch(() => navigateTo('/'));
 
-  auth0.checkSession = () => self0.checkSession()
-    .then(async () => Promise.all([auth0.getUser(), auth0.getTokenSilently()]))
-    .catch(() => ({}))
-    .finally(() => (isLoading.value = false));
-
+  // ---------- Login ----------
   auth0.loginWithRedirect = () => self0.loginWithRedirect({
     authorizationParams: {
       audience: $config.merkaly.auth0.audience,
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
         ? $config.merkaly.auth0.callbackUrl
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
-      scope: 'openid profile email',
+      scope: 'openid profile email offline_access', // necesario aquí para API
     },
   });
 
@@ -55,6 +53,11 @@ export default defineNuxtPlugin(async () => {
         : location.origin.concat($config.merkaly.auth0.logoutUrl),
     },
   });
+
+  // ---------- Bootstrap ----------
+  Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
+    .catch(() => undefined)
+    .finally(() => isLoading.value = false);
 
   return { provide: { auth0 } };
 });

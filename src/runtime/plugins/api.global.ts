@@ -1,5 +1,6 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app';
-import { type Ref, useAuth } from '#imports';
+import type { Ref } from '#imports';
+import { useAuth } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
@@ -55,7 +56,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
   const { public: $config } = useRuntimeConfig();
   const { tenant, token, user } = useAuth();
 
-  return $fetch(url, {
+  $fetch(url, {
     // Determine the base URL
     baseURL: new URL(options.prefix || $config.merkaly.api.prefix || '/', $config.merkaly.api.url).href,
 

@@ -5,21 +5,21 @@ import { callOnce } from '#imports';
 const { $auth0 } = useNuxtApp();
 
 const emit = defineEmits<{
-  (e: 'success', v: string): any;
+  (e: 'success', v?: string): void;
 }>();
 
 // Parseamos los query params directamente desde la URL
 // (este componente asume ejecución en el cliente)
 const params = new URLSearchParams(window.location.search);
 
-const invitation = params.get('invitation') as string;
-const error = params.get('error') as string;
 const code = params.get('code') as string;
+const error = params.get('error') as string;
+const invitation = params.get('invitation') as string;
+const organization = params.get('organization') as string;
 
 // Maneja el flujo de invitación a una organización
 // Reenvía a Auth0 incluyendo organization + invitation
 function handleInvite() {
-  const organization = params.get('organization') as string;
 
   return $auth0.loginWithRedirect({ authorizationParams: { organization, invitation } });
 }
@@ -30,19 +30,19 @@ function handleError() {
   const errorDescription = params.get('error_description') as string;
 
   return showError({
-    statusMessage: errorDescription,
     statusCode: 400,
+    statusMessage: errorDescription ?? 'Auth error',
   });
 }
 
 function handleCode() {
-  return $auth0.handleRedirectCallback()
+  return void $auth0.handleRedirectCallback()
     .then(() => emit('success'));
 }
 
 callOnce(async () => {
   // 1️⃣ Si viene una invitación, priorizamos ese flujo
-  if (invitation) {
+  if (invitation && organization) {
     return handleInvite();
   }
 
@@ -62,10 +62,8 @@ callOnce(async () => {
 </script>
 
 <template>
-  <slot>
-    <div class="d-flex gap-3 justify-content-center align-items-center h-100">
-      <BSpinner variant="primary" />
-      <span v-text="'Loading...'" />
-    </div>
-  </slot>
+  <div class="d-flex gap-3 justify-content-center align-items-center h-100">
+    <BSpinner />
+    <span v-text="'Loading...'" />
+  </div>
 </template>

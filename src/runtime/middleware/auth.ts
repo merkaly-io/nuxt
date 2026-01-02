@@ -1,36 +1,36 @@
-import { defineNuxtRouteMiddleware, useNuxtApp, useRuntimeConfig } from '#app';
-import { useAuth } from '#imports';
+// middleware/auth.global.ts
+import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig } from '#app';
+import { useAuth } from '../composables/useAuth';
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to) => {
   const { isLoading, isAuthenticated } = useAuth();
-  const { $auth0 } = useNuxtApp();
   const { public: { merkaly } } = useRuntimeConfig();
 
-  // 1️⃣ Nunca interceptar la callback
-  if (location.pathname === merkaly.auth0.callbackUrl) {
-    return;
-  }
-
-  // 2️⃣ Esperar a Auth0
+  // 1️⃣ No interferir mientras carga auth
   if (isLoading.value) {
     return;
   }
 
-  // 3️⃣ Si ya está autenticado, continuar
-  if (isAuthenticated.value) {
+  // 2️⃣ No proteger callback
+  if (to.path === merkaly.auth0.callbackUrl) {
     return;
   }
 
-  // 4️⃣ Decidir si la ruta requiere auth
+  // 3️⃣ ¿La ruta requiere auth?
   const requiresAuth =
     typeof to.meta.requiresAuth === 'boolean'
       ? to.meta.requiresAuth
       : merkaly.auth0.requiresAuth;
 
-  // 5️⃣ Si NO requiere auth, continuar
+  // 4️⃣ Si NO requiere auth, continuar
   if (!requiresAuth) {
     return;
   }
 
-  return location.href = merkaly.auth0.callbackUrl;
+  // 5️⃣ Si no está autenticado → login
+  if (isAuthenticated.value) {
+    return;
+  }
+
+  return navigateTo(merkaly.auth0.callbackUrl);
 });
