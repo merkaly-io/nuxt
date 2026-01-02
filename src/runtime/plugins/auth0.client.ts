@@ -48,7 +48,9 @@ export default defineNuxtPlugin(async () => {
 
   auth0.logout = () => self0.logout({
     logoutParams: {
-      returnTo: $config.merkaly.auth0.logoutUrl,
+      returnTo: URL.canParse($config.merkaly.auth0.logoutUrl)
+        ? $config.merkaly.auth0.logoutUrl
+        : location.origin.concat($config.merkaly.auth0.logoutUrl),
     },
   });
 
