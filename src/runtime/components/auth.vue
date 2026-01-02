@@ -4,6 +4,10 @@ import { callOnce } from '#imports';
 
 const { $auth0 } = useNuxtApp();
 
+const emit = defineEmits<{
+  (e: 'success', v: string): any;
+}>();
+
 // Parseamos los query params directamente desde la URL
 // (este componente asume ejecución en el cliente)
 const params = new URLSearchParams(window.location.search);
@@ -32,7 +36,8 @@ function handleError() {
 }
 
 function handleCode() {
-  return $auth0.handleRedirectCallback();
+  return $auth0.handleRedirectCallback()
+    .then(() => emit('success'));
 }
 
 callOnce(async () => {

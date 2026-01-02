@@ -2,6 +2,7 @@ import type { User } from '@auth0/auth0-spa-js';
 import { createAuth0Client } from '@auth0/auth0-spa-js';
 import { useAuth, defineNuxtPlugin, useRuntimeConfig } from '#imports';
 import { defu } from 'defu';
+import { navigateTo } from '#app';
 
 export default defineNuxtPlugin(async () => {
   const { public: $config } = useRuntimeConfig();
@@ -28,8 +29,9 @@ export default defineNuxtPlugin(async () => {
       .catch((reason) => console.error('[Auth0] getTokenSilently failed', reason));
 
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
-    .then(({ appState }) => location.href = (appState.target || '/'))
-    .catch(() => location.href = '/');
+    .then(async ({ appState }) => auth0.checkSession()
+      .then(() => navigateTo(appState.target || '/')))
+    .catch(() => navigateTo('/'));
 
   auth0.checkSession = () => self0.checkSession()
     .then(async () => Promise.all([auth0.getUser(), auth0.getTokenSilently()]))
@@ -42,7 +44,7 @@ export default defineNuxtPlugin(async () => {
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
         ? $config.merkaly.auth0.callbackUrl
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
-      scope: 'openid profile email offline_access',
+      scope: 'openid profile email',
     },
   });
 
