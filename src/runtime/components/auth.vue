@@ -4,8 +4,17 @@ import { callOnce } from '#imports';
 
 const { $auth0 } = useNuxtApp();
 
+type AuthErrorReason =
+  | 'org_required'
+  | 'login_required'
+  | 'consent_required'
+  | 'invalid_request'
+  | 'unknown';
+
+
 const emit = defineEmits<{
-  (e: 'success', v?: string): void;
+  (e: 'success'): void;
+  (e: 'error', reason: string): void;
 }>();
 
 // Parseamos los query params directamente desde la URL
@@ -27,11 +36,13 @@ function handleInvite() {
 // Maneja errores OAuth devueltos por Auth0
 // Muestra el mensaje como error 400 en Nuxt
 function handleError() {
-  const errorDescription = params.get('error_description') as string;
+  const errorDescription = params.get('error_description') ?? 'Auth error';
+
+  emit('error', errorDescription);
 
   return showError({
     statusCode: 400,
-    statusMessage: errorDescription ?? 'Auth error',
+    statusMessage: errorDescription,
   });
 }
 
@@ -63,7 +74,7 @@ callOnce(async () => {
 
 <template>
   <div class="d-flex gap-3 justify-content-center align-items-center h-100">
-    <BSpinner />
+    <BSpinner variant="primary" />
     <span v-text="'Loading...'" />
   </div>
 </template>
