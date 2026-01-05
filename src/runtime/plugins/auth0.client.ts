@@ -1,4 +1,3 @@
-// plugins/auth0.client.ts
 import { createAuth0Client, type User } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 import { navigateTo } from '#app';
@@ -25,7 +24,7 @@ export default defineNuxtPlugin(async () => {
     .catch((reason: Error) => console.error('[Auth0] getUser failed', reason));
 
   auth0.getTokenSilently = (options: any = {}) =>
-    self0.getTokenSilently(defu(options, { authorizationParams: { audience: $config.merkaly.auth0.audience } }))
+    self0.getTokenSilently(defu({ authorizationParams: { audience: $config.merkaly.auth0.audience } }, options))
       .then((result: string) => (token.value = result))
       .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));
 

@@ -4,14 +4,6 @@ import { callOnce } from '#imports';
 
 const { $auth0 } = useNuxtApp();
 
-type AuthErrorReason =
-  | 'org_required'
-  | 'login_required'
-  | 'consent_required'
-  | 'invalid_request'
-  | 'unknown';
-
-
 const emit = defineEmits<{
   (e: 'success'): void;
   (e: 'error', reason: string): void;
