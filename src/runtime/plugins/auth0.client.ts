@@ -23,7 +23,7 @@ export default defineNuxtPlugin(async () => {
     .then((result: User) => (user.value = result))
     .catch((reason: Error) => console.error('[Auth0] getUser failed', reason));
 
-  auth0.getTokenSilently = (options: any = {}) =>
+  auth0.getTokenSilently = (options: Parameters<typeof self0.getTokenSilently>[0] = {}) =>
     self0.getTokenSilently(defu({ authorizationParams: { audience: $config.merkaly.auth0.audience } }, options))
       .then((result: string) => (token.value = result))
       .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));

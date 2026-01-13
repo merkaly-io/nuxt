@@ -54,7 +54,7 @@ export type ApiOptions = ParamsOptions & HooksOptions & RefOptions
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
-  const { tenant, token, user } = useAuth();
+  const { tenant, token } = useAuth();
 
   $fetch(url, {
     // Determine the base URL

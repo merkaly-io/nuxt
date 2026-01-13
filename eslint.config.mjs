@@ -5,5 +5,10 @@ import storybook from "eslint-plugin-storybook";
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
-  // Your custom configs here
+  ...storybook.configs["flat/recommended"],
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
 )
