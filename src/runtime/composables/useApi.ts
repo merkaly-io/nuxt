@@ -44,6 +44,7 @@ function useApi<D extends object>(callback: CallbackArgs<D>) {
       default: currentOptions.default,
       error,
       loading,
+      meta,
     });
   };
 
