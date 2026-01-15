@@ -90,7 +90,9 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     let BootstrapConfig: BvnComponentProps;
 
     if (existsSync(bootstrapConfigPath)) {
-      BootstrapConfig = await import(bootstrapConfigPath) || {};
+      await import(bootstrapConfigPath)
+        .then(result => BootstrapConfig = result.default)
+        .catch(() => BootstrapConfig = {});
     }
 
     if (!BootstrapConfig) {
