@@ -4,13 +4,13 @@ import type { ApiOptions } from '../plugins/api.global';
 declare module '#app' {
   interface NuxtApp {
     $auth0: Auth0Client;
-    $api: (url: string, options?: ApiOptions) => Promise<unknown>;
+    $api: (url: string, options?: ApiOptions) => Promise<void>;
   }
 }
 
 declare module 'vue' {
   interface ComponentCustomProperties {
     $auth0: Auth0Client;
-    $api: (url: string, options?: ApiOptions) => Promise<unknown>;
+    $api: (url: string, options?: ApiOptions) => Promise<void>;
   }
 }

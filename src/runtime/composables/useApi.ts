@@ -1,4 +1,5 @@
 import { ref, reactive, useNuxtApp } from '#imports';
+import type { Ref } from 'vue';
 import type { ApiOptions } from '../plugins/api.global';
 
 export interface ComposableOptions extends ApiOptions {
@@ -6,45 +7,54 @@ export interface ComposableOptions extends ApiOptions {
   uri: string;
 }
 
-export type CallbackArgs<T extends object> = (args: T) => ComposableOptions;
+export interface UseApiReturn<TData, TMeta, TParams> {
+  abort: () => void;
+  data: Ref<TData | undefined>;
+  error: Ref<Error | undefined>;
+  execute: (args?: Partial<TParams>) => Promise<void>;
+  loading: Ref<boolean>;
+  meta: Ref<TMeta>;
+  params: TParams;
+}
 
-function useApi<D extends object>(callback: CallbackArgs<D>) {
+function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extends object = object>(
+  callback: (params: TParams) => ComposableOptions,
+): UseApiReturn<TData, TMeta, TParams> {
   const { $api } = useNuxtApp();
 
   const controller = new AbortController();
 
-  const params = reactive({}) as D;
+  const params = reactive({}) as TParams;
 
-  const getOptions = (currentParams: D): ComposableOptions => {
+  const getOptions = (currentParams: TParams): ComposableOptions => {
     const options = callback(currentParams);
     options.method ||= 'GET';
     options.immediate ??= options.method === 'GET';
     return options;
   };
 
-  // Get initial options with empty params for immediate execution
   const initialOptions = getOptions(params);
 
   const loading = ref(false);
-  const data = ref(initialOptions.default?.());
-  const meta = ref({});
-  const error = ref<Error>();
+  const data = ref<TData | undefined>(initialOptions.default?.() as TData | undefined);
+  const meta = ref<TMeta>({} as TMeta);
+  const error = ref<Error | undefined>();
 
-  const execute = (args: Partial<D> = {}) => {
-    // Merge new args into params
-    Object.assign(params, args);
+  const execute = async (args: Partial<TParams> = {}): Promise<void> => {
+    Object.keys(args).forEach((key) => {
+      (params as Record<string, unknown>)[key] = (args as Record<string, unknown>)[key];
+    });
 
-    // Get options with updated params
     const currentOptions = getOptions(params);
 
-    return $api(currentOptions.uri, {
+    await $api(currentOptions.uri, {
       ...currentOptions,
       controller,
-      data,
+      data: data as Ref<unknown>,
       default: currentOptions.default,
-      error,
+      error: error as Ref<unknown>,
       loading,
-      meta,
+      meta: meta as Ref<Record<string, unknown>>,
     });
   };
 
@@ -53,12 +63,13 @@ function useApi<D extends object>(callback: CallbackArgs<D>) {
   }
 
   return {
-    abort: controller.abort,
-    data,
+    abort: () => controller.abort(),
+    data: data as Ref<TData | undefined>,
     error,
     execute,
     loading,
-    meta,
+    meta: meta as Ref<TMeta>,
+    params,
   };
 }
 

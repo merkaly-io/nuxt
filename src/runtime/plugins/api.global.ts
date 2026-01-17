@@ -5,7 +5,7 @@ import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
 type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
-type OnSuccessArgs = { data: unknown, meta: Record<string, unknown>, headers: FetchOptions['headers'] }
+type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>> = { data: TData, meta: TMeta, headers: FetchOptions['headers'] }
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
 export interface RefOptions {
@@ -18,7 +18,7 @@ export interface RefOptions {
   meta?: Ref<Record<string, unknown>>;
 }
 
-export interface HooksOptions {
+export interface HooksOptions<TData = unknown, TMeta = Record<string, unknown>> {
   onBeforeSend?(args: OnBeforeSendArgs): Promise<unknown> | unknown;
 
   onComplete?(args: OnCompleteArgs): Promise<unknown> | unknown;
@@ -29,7 +29,7 @@ export interface HooksOptions {
 
   onResponse?(args: OnResponseArgs): Promise<unknown> | unknown;
 
-  onSuccess?(args: OnSuccessArgs): Promise<unknown> | unknown;
+  onSuccess?(args: OnSuccessArgs<TData, TMeta>): Promise<unknown> | unknown;
 }
 
 export interface ParamsOptions {

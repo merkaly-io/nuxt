@@ -14,6 +14,10 @@ import svgLoader from 'vite-svg-loader';
 // @ts-expect-error Types aren't exposed but they exists
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
 
+// Re-export types for consumers
+export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
+export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runtime/plugins/api.global';
+
 export interface MerkalyModuleOptions {
   auth0: {
     audience: string
