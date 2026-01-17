@@ -5,7 +5,7 @@ import type { FetchOptions, FetchResponse } from 'ofetch';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
 type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
-type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>> = { data: TData, meta: TMeta, headers: FetchOptions['headers'] }
+type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = { data: TData, meta: TMeta, headers: FetchOptions['headers'], params: TParams }
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
 export interface RefOptions {
@@ -18,7 +18,7 @@ export interface RefOptions {
   meta?: Ref<Record<string, unknown>>;
 }
 
-export interface HooksOptions<TData = unknown, TMeta = Record<string, unknown>> {
+export interface HooksOptions<TData = unknown, TMeta = Record<string, unknown>, TParams = object> {
   onBeforeSend?(args: OnBeforeSendArgs): Promise<unknown> | unknown;
 
   onComplete?(args: OnCompleteArgs): Promise<unknown> | unknown;
@@ -29,7 +29,7 @@ export interface HooksOptions<TData = unknown, TMeta = Record<string, unknown>> 
 
   onResponse?(args: OnResponseArgs): Promise<unknown> | unknown;
 
-  onSuccess?(args: OnSuccessArgs<TData, TMeta>): Promise<unknown> | unknown;
+  onSuccess?(args: OnSuccessArgs<TData, TMeta, TParams>): Promise<unknown> | unknown;
 }
 
 export interface ParamsOptions {
@@ -50,7 +50,7 @@ export interface ParamsOptions {
   timeout?: FetchOptions['timeout'];
 }
 
-export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>> = ParamsOptions & HooksOptions<TData, TMeta> & RefOptions
+export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = ParamsOptions & HooksOptions<TData, TMeta, TParams> & RefOptions & { params?: TParams }
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();
@@ -103,7 +103,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
       // ignorar errores
       if (status >= 400) return;
 
-      await options?.onSuccess?.({ data, meta, headers });
+      await options?.onSuccess?.({ data, meta, headers, params: options.params as object });
       if (options.data) options.data.value = data;
       if (options.meta) options.meta.value = meta;
 

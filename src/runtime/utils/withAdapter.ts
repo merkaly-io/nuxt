@@ -9,7 +9,7 @@ export interface AdapterOptions {
   params: object;
 }
 
-export interface AdapterArgs<TData, TMeta, TParams> extends HooksOptions<TData, TMeta> {
+export interface AdapterArgs<TData, TMeta, TParams> extends HooksOptions<TData, TMeta, TParams> {
   params?: Partial<TParams>;
 }
 

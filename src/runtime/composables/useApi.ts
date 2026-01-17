@@ -55,6 +55,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
       error: error as Ref<unknown>,
       loading,
       meta: meta as Ref<Record<string, unknown>>,
+      params,
     });
   };
 
