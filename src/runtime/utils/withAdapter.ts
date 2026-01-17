@@ -16,7 +16,7 @@ export interface AdapterArgs<TData, TMeta, TParams> extends HooksOptions<TData, 
 type AdapterCallback<T extends AdapterOptions> = (args: T['params']) => AdapterArgs<T['data'], T['meta'], T['params']>;
 
 export const withAdapter = <T extends AdapterOptions>(
-  callback: (params: T['params']) => ComposableOptions,
+  callback: (params: T['params']) => ComposableOptions<T['data'], T['meta']>,
 ) => (
   args?: AdapterCallback<T>,
 ): UseApiReturn<T['data'], T['meta'], T['params']> => {
@@ -32,6 +32,6 @@ export const withAdapter = <T extends AdapterOptions>(
     const adapterResult = callback(mergedParams);
 
     // Merge hooks with adapter result (hooks take priority for onSuccess, onError, etc.)
-    return defu(hooks, adapterResult) as ComposableOptions;
+    return defu(hooks, adapterResult) as ComposableOptions<T['data'], T['meta']>;
   });
 };

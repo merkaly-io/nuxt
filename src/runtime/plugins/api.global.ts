@@ -50,7 +50,7 @@ export interface ParamsOptions {
   timeout?: FetchOptions['timeout'];
 }
 
-export type ApiOptions = ParamsOptions & HooksOptions & RefOptions
+export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>> = ParamsOptions & HooksOptions<TData, TMeta> & RefOptions
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { public: $config } = useRuntimeConfig();

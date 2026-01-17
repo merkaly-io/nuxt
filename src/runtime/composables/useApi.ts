@@ -2,7 +2,7 @@ import { ref, reactive, useNuxtApp } from '#imports';
 import type { Ref } from 'vue';
 import type { ApiOptions } from '../plugins/api.global';
 
-export interface ComposableOptions extends ApiOptions {
+export interface ComposableOptions<TData = unknown, TMeta = Record<string, unknown>> extends ApiOptions<TData, TMeta> {
   immediate?: boolean;
   uri: string;
 }
@@ -18,7 +18,7 @@ export interface UseApiReturn<TData, TMeta, TParams> {
 }
 
 function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extends object = object>(
-  callback: (params: TParams) => ComposableOptions,
+  callback: (params: TParams) => ComposableOptions<TData, TMeta>,
 ): UseApiReturn<TData, TMeta, TParams> {
   const { $api } = useNuxtApp();
 
