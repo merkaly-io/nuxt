@@ -4,7 +4,7 @@ import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
 
-export default defineNuxtPlugin(async () => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const { public: $config } = useRuntimeConfig();
 
   const auth0 = await createAuth0Client({
@@ -55,7 +55,17 @@ export default defineNuxtPlugin(async () => {
 
   // ---------- Bootstrap ----------
   Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-    .catch(() => undefined)
+    .then((results) => {
+      const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+
+      if (rejected.length > 0) {
+        return nuxtApp.callHook('merkaly:auth:error', { errors: rejected.map((r) => r.reason) });
+      }
+
+      if (user.value) {
+        return nuxtApp.callHook('merkaly:auth:success', { user: user.value, token: token.value! });
+      }
+    })
     .finally(() => isLoading.value = false);
 
   return { provide: { auth0 } };
