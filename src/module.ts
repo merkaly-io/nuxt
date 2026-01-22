@@ -11,7 +11,6 @@ import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
 import svgLoader from 'vite-svg-loader';
-import { createJiti } from 'jiti';
 
 // @ts-expect-error Types aren't exposed but they exists
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
@@ -94,13 +93,15 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     const logger = useLogger('@merkaly/nuxt');
     const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');
-    const jiti = createJiti(import.meta.url);
 
     logger.info(`Loading bootstrap.config.ts from: ${bootstrapConfigPath} (exists: ${existsSync(bootstrapConfigPath)})`);
 
-    const BootstrapConfig: BvnComponentProps = await jiti.import(bootstrapConfigPath)
-      .then((m) => (m as { default?: BvnComponentProps }).default || {})
-      .catch(() => ({}));
+    const BootstrapConfig: BvnComponentProps = await import(bootstrapConfigPath)
+      .then((m: { default?: BvnComponentProps }) => m.default || {})
+      .catch((err: Error) => {
+        logger.error(`Failed to load bootstrap.config.ts:`, err.message);
+        return {};
+      });
 
     logger.info(`Bootstrap config keys: ${Object.keys(BootstrapConfig).join(', ') || '(empty)'}`)
 
