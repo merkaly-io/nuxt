@@ -5,11 +5,13 @@ import {
   defineNuxtModule,
   createResolver,
   addComponentsDir,
+  useLogger,
 } from '@nuxt/kit';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
 import svgLoader from 'vite-svg-loader';
+import { createJiti } from 'jiti';
 
 // @ts-expect-error Types aren't exposed but they exists
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
@@ -90,19 +92,17 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       ignoredHostnames: ['localhost'].concat(options.plausible?.localhost || '').filter(Boolean),
     }, nuxt.options.plausible || {});
 
+    const logger = useLogger('@merkaly/nuxt');
     const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');
-    let BootstrapConfig: BvnComponentProps;
+    const jiti = createJiti(import.meta.url);
 
-    if (existsSync(bootstrapConfigPath)) {
-      await import(bootstrapConfigPath)
-        .then(result => BootstrapConfig = result.default)
-        .catch(() => BootstrapConfig = {});
-    }
+    logger.info(`Loading bootstrap.config.ts from: ${bootstrapConfigPath} (exists: ${existsSync(bootstrapConfigPath)})`);
 
-    if (!BootstrapConfig) {
-      // $logger.warn('bootstrap.config.ts not found in root directory. Skipping');
-      BootstrapConfig = {};
-    }
+    const BootstrapConfig: BvnComponentProps = await jiti.import(bootstrapConfigPath)
+      .then((m) => (m as { default?: BvnComponentProps }).default || {})
+      .catch(() => ({}));
+
+    logger.info(`Bootstrap config keys: ${Object.keys(BootstrapConfig).join(', ') || '(empty)'}`)
 
     nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), { plugin: { components: BootstrapConfig } });
 
