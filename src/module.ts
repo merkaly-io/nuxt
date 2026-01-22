@@ -7,6 +7,7 @@ import {
   addComponentsDir,
   useLogger,
 } from '@nuxt/kit';
+import { createJiti } from 'jiti';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
@@ -96,8 +97,9 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     logger.info(`Loading bootstrap.config.ts from: ${bootstrapConfigPath} (exists: ${existsSync(bootstrapConfigPath)})`);
 
-    const BootstrapConfig: BvnComponentProps = await import(bootstrapConfigPath)
-      .then((m: { default?: BvnComponentProps }) => m.default || {})
+    const jiti = createJiti(import.meta.url);
+    const BootstrapConfig: BvnComponentProps = await jiti.import(bootstrapConfigPath)
+      .then((m) => (m as { default?: BvnComponentProps }).default || {})
       .catch((err: Error) => {
         logger.error(`Failed to load bootstrap.config.ts:`, err.message);
         return {};
