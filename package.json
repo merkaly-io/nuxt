@@ -78,6 +78,9 @@
     "vitest": "^4.0.6",
     "vue-tsc": "^3.2.1"
   },
+  "optionalDependencies": {
+    "defu": "^6.1.4"
+  },
   "engines": {
     "node": ">=20.0.0"
   }
