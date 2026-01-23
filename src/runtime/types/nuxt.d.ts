@@ -8,8 +8,7 @@ declare module '#app' {
   }
 
   interface RuntimeNuxtHooks {
-    'merkaly:auth:success': (payload: { user: User; token: string }) => void | Promise<void>;
-    'merkaly:auth:error': (payload: { errors: unknown[] }) => void | Promise<void>;
+    'merkaly:auth': (user: User | null) => void | Promise<void>;
   }
 }
 
