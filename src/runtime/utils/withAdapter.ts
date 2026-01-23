@@ -10,6 +10,7 @@ export interface AdapterOptions {
 }
 
 export interface AdapterArgs<TData, TMeta, TParams> extends HooksOptions<TData, TMeta, TParams> {
+  immediate?: boolean;
   params?: Partial<TParams>;
 }
 
