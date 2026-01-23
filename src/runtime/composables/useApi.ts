@@ -9,7 +9,7 @@ export interface ComposableOptions<TData = unknown, TMeta = Record<string, unkno
 
 export interface UseApiReturn<TData, TMeta, TParams> {
   abort: () => void;
-  data: Ref<TData | undefined>;
+  data: Ref<TData>;
   error: Ref<Error | undefined>;
   execute: (args?: Partial<TParams>) => Promise<void>;
   loading: Ref<boolean>;
@@ -36,7 +36,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
   const initialOptions = getOptions(params);
 
   const loading = ref(false);
-  const data = ref<TData | undefined>(initialOptions.default?.() as TData | undefined);
+  const data = ref<TData>(initialOptions.default?.() as TData);
   const meta = ref<TMeta>({} as TMeta);
   const error = ref<Error | undefined>();
 
@@ -65,7 +65,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
 
   return {
     abort: () => controller.abort(),
-    data: data as Ref<TData | undefined>,
+    data: data as Ref<TData>,
     error,
     execute,
     loading,
