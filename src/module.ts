@@ -2,6 +2,7 @@ import {
   addPlugin,
   addImportsDir,
   addRouteMiddleware,
+  addTypeTemplate,
   defineNuxtModule,
   createResolver,
   addComponentsDir,
@@ -130,5 +131,11 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     });
 
     nuxt.options['vite'] = defu((nuxt.options['vite'] || {}), { plugins: [svgLoader()] });
+
+    // Type augmentations for $api and $auth0
+    addTypeTemplate({
+      filename: 'types/merkaly.d.ts',
+      src: moduleResolver.resolve('./runtime/types/nuxt.d.ts'),
+    });
   },
 });
