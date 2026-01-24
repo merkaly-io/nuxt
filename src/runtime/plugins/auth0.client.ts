@@ -23,7 +23,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     .then((result: User) => (user.value = result))
     .catch((reason: Error) => console.error('[Auth0] getUser failed', reason));
 
-  auth0.getTokenSilently = (options: Parameters<typeof self0.getTokenSilently>[0] = {}) =>
+  auth0.getTokenSilently = (options = {}) =>
     self0.getTokenSilently(defu({ authorizationParams: { audience: $config.merkaly.auth0.audience } }, options))
       .then((result: string) => (token.value = result))
       .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));
@@ -54,9 +54,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   });
 
   // ---------- Bootstrap ----------
-  hook('app:created', () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-    .then(() => callHook('merkaly:auth', user.value))
-    .finally(() => isLoading.value = false));
+  Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
+    .then(() => hook('app:created', () => callHook('merkaly:auth', user.value)))
+    .catch(() => undefined)
+    .finally(() => isLoading.value = false);
 
   return { provide: { auth0 } };
 });
