@@ -60,7 +60,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.42.0",
     "eslint": "^9.39.1",
-    "nuxt": "^4.2.0",
+    "nuxt": "^4.3.0",
     "sass": "^1.97.0",
     "typescript": "~5.9.3",
     "v-money3": "^3.24.1",
