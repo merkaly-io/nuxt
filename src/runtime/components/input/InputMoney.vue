@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed } from '#imports';
+import type { Numberish } from 'bootstrap-vue-next/dist/src/types/CommonTypes';
 import { Money3Component } from 'v-money3';
 
-const model = defineModel<string | number>({
+const money = defineModel<Numberish>({
   default: () => 0,
   get: v => v / 100,
   set: v => v * 100,
@@ -11,28 +11,31 @@ const model = defineModel<string | number>({
 
 const props = defineProps({
   decimal: { type: String, default: () => '.' },
-  thousands: { type: String, default: () => ',' },
+  max: { type: Number, required: false, default: undefined },
+  min: { type: Number, default: () => 0 },
+  placeholder: { type: String, default: () => '$0.00' },
   precision: { type: Number, default: () => 2 },
-  prefix: { type: String, default: () => '' },
-  suffix: { type: String, default: () => '' },
-  min: { type: Number, default: undefined },
-  max: { type: Number, default: undefined },
-  placeholder: { type: String, default: () => '0.00' },
+  prefix: { type: String, default: () => '$' },
+  suffix: { type: String, default: () => ' ' },
+  thousands: { type: String, default: () => ',' },
 });
 
 const config = computed(() => ({
-  class: 'form-control',
   decimal: props.decimal,
-  max: props.max,
-  min: props.min,
-  placeholder: props.placeholder,
   precision: props.precision,
-  prefix: props.prefix ? `${props.prefix} ` : '',
+  prefix: props.prefix.concat(' '),
   suffix: props.suffix,
   thousands: props.thousands,
 }));
 </script>
 
 <template>
-  <Money3Component v-model="model" v-bind="config" />
+  <Money3Component
+      v-model.number="money"
+      :max="props.max"
+      :min="props.min"
+      :placeholder="props.placeholder"
+      class="form-control"
+      v-bind="config"
+  />
 </template>
