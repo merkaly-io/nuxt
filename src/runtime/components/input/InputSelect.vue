@@ -1,6 +1,8 @@
 <script generic="T extends Record<string, any>" lang="ts" setup>
-import type { PropType } from '#imports';
+import type { PropType } from 'vue';
 import type { Size } from 'bootstrap-vue-next';
+import { computed, onBeforeMount } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import type { OptionConsumer, VueSelectProps } from 'vue-select';
 import VSelect from 'vue-select';
 import FormatIcon from '../format/FormatIcon.vue';

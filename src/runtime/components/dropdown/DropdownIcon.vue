@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { BaseButtonVariant, BaseSize } from 'bootstrap-vue-next';
+import { computed, useSlots } from 'vue';
 
 const props = defineProps({
   size: { type: String as PropType<keyof BaseSize>, default: () => 'sm' },

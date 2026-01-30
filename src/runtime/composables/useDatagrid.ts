@@ -1,4 +1,4 @@
-import { reactive } from '#imports';
+import { reactive } from 'vue';
 
 interface ColumnDefinition<C = unknown> {
   class?: string;

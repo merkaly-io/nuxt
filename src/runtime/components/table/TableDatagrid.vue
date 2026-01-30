@@ -1,5 +1,6 @@
 <script generic="G" lang="ts" setup>
 import { sentenceCase } from 'change-case';
+import { computed, getCurrentInstance, useSlots } from 'vue';
 import FormatIcon from '../format/FormatIcon.vue';
 import FormatText from '../format/FormatText.vue';
 import InputSearch from '../input/InputSearch.vue';

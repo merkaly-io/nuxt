@@ -1,4 +1,5 @@
-import { useState, computed } from '#imports';
+import { computed } from 'vue';
+import { useState } from '#imports';
 import type { RouteLocationNormalized } from 'vue-router';
 
 // Interface for navigation item

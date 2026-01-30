@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Numberish } from 'bootstrap-vue-next/dist/src/types/CommonTypes';
+import { computed } from 'vue';
 import { Money3Component } from 'v-money3';
 
 const money = defineModel<Numberish>({

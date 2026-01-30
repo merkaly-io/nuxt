@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ColorVariant } from 'bootstrap-vue-next';
-import type { PropType } from '#imports';
-import { computed } from '#imports';
+import type { PropType } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   mode: { type: String, default: 'duotone' },

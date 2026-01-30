@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import type { PropType } from 'vue';
+import { computed } from 'vue';
+
 const props = defineProps({
   date: { type: [String, Date], default: () => new Date() },
   format: { type: String as PropType<'short' | 'relative'>, default: () => null },

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { PropType } from '#imports';
-import { ref, computed, onBeforeMount } from '#imports';
+import type { PropType } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import FormatIcon from '../format/FormatIcon.vue';
 
 type PresetKey = 'today' | 'yesterday' | 'last7days' | 'last30days' | 'thisMonth' | 'lastMonth';

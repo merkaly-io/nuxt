@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed, useSlots } from 'vue';
+
 const props = defineProps({
   fallback: { type: String, required: false },
   tag: { type: String, default: () => 'span' },

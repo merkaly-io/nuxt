@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { PropType } from '#imports';
-import { computed } from '#imports';
+import type { PropType } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   base: { type: Number, default: 1_00 },

@@ -1,4 +1,5 @@
-import { ref, reactive, useNuxtApp } from '#imports';
+import { reactive, ref } from 'vue';
+import { useNuxtApp } from '#imports';
 import type { Ref } from 'vue';
 import type { ApiOptions } from '../plugins/api.global';
 

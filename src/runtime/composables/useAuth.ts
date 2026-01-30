@@ -1,5 +1,6 @@
 import type { User } from '@auth0/auth0-spa-js';
-import { useState, computed } from '#imports';
+import { computed } from 'vue';
+import { useState } from '#imports';
 
 export const useAuth = () => {
   const user = useState<User | null>('auth:user', () => null);

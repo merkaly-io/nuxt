@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { PropType } from '#imports';
+import type { PropType } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { BFormInput } from 'bootstrap-vue-next';
 
 export type PlaceTypes = 'address' | 'geocode' | 'establishment' | '(regions)' | '(cities)'
@@ -15,8 +16,6 @@ const props = defineProps({
 });
 
 const model = defineModel({ type: String, default: () => '' });
-
-const { $gmap } = useNuxtApp();
 
 const address = reactive({
   city: String(),
@@ -67,6 +66,7 @@ function setAddress(items: any[]) {
 const input = ref<typeof BFormInput>();
 
 onMounted(() => {
+  const { $gmap } = useNuxtApp();
 
   //@ts-ignore
   input.value.element.value = model.value;
