@@ -12,6 +12,7 @@ export interface Address {
   country: string;
   latitude: number;
   line1: string;
+  line2: string;
   locality: string;
   longitude: number;
   number: string;
@@ -73,6 +74,7 @@ const address = reactive<Address>({
   country: '',
   latitude: 0,
   line1: '',
+  line2: '',
   locality: '',
   longitude: 0,
   number: '',
