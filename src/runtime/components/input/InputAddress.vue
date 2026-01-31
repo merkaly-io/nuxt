@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { ComponentPublicInstance, PropType } from 'vue';
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-import { BFormInput } from 'bootstrap-vue-next';
+import { BFormInput, BInputGroup, BButton, useModal } from 'bootstrap-vue-next';
 import { useNuxtApp } from '#imports';
+import FormatIcon from '../format/FormatIcon.vue';
 
 export type PlaceTypes = 'address' | 'geocode' | 'establishment' | '(regions)' | '(cities)'
 
@@ -141,14 +142,30 @@ onBeforeUnmount(() => {
   placeChangedListener?.remove();
   placeChangedListener = null;
 });
+
+const { create: createModal } = useModal();
+
+async function openAddressModal() {
+  const result = await createModal({
+    title: 'Editar dirección',
+    okTitle: 'Guardar',
+    cancelTitle: 'Cancelar',
+  }).show();
+
+  if (result.ok) {
+    emit('search', { ...address });
+  }
+}
 </script>
 
 <template>
-  <BFormInput
-    ref="input"
-    :model-value="model"
-    :placeholder="props.placeholder"
-    :disabled="props.disabled"
-    autocomplete="one-time-code"
-  />
+  <BInputGroup>
+    <template #append>
+      <BButton variant="light" class="border" @click="openAddressModal()">
+        <FormatIcon name="map-marker-alt" />
+      </BButton>
+    </template>
+
+    <BFormInput ref="input" :model-value="model" v-bind="{ ...props, $attrs }" autocomplete="one-time-code" />
+  </BInputGroup>
 </template>

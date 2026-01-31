@@ -16,7 +16,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>
 
-export const main: Story = {
+export const Main: Story = {
   name: 'Default',
   args: {
     modelValue: 1502,
