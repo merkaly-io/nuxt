@@ -25,6 +25,7 @@ const address = reactive({
   line1: String(),
   locality: String(),
   longitude: Number(),
+  name: String(),
   number: String(),
   state: String(),
   street: String(),
@@ -87,6 +88,7 @@ onMounted(() => {
 
     const { lat, lng } = place.geometry.location;
 
+    address.name = place.formatted_address;
     address.line1 = place.name;
     address.latitude = lat?.();
     address.longitude = lng?.();
@@ -97,5 +99,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <BFormInput ref="input" autocomplete="one-time-code" placeholder="Search address" />
+  <BFormInput ref="input" :model-value="address.name" autocomplete="one-time-code" placeholder="Search address" />
 </template>
