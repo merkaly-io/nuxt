@@ -5,6 +5,7 @@ declare module '#app' {
   interface NuxtApp {
     $auth0: Auth0Client;
     $api: (url: string, options?: ApiOptions) => Promise<void>;
+    $gmap: any;
   }
 
   interface RuntimeNuxtHooks {

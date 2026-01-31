@@ -1,103 +1,152 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-import { onMounted, reactive, ref } from 'vue';
+import type { ComponentPublicInstance, PropType } from 'vue';
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { BFormInput } from 'bootstrap-vue-next';
+import { useNuxtApp } from '#imports';
 
 export type PlaceTypes = 'address' | 'geocode' | 'establishment' | '(regions)' | '(cities)'
 
+export interface Address {
+  city: string;
+  code: string;
+  country: string;
+  latitude: number;
+  line1: string;
+  locality: string;
+  longitude: number;
+  number: string;
+  state: string;
+  street: string;
+}
+
+interface PlaceResult {
+  formatted_address?: string;
+  name?: string;
+  geometry?: {
+    location: {
+      lat: () => number;
+      lng: () => number;
+    };
+  };
+  address_components?: AddressComponent[];
+}
+
+interface AddressComponent {
+  short_name: string;
+  types: string[];
+}
+
+interface Autocomplete {
+  getPlace: () => PlaceResult;
+  addListener: (event: string, callback: () => void) => { remove: () => void };
+}
+
+type AddressFormatKey = keyof Pick<Address, 'city' | 'code' | 'country' | 'locality' | 'number' | 'state' | 'street'>;
+
+const ADDRESS_FORMAT: Record<AddressFormatKey, string[]> = {
+  city: ['locality', 'administrative_area_level_2'],
+  code: ['postal_code'],
+  country: ['country'],
+  locality: ['sublocality', 'sublocality_level_1', 'political'],
+  number: ['street_number'],
+  state: ['administrative_area_level_1'],
+  street: ['route'],
+};
+
 const emit = defineEmits<{
-  (e: 'search', args: typeof address): void
-  (e: 'error', place: any): void
+  (e: 'search', args: Address): void
+  (e: 'error', place: PlaceResult): void
 }>();
 
 const props = defineProps({
   mode: { type: String as PropType<PlaceTypes>, default: 'geocode' },
-  countries: { type: Array<`${string}${string}`>, default: [] },
+  countries: { type: Array as PropType<string[]>, default: () => [] },
+  placeholder: { type: String, default: 'Search address' },
+  disabled: { type: Boolean, default: false },
 });
 
 const model = defineModel({ type: String, default: () => '' });
 
-const address = reactive({
-  city: String(),
-  code: String(),
-  country: String(),
-  latitude: Number(),
-  line1: String(),
-  locality: String(),
-  longitude: Number(),
-  name: String(),
-  number: String(),
-  state: String(),
-  street: String(),
+const address = reactive<Address>({
+  city: '',
+  code: '',
+  country: '',
+  latitude: 0,
+  line1: '',
+  locality: '',
+  longitude: 0,
+  number: '',
+  state: '',
+  street: '',
 });
 
-function setAddress(items: any[]) {
-  const format = {
-    city: ['locality', 'administrative_area_level_2'],
-    code: ['postal_code'],
-    country: ['country'],
-    locality: ['sublocality', 'sublocality_level_1', 'political'],
-    number: ['street_number'],
-    state: ['administrative_area_level_1'],
-    street: ['route'],
-  };
+const input = ref<ComponentPublicInstance<typeof BFormInput>>();
 
-  items.forEach(item => {
-    const [name] = item.types;
-    const value = item.short_name;
+let placeChangedListener: { remove: () => void } | null = null;
 
-    for (const key in format) {
-      //@ts-ignore
-      const group: string[] = format[key];
+function setAddress(items: AddressComponent[]) {
+  for (const item of items) {
+    const type = item.types[0];
+    if (!type) continue;
 
-      const exist = group.includes(name);
-
-      if (!exist) {
-        continue;
+    for (const key of Object.keys(ADDRESS_FORMAT) as AddressFormatKey[]) {
+      if (ADDRESS_FORMAT[key].includes(type)) {
+        address[key] = item.short_name;
+        break;
       }
-
-      //@ts-ignore
-      address[key] = value;
     }
-  });
+  }
 
-  return emit('search', { ...address });
+  emit('search', { ...address });
 }
 
-const input = ref<typeof BFormInput>();
+function getInputElement(): HTMLInputElement | null {
+  return (input.value?.$el as HTMLInputElement) ?? null;
+}
 
 onMounted(() => {
   const { $gmap } = useNuxtApp();
+  const inputElement = getInputElement();
 
-  //@ts-ignore
-  input.value.element.value = model.value;
+  if (!inputElement) return;
 
-  // @ts-ignore
-  const autocomplete = new $gmap.places.Autocomplete(input.value?.element, {
-    componentRestrictions: { country: props.countries },
+  inputElement.value = model.value;
+
+  const ac: Autocomplete = new $gmap.places.Autocomplete(inputElement, {
+    componentRestrictions: props.countries.length ? { country: props.countries } : undefined,
     types: [props.mode],
   });
 
-  // Listener for place selection
-  autocomplete.addListener('place_changed', () => {
-    const place = autocomplete.getPlace();
+  placeChangedListener = ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
 
     if (!place.geometry) {
       return emit('error', place);
     }
 
-    const { lat, lng } = place.geometry.location;
+    const { lat, lng } = place.geometry.location!;
 
-    address.name = place.formatted_address;
-    address.line1 = place.name;
-    address.latitude = lat?.();
-    address.longitude = lng?.();
+    model.value = place.formatted_address ?? '';
+    address.line1 = place.name ?? '';
+    address.latitude = lat();
+    address.longitude = lng();
 
-    return setAddress(place.address_components);
+    setAddress(place.address_components ?? []);
   });
+});
+
+onBeforeUnmount(() => {
+  placeChangedListener?.remove();
+  placeChangedListener = null;
 });
 </script>
 
 <template>
-  <BFormInput ref="input" :model-value="address.name" autocomplete="one-time-code" placeholder="Search address" />
+  <BFormInput
+    ref="input"
+    :model-value="model"
+    :placeholder="props.placeholder"
+    :disabled="props.disabled"
+    autocomplete="one-time-code"
+  />
 </template>
