@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import type { ComponentPublicInstance, PropType } from 'vue';
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { h, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { BFormInput, BInputGroup, BButton, useModal } from 'bootstrap-vue-next';
 import { useNuxtApp } from '#imports';
 import FormatIcon from '../format/FormatIcon.vue';
+import ModalAddress from '../modal/ModalAddress.vue';
 
 export type PlaceTypes = 'address' | 'geocode' | 'establishment' | '(regions)' | '(cities)'
 
@@ -16,6 +17,7 @@ export interface Address {
   line2: string;
   locality: string;
   longitude: number;
+  name: string;
   number: string;
   state: string;
   street: string;
@@ -24,12 +26,7 @@ export interface Address {
 interface PlaceResult {
   formatted_address?: string;
   name?: string;
-  geometry?: {
-    location: {
-      lat: () => number;
-      lng: () => number;
-    };
-  };
+  geometry?: { location: { lat: () => number; lng: () => number; }; };
   address_components?: AddressComponent[];
 }
 
@@ -78,6 +75,7 @@ const address = reactive<Address>({
   line2: '',
   locality: '',
   longitude: 0,
+  name: '',
   number: '',
   state: '',
   street: '',
@@ -129,12 +127,14 @@ onMounted(() => {
 
     const { lat, lng } = place.geometry.location!;
 
-    model.value = place.formatted_address ?? '';
     address.line1 = place.name ?? '';
     address.latitude = lat();
     address.longitude = lng();
 
     setAddress(place.address_components ?? []);
+
+    model.value = place.formatted_address;
+    address.name = model.value;
   });
 });
 
@@ -146,13 +146,23 @@ onBeforeUnmount(() => {
 const { create: createModal } = useModal();
 
 async function openAddressModal() {
+  const editedAddress = reactive<Address>({ ...address });
+
   const result = await createModal({
-    title: 'Editar dirección',
-    okTitle: 'Guardar',
     cancelTitle: 'Cancelar',
+    okTitle: 'Guardar',
+    size: 'lg',
+    slots: {
+      default: () => h(ModalAddress, {
+        address: editedAddress,
+        'onUpdate:address': (value: Address) => Object.assign(editedAddress, value),
+      }),
+    },
+    title: 'Editar dirección',
   }).show();
 
   if (result.ok) {
+    Object.assign(address, editedAddress);
     emit('search', { ...address });
   }
 }
@@ -161,7 +171,7 @@ async function openAddressModal() {
 <template>
   <BInputGroup>
     <template #append>
-      <BButton variant="light" class="border" @click="openAddressModal()">
+      <BButton variant="light" class="border px-3" @click="openAddressModal()">
         <FormatIcon name="map-marker-alt" />
       </BButton>
     </template>

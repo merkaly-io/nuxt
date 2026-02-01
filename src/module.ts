@@ -13,6 +13,7 @@ import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import { defu } from 'defu';
 import { existsSync } from 'node:fs';
 import svgLoader from 'vite-svg-loader';
+import 'reflect-metadata';
 
 // @ts-expect-error Types aren't exposed but they exists
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
