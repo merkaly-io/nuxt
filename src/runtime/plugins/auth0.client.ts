@@ -38,7 +38,6 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   auth0.loginWithRedirect = () => self0.loginWithRedirect({
     authorizationParams: {
       audience: $config.merkaly.auth0.audience,
-      prompt: 'login',
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
         ? $config.merkaly.auth0.callbackUrl
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
