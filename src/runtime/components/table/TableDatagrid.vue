@@ -1,6 +1,7 @@
 <script generic="G" lang="ts" setup>
 import { sentenceCase } from 'change-case';
 import { computed, getCurrentInstance, useSlots } from 'vue';
+import DropdownIcon from '../dropdown/DropdownIcon.vue';
 import FormatIcon from '../format/FormatIcon.vue';
 import FormatText from '../format/FormatText.vue';
 import InputSearch from '../input/InputSearch.vue';
@@ -27,6 +28,7 @@ const instance = getCurrentInstance();
 const canFetch = Boolean(instance?.vnode?.props?.onFetch);
 const canFilter = Boolean(slots.filters);
 const hasDetails = computed(() => Boolean(slots['details']));
+const hasActions = computed(() => Boolean(slots['actions']));
 
 const visibleColumns = computed(() => Object.entries($datagrid.value.columns));
 
@@ -179,7 +181,7 @@ function getItemValue(item: G, key: string): unknown {
             </BTh>
           </template>
 
-          <BTh class="w-10px" />
+          <BTh class="text-end px-3" />
         </BTr>
       </BThead>
 
@@ -226,7 +228,11 @@ function getItemValue(item: G, key: string): unknown {
               </BTd>
             </template>
 
-            <BTd class="w-10px" />
+            <BTd class="text-end px-3">
+              <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body">
+                <slot v-if="hasActions" :index="idx" :item="item" name="actions" />
+              </DropdownIcon>
+            </BTd>
           </BTr>
 
           <BTr v-if="hasDetails && item._showDetails">
