@@ -11,6 +11,7 @@ type FetchReason = 'paginate' | 'refresh' | 'search' | 'sort' | 'filter';
 
 const emit = defineEmits<{
   (e: 'fetch', reason: FetchReason): void
+  (e: 'toggle:item', item: G, expanded: boolean): void
 }>();
 
 const slots = useSlots();
@@ -91,6 +92,12 @@ function toggleCheckAll() {
 
 function getItemValue(item: G, key: string): unknown {
   return (item as Record<string, unknown>)[key];
+}
+
+function toggleDetails(item: G) {
+  const record = item as Record<string, unknown>;
+  record._showDetails = !record._showDetails;
+  emit('toggle:item', item, Boolean(record._showDetails));
 }
 </script>
 
@@ -209,7 +216,7 @@ function getItemValue(item: G, key: string): unknown {
                 class="w-25px h-100 rounded-0 p-0 bg-light bg-hover-light-secondary border-end border-dashed"
                 size="sm"
                 variant="none"
-                @click="item._showDetails = !item._showDetails">
+                @click="toggleDetails(item)">
                 <FormatIcon :name="item._showDetails ? 'chevron-down' : 'chevron-right'" size="sm" variant="primary" />
               </BButton>
             </BTd>
@@ -240,7 +247,7 @@ function getItemValue(item: G, key: string): unknown {
               <slot
                 :index="idx"
                 :item="item"
-                :toggle-details="() => item._showDetails = !item._showDetails"
+                :toggle-details="() => toggleDetails(item)"
                 name="details" />
             </BTd>
           </BTr>
