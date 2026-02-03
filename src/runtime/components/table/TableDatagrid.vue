@@ -4,6 +4,7 @@ import { computed, getCurrentInstance, useSlots } from 'vue';
 import FormatIcon from '../format/FormatIcon.vue';
 import FormatText from '../format/FormatText.vue';
 import InputSearch from '../input/InputSearch.vue';
+import type { DataGrid } from '../../composables/useDatagrid';
 
 type FetchReason = 'paginate' | 'refresh' | 'search' | 'sort' | 'filter';
 
@@ -25,6 +26,7 @@ const $datagrid = defineModel<DataGrid<G>>({ type: Object, required: true });
 const instance = getCurrentInstance();
 const canFetch = Boolean(instance?.vnode?.props?.onFetch);
 const canFilter = Boolean(slots.filters);
+const hasDetails = computed(() => Boolean(slots['details']));
 
 const visibleColumns = computed(() => Object.entries($datagrid.value.columns));
 
@@ -104,12 +106,12 @@ function getItemValue(item: G, key: string): unknown {
 
         <template v-if="canFilter">
           <BDropdown
-              :disabled="$datagrid.loading"
-              auto-close="outside"
-              menu-class="w-400px pb-0"
-              no-caret
-              toggle-class="btn-icon h-40px w-40px"
-              variant="light">
+            :disabled="$datagrid.loading"
+            auto-close="outside"
+            menu-class="w-400px pb-0"
+            no-caret
+            toggle-class="btn-icon h-40px w-40px"
+            variant="light">
             <template #button-content>
               <FormatIcon name="bars-filter" />
             </template>
@@ -138,11 +140,11 @@ function getItemValue(item: G, key: string): unknown {
 
         <template v-if="canFetch">
           <BButton
-              :disabled="$datagrid.loading"
-              class="h-40px w-40px btn-icon border"
-              size="sm"
-              variant="active-light-primary"
-              @click="emit('fetch', 'refresh')">
+            :disabled="$datagrid.loading"
+            class="h-40px w-40px btn-icon border"
+            size="sm"
+            variant="active-light-primary"
+            @click="emit('fetch', 'refresh')">
             <FormatIcon :spin="$datagrid.loading" name="rotate" variant="primary" />
           </BButton>
         </template>
@@ -150,24 +152,24 @@ function getItemValue(item: G, key: string): unknown {
     </BCardHeader>
 
     <BTableSimple
-        :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
-        class="mb-0"
-        hover
-        responsive="lg"
-        small
-        table-class="align-middle table-row-dashed gy-3 h-100">
+      :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
+      class="mb-0"
+      hover
+      responsive="lg"
+      small
+      table-class="align-middle table-row-dashed gy-3 h-100">
       <BThead class="sticky-top z-index-1">
         <BTr class="text-start text-body-secondary fw-bold fs-7 text-uppercase gs-0">
-          <BTh class="w-10px" />
+          <BTh v-if="hasDetails" class="p-0 w-25px" />
 
-          <BTh v-if="!props.hideSelect" class="w-40px">
+          <BTh v-if="!props.hideSelect" class="w-40px px-0">
             <div class="form-check form-check-sm form-check-custom cell-checkbox">
               <input
-                  :disabled="$datagrid.loading"
-                  class="form-check-input"
-                  type="checkbox"
-                  v-bind="checkboxAllAttrs"
-                  @input="toggleCheckAll()">
+                :disabled="$datagrid.loading"
+                class="form-check-input"
+                type="checkbox"
+                v-bind="checkboxAllAttrs"
+                @input="toggleCheckAll()">
             </div>
           </BTh>
 
@@ -200,9 +202,17 @@ function getItemValue(item: G, key: string): unknown {
       <BTbody v-else class="fw-semibold text-gray-600">
         <template v-for="(item, idx) in visibleItems" :key="idx">
           <BTr>
-            <BTd class="w-10px" />
+            <BTd v-if="hasDetails" class="p-0 w-25px">
+              <BButton
+                class="w-25px h-100 rounded-0 p-0 bg-light bg-hover-light-secondary border-end border-dashed"
+                size="sm"
+                variant="none"
+                @click="item._showDetails = !item._showDetails">
+                <FormatIcon :name="item._showDetails ? 'chevron-down' : 'chevron-right'" size="sm" variant="primary" />
+              </BButton>
+            </BTd>
 
-            <BTd v-if="!props.hideSelect" class="w-40px">
+            <BTd v-if="!props.hideSelect" class="w-40px px-0">
               <div class="form-check form-check-sm form-check-custom cell-checkbox">
                 <input v-model="item._checked" :disabled="$datagrid.loading" class="form-check-input" type="checkbox">
               </div>
@@ -217,6 +227,16 @@ function getItemValue(item: G, key: string): unknown {
             </template>
 
             <BTd class="w-10px" />
+          </BTr>
+
+          <BTr v-if="hasDetails && item._showDetails">
+            <BTd :colspan="tableColspan" class="p-0">
+              <slot
+                :index="idx"
+                :item="item"
+                :toggle-details="() => item._showDetails = !item._showDetails"
+                name="details" />
+            </BTd>
           </BTr>
         </template>
       </BTbody>
@@ -239,13 +259,13 @@ function getItemValue(item: G, key: string): unknown {
 
         <BCol v-show="!$datagrid.loading" cols="auto">
           <BPagination
-              v-model="$datagrid.page"
-              :disabled="$datagrid.loading"
-              :per-page="$datagrid.limit"
-              :total-rows="$datagrid.total"
-              class="mb-0"
-              no-goto-end-buttons
-              @update:model-value="emit('fetch', 'paginate')" />
+            v-model="$datagrid.page"
+            :disabled="$datagrid.loading"
+            :per-page="$datagrid.limit"
+            :total-rows="$datagrid.total"
+            class="mb-0"
+            no-goto-end-buttons
+            @update:model-value="emit('fetch', 'paginate')" />
         </BCol>
 
         <BCol class="fs-7 text-muted" cols="auto">
@@ -259,7 +279,9 @@ function getItemValue(item: G, key: string): unknown {
 
 <style lang="scss" scoped>
 .cell-checkbox {
-  justify-content: start;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
   width: 2em;
 
   input {
