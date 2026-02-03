@@ -35,7 +35,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     .catch(() => navigateTo('/'));
 
   // ---------- Login ----------
-  auth0.loginWithRedirect = () => self0.loginWithRedirect({
+  auth0.loginWithRedirect = (options = {}) => self0.loginWithRedirect(defu(options, {
     authorizationParams: {
       audience: $config.merkaly.auth0.audience,
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
@@ -43,7 +43,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
       scope: 'openid profile email offline_access', // necesario aquí para API
     },
-  });
+  }));
 
   auth0.logout = () => self0.logout({
     logoutParams: {
