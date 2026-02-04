@@ -1,4 +1,4 @@
-import { createAuth0Client, PopupCancelledError, type User } from '@auth0/auth0-spa-js';
+import { createAuth0Client, type User } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
@@ -66,8 +66,8 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     },
   });
 
-  (auth0 as any).linkWithConnection = (connection: string) =>
-    linkingClient.loginWithPopup({ authorizationParams: { connection } })
+  auth0.linkWithConnection = (connection: string) => {
+    return linkingClient.loginWithPopup({ authorizationParams: { connection } })
       .then(() => linkingClient.getIdTokenClaims())
       .then((claims) => {
         if (!claims?.sub) {
@@ -78,21 +78,13 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         const [provider, ...userIdParts] = claims.sub.split('|');
         const userId = userIdParts.join('|');
 
+        const body = { provider, userId };
+
         const { $api } = useNuxtApp();
 
-        return $api('/identities', {
-          method: 'POST',
-          prefix: '/',
-          body: { provider, userId },
-        });
-      })
-      .catch((error: Error) => {
-        if (error instanceof PopupCancelledError) {
-          console.warn('[Auth0] Linking cancelled by user');
-          return;
-        }
-        throw error;
+        return $api('/identities', { method: 'POST', prefix: '/', body });
       });
+  };
 
   // ---------- Bootstrap ----------
   Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
