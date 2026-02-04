@@ -54,19 +54,19 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   });
 
   // ---------- Account Linking ----------
+  const callbackUrl = $config.merkaly.auth0.callbackUrl;
+  const redirectUri = URL.canParse(callbackUrl) ? callbackUrl : `${location.origin}${callbackUrl}`;
+
+  const linkingClient = await createAuth0Client({
+    cacheLocation: 'memory',
+    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
+    domain: $config.merkaly.auth0.domain,
+    authorizationParams: {
+      redirect_uri: redirectUri,
+    },
+  });
+
   (auth0 as any).linkWithConnection = async (connection: string) => {
-    const callbackUrl = $config.merkaly.auth0.callbackUrl;
-    const redirectUri = URL.canParse(callbackUrl) ? callbackUrl : `${location.origin}${callbackUrl}`;
-
-    const linkingClient = await createAuth0Client({
-      cacheLocation: 'memory',
-      clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
-      domain: $config.merkaly.auth0.domain,
-      authorizationParams: {
-        redirect_uri: redirectUri,
-      },
-    });
-
     try {
       await linkingClient.loginWithPopup({
         authorizationParams: { connection },
