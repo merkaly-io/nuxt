@@ -59,7 +59,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   const linkingClient = await createAuth0Client({
     cacheLocation: 'memory',
-    clientId: $config.merkaly.auth0.client, // Usar app principal
+    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
     domain: $config.merkaly.auth0.domain,
     authorizationParams: {
       redirect_uri: redirectUri,
@@ -72,18 +72,22 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         authorizationParams: { connection },
       });
 
-      const claims = await linkingClient.getIdTokenClaims();
+      const linkedUser = await linkingClient.getUser();
 
-      if (!claims?.__raw) {
-        throw new Error('Failed to get ID token for linking');
+      if (!linkedUser?.sub) {
+        throw new Error('Failed to get user info for linking');
       }
+
+      // sub format: "provider|user_id" (e.g., "github|16559276")
+      const [provider, ...userIdParts] = linkedUser.sub.split('|');
+      const userId = userIdParts.join('|');
 
       const { $api } = useNuxtApp();
 
       await $api('/identities', {
         method: 'POST',
         prefix: '/',
-        body: { idToken: claims.__raw },
+        body: { provider, userId },
       });
     } catch (error) {
       if (error instanceof PopupCancelledError) {
