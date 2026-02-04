@@ -63,7 +63,12 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
     try {
       await linkingClient.loginWithPopup({
-        authorizationParams: { connection },
+        authorizationParams: {
+          connection,
+          redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
+            ? $config.merkaly.auth0.callbackUrl
+            : location.origin.concat($config.merkaly.auth0.callbackUrl),
+        },
       });
 
       const claims = await linkingClient.getIdTokenClaims();
