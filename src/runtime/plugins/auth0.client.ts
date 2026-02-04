@@ -57,7 +57,12 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   (auth0 as any).linkWithConnection = async (connection: string) => {
     try {
       await self0.loginWithPopup({
-        authorizationParams: { connection },
+        authorizationParams: {
+          connection,
+          redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
+            ? $config.merkaly.auth0.callbackUrl
+            : location.origin.concat($config.merkaly.auth0.callbackUrl),
+        },
       });
 
       const claims = await self0.getIdTokenClaims();
