@@ -63,6 +63,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     domain: $config.merkaly.auth0.domain,
     authorizationParams: {
       redirect_uri: redirectUri,
+      audience: $config.merkaly.auth0.client,
     },
   });
 
