@@ -59,6 +59,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
       await self0.loginWithPopup({
         authorizationParams: {
           connection,
+          organization: user.value?.org_id,
           redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
             ? $config.merkaly.auth0.callbackUrl
             : location.origin.concat($config.merkaly.auth0.callbackUrl),
