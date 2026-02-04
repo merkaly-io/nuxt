@@ -72,14 +72,14 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         authorizationParams: { connection },
       });
 
-      const linkedUser = await linkingClient.getUser();
+      const claims = await linkingClient.getIdTokenClaims();
 
-      if (!linkedUser?.sub) {
-        throw new Error('Failed to get user info for linking');
+      if (!claims?.sub) {
+        throw new Error('Failed to get ID token for linking');
       }
 
       // sub format: "provider|user_id" (e.g., "github|16559276")
-      const [provider, ...userIdParts] = linkedUser.sub.split('|');
+      const [provider, ...userIdParts] = claims.sub.split('|');
       const userId = userIdParts.join('|');
 
       const { $api } = useNuxtApp();
