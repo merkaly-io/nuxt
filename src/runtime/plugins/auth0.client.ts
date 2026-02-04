@@ -59,11 +59,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   const linkingClient = await createAuth0Client({
     cacheLocation: 'memory',
-    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
+    clientId: $config.merkaly.auth0.client, // Usar app principal
     domain: $config.merkaly.auth0.domain,
     authorizationParams: {
       redirect_uri: redirectUri,
-      audience: $config.merkaly.auth0.client,
     },
   });
 
