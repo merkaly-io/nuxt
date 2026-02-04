@@ -57,20 +57,24 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   const callbackUrl = $config.merkaly.auth0.callbackUrl;
   const redirectUri = URL.canParse(callbackUrl) ? callbackUrl : `${location.origin}${callbackUrl}`;
 
-  const linkingClient = await createAuth0Client({
-    cacheLocation: 'memory',
-    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
-    domain: $config.merkaly.auth0.domain,
-    authorizationParams: {
-      redirect_uri: redirectUri,
-    },
-  });
-
   (auth0 as any).linkWithConnection = async (connection: string) => {
+    // Open popup immediately to preserve user gesture
+    const popup = window.open('', 'auth0:authorize:popup', 'width=500,height=600');
+
     try {
+      // Create fresh client for each linking attempt
+      const linkingClient = await createAuth0Client({
+        cacheLocation: 'memory',
+        clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
+        domain: $config.merkaly.auth0.domain,
+        authorizationParams: {
+          redirect_uri: redirectUri,
+        },
+      });
+
       await linkingClient.loginWithPopup({
         authorizationParams: { connection },
-      });
+      }, { popup });
 
       const claims = await linkingClient.getIdTokenClaims();
 
@@ -90,6 +94,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         body: { provider, userId },
       });
     } catch (error) {
+      popup?.close();
       if (error instanceof PopupCancelledError) {
         console.warn('[Auth0] Linking cancelled by user');
         return;
