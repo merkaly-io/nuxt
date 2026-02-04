@@ -66,37 +66,33 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     },
   });
 
-  (auth0 as any).linkWithConnection = async (connection: string) => {
-    try {
-      await linkingClient.loginWithPopup({
-        authorizationParams: { connection },
+  (auth0 as any).linkWithConnection = (connection: string) =>
+    linkingClient.loginWithPopup({ authorizationParams: { connection } })
+      .then(() => linkingClient.getIdTokenClaims())
+      .then((claims) => {
+        if (!claims?.sub) {
+          throw new Error('Failed to get ID token for linking');
+        }
+
+        // sub format: "provider|user_id" (e.g., "github|16559276")
+        const [provider, ...userIdParts] = claims.sub.split('|');
+        const userId = userIdParts.join('|');
+
+        const { $api } = useNuxtApp();
+
+        return $api('/identities', {
+          method: 'POST',
+          prefix: '/',
+          body: { provider, userId },
+        });
+      })
+      .catch((error: Error) => {
+        if (error instanceof PopupCancelledError) {
+          console.warn('[Auth0] Linking cancelled by user');
+          return;
+        }
+        throw error;
       });
-
-      const claims = await linkingClient.getIdTokenClaims();
-
-      if (!claims?.sub) {
-        throw new Error('Failed to get ID token for linking');
-      }
-
-      // sub format: "provider|user_id" (e.g., "github|16559276")
-      const [provider, ...userIdParts] = claims.sub.split('|');
-      const userId = userIdParts.join('|');
-
-      const { $api } = useNuxtApp();
-
-      await $api('/identities', {
-        method: 'POST',
-        prefix: '/',
-        body: { provider, userId },
-      });
-    } catch (error) {
-      if (error instanceof PopupCancelledError) {
-        console.warn('[Auth0] Linking cancelled by user');
-        return;
-      }
-      throw error;
-    }
-  };
 
   // ---------- Bootstrap ----------
   Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
