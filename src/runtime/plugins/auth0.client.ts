@@ -55,17 +55,18 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   // ---------- Account Linking ----------
   (auth0 as any).linkWithConnection = async (connection: string) => {
+    const linkingClient = await createAuth0Client({
+      cacheLocation: 'memory',
+      clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
+      domain: $config.merkaly.auth0.domain,
+    });
+
     try {
-      await self0.loginWithPopup({
-        authorizationParams: {
-          connection,
-          redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
-            ? $config.merkaly.auth0.callbackUrl
-            : location.origin.concat($config.merkaly.auth0.callbackUrl),
-        },
+      await linkingClient.loginWithPopup({
+        authorizationParams: { connection },
       });
 
-      const claims = await self0.getIdTokenClaims();
+      const claims = await linkingClient.getIdTokenClaims();
 
       if (!claims?.__raw) {
         throw new Error('Failed to get ID token for linking');
