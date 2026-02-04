@@ -1,5 +1,5 @@
-import { createAuth0Client, type User } from '@auth0/auth0-spa-js';
-import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
+import { createAuth0Client, PopupCancelledError, type User } from '@auth0/auth0-spa-js';
+import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
@@ -52,6 +52,35 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         : location.origin.concat($config.merkaly.auth0.logoutUrl),
     },
   });
+
+  // ---------- Account Linking ----------
+  (auth0 as any).linkWithConnection = async (connection: string) => {
+    try {
+      await self0.loginWithPopup({
+        authorizationParams: { connection },
+      });
+
+      const claims = await self0.getIdTokenClaims();
+
+      if (!claims?.__raw) {
+        throw new Error('Failed to get ID token for linking');
+      }
+
+      const { $api } = useNuxtApp();
+
+      await $api('/identities', {
+        method: 'POST',
+        prefix: '/',
+        body: { idToken: claims.__raw },
+      });
+    } catch (error) {
+      if (error instanceof PopupCancelledError) {
+        console.warn('[Auth0] Linking cancelled by user');
+        return;
+      }
+      throw error;
+    }
+  };
 
   // ---------- Bootstrap ----------
   Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
