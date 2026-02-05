@@ -188,7 +188,7 @@ function toggleDetails(item: G) {
             </BTh>
           </template>
 
-          <BTh class="text-end px-3" />
+          <BTh v-if="hasActions" class="text-end px-3" />
         </BTr>
       </BThead>
 
@@ -235,9 +235,9 @@ function toggleDetails(item: G) {
               </BTd>
             </template>
 
-            <BTd class="text-end px-3">
+            <BTd v-if="hasActions" class="text-end px-3">
               <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body">
-                <slot v-if="hasActions" :index="idx" :item="item" name="actions" />
+                <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
           </BTr>
