@@ -184,7 +184,9 @@ function toggleDetails(item: G) {
 
           <template v-for="(column, key) in $datagrid.columns" :key="key">
             <BTh :class="[column.class, column.thClass]">
-              <span v-text="column.title ?? sentenceCase(key)" />
+              <slot :name="`head[${key}]`" v-bind="{ column,  key }">
+                <span v-text="column.title ?? sentenceCase(key)" />
+              </slot>
             </BTh>
           </template>
 
