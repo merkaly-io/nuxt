@@ -184,11 +184,13 @@ function toggleDetails(item: G) {
 
           <template v-for="(column, key) in $datagrid.columns" :key="key">
             <BTh :class="[column.class, column.thClass]">
-              <span v-text="column.title ?? sentenceCase(key)" />
+              <slot :name="`head[${key}]`" v-bind="{ column,  key }">
+                <span v-text="column.title ?? sentenceCase(key)" />
+              </slot>
             </BTh>
           </template>
 
-          <BTh class="text-end px-3" />
+          <BTh v-if="hasActions" class="text-end px-3" />
         </BTr>
       </BThead>
 
@@ -235,9 +237,9 @@ function toggleDetails(item: G) {
               </BTd>
             </template>
 
-            <BTd class="text-end px-3">
+            <BTd v-if="hasActions" class="text-end px-3">
               <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body">
-                <slot v-if="hasActions" :index="idx" :item="item" name="actions" />
+                <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
           </BTr>
