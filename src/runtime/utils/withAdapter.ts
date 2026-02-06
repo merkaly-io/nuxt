@@ -27,7 +27,7 @@ export const withAdapter = <T extends AdapterOptions>(
     const { params: initialParams = {}, ...hooks } = config;
 
     // Merge initial params with execution params (execution params take priority)
-    const mergedParams = defu(executionParams, initialParams) as T['params'];
+    const mergedParams = defu(executionParams, { ...initialParams }) as T['params'];
 
     // Call adapter callback with merged params
     const adapterResult = callback(mergedParams);
