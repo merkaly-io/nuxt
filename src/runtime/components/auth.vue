@@ -17,6 +17,7 @@ const code = params.get('code') as string;
 const error = params.get('error') as string;
 const invitation = params.get('invitation') as string;
 const organization = params.get('organization') as string;
+const redirect = params.get('redirect') as string;
 
 // Maneja el flujo de invitación a una organización
 // Reenvía a Auth0 incluyendo organization + invitation
@@ -60,7 +61,9 @@ callOnce(async () => {
   }
 
   // 4️⃣ Fallback: login estándar
-  return $auth0.loginWithRedirect();
+  return $auth0.loginWithRedirect({
+    appState: { target: redirect || '/' },
+  });
 });
 </script>
 

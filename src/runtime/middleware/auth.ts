@@ -32,5 +32,10 @@ export default defineNuxtRouteMiddleware((to) => {
     return;
   }
 
-  return navigateTo(merkaly.auth0.callbackUrl);
+  const redirect = to.fullPath;
+  const callbackUrl = redirect === '/'
+    ? merkaly.auth0.callbackUrl
+    : `${merkaly.auth0.callbackUrl}?redirect=${encodeURIComponent(redirect)}`;
+
+  return navigateTo(callbackUrl);
 });
