@@ -1,6 +1,6 @@
 import { reactive } from 'vue';
 
-interface ColumnDefinition<C = unknown> {
+export interface ColumnDefinition<C = unknown> {
   class?: string;
   getter?: (row: C) => any;
   tdClass?: string;
