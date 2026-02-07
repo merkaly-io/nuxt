@@ -32,6 +32,11 @@ export const withAdapter = <T extends AdapterOptions>(
     // Call adapter callback with merged params
     const adapterResult = callback(mergedParams);
 
+    // Ensure body is a plain object for ofetch serialization
+    if (adapterResult.body && typeof adapterResult.body === 'object' && !(adapterResult.body instanceof FormData)) {
+      adapterResult.body = { ...adapterResult.body };
+    }
+
     // Merge hooks with adapter result (hooks take priority for onSuccess, onError, etc.)
     return defu(hooks, adapterResult) as ComposableOptions<T['data'], T['meta']>;
   });
