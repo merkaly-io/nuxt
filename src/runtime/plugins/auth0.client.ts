@@ -87,10 +87,15 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   };
 
   // ---------- Bootstrap ----------
-  Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-    .then(() => hook('app:created', () => callHook('merkaly:auth', user.value)))
-    .catch(() => undefined)
-    .finally(() => isLoading.value = false);
+  const isAuthCallback = window.location.pathname === $config.merkaly.auth0.callbackUrl;
+
+  if (!isAuthCallback) {
+    await Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
+      .then(() => hook('app:created', () => callHook('merkaly:auth', user.value)))
+      .catch(() => undefined);
+  }
+
+  isLoading.value = false;
 
   return { provide: { auth0 } };
 });
