@@ -54,7 +54,7 @@ export function useNavigation(page?: NavigationItemOrGetter) {
 
         return { path: uri, text, loading };
       })
-      .filter(({ text, loading }) => text !== null && !loading); // Exclude null text and loading items
+      .filter(({ text, loading }) => text != null && !loading); // Exclude null/undefined text and loading items
   });
 
   const current = computed(() => {
