@@ -16,10 +16,12 @@ interface INavigationItem {
   path: string;
 }
 
+type NavigationItemOrGetter = INavigationItem | (() => INavigationItem);
+
 // Composition function to use navigation in components
-export function useNavigation(page?: INavigationItem) {
-  // Reactive list of navigation items
-  const list = useState<INavigationItem[]>('breadcrumbs', () => []);
+export function useNavigation(page?: NavigationItemOrGetter) {
+  // Reactive list of navigation items (stores getters or plain objects)
+  const list = useState<NavigationItemOrGetter[]>('breadcrumbs', () => []);
 
   // Utility function to normalize paths and prevent repeated slashes
   function normalizePath(base: string, path: string): string {
@@ -36,12 +38,17 @@ export function useNavigation(page?: INavigationItem) {
     return base + path;
   }
 
+  function resolve(item: NavigationItemOrGetter): INavigationItem {
+    return typeof item === 'function' ? item() : item;
+  }
+
   // Computed property for navigation items with full path and text
   const items = computed(() => {
     let uri = '';
 
     return list.value
-      .map(({ text, path }) => {
+      .map((item) => {
+        const { text, path } = resolve(item);
         uri = normalizePath(uri, path);
 
         return { path: uri, text };
@@ -56,12 +63,12 @@ export function useNavigation(page?: INavigationItem) {
   });
 
   // Function to add a new page to the navigation list
-  const setPage = (item: INavigationItem) => {
-    const newItem = JSON.stringify(item);
-    const existingItems = list.value.map((item) => JSON.stringify(item));
+  const setPage = (item: NavigationItemOrGetter) => {
+    const { path } = resolve(item);
+    const existingIndex = list.value.findIndex((i) => resolve(i).path === path);
 
-    if (existingItems.includes(newItem)) {
-      // New breadcrumb found in existing breadcrumbs, skip adding it to the array
+    if (existingIndex >= 0) {
+      list.value[existingIndex] = item;
       return;
     }
 
