@@ -14,6 +14,7 @@ import type { RouteLocationNormalized } from 'vue-router';
 interface INavigationItem {
   text: string | null;
   path: string;
+  loading?: boolean;
 }
 
 type NavigationItemOrGetter = INavigationItem | (() => INavigationItem);
@@ -48,12 +49,12 @@ export function useNavigation(page?: NavigationItemOrGetter) {
 
     return list.value
       .map((item) => {
-        const { text, path } = resolve(item);
+        const { text, path, loading } = resolve(item);
         uri = normalizePath(uri, path);
 
-        return { path: uri, text };
+        return { path: uri, text, loading };
       })
-      .filter(({ text }) => text !== null); // Exclude items with null as text
+      .filter(({ text, loading }) => text !== null && !loading); // Exclude null text and loading items
   });
 
   const current = computed(() => {
