@@ -64,27 +64,17 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     return all.value.at(-1);
   });
 
-  // Function to add a new page to the navigation list
-  const setPage = (item: NavigationItemOrGetter) => {
-    const { path } = resolve(item);
-    const existingIndex = list.value.findIndex((i) => resolve(i).path === path);
+  // Shared pending route for deferred regeneration (avoids flicker during navigation)
+  const pendingRoute = useState<string | null>('breadcrumbs:pending', () => null);
 
-    if (existingIndex >= 0) {
-      list.value[existingIndex] = item;
-      return;
-    }
+  // Apply deferred trim based on pending route
+  function flushRegenerate() {
+    if (!pendingRoute.value) return;
 
-    return list.value.push(item);
-  };
+    const route = pendingRoute.value;
+    pendingRoute.value = null;
 
-  // Auto-set page if provided as parameter
-  if (page) {
-    setPage(page);
-  }
-
-  // Function to regenerate the navigation list based on the current route
-  function regenerate(route: RouteLocationNormalized) {
-    const itemIndex = items.value.findLastIndex((value) => route.path.startsWith(value.path));
+    const itemIndex = all.value.findLastIndex((value) => route.startsWith(value.path));
 
     if (itemIndex >= 0) {
       list.value = list.value.slice(0, itemIndex + 1);
@@ -94,5 +84,24 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     list.value = [];
   }
 
-  return { current, items, regenerate, setPage };
+  // Register page if provided
+  if (page) {
+    flushRegenerate();
+
+    const { path } = resolve(page);
+    const existingIndex = list.value.findIndex((i) => resolve(i).path === path);
+
+    if (existingIndex >= 0) {
+      list.value[existingIndex] = page;
+    } else {
+      list.value.push(page);
+    }
+  }
+
+  // Store the target route for deferred regeneration
+  function regenerate(route: RouteLocationNormalized) {
+    pendingRoute.value = route.path;
+  }
+
+  return { current, items, regenerate, flushRegenerate };
 }
