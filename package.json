@@ -60,6 +60,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.43.0",
     "change-case": "^5",
+    "class-validator": "^0.14.3",
     "eslint": "^9.39.1",
     "filesize": "^11.0.2",
     "nuxt": "^4.3.0",

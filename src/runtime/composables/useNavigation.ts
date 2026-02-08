@@ -25,7 +25,7 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     let uri = '';
 
     return list.value.map((item) => {
-      const { text, path, loading } = resolve(item);
+      const { text, path = '', loading } = resolve(item);
       uri = normalizePath(uri, path);
 
       return { path: uri, text, loading: !!loading };

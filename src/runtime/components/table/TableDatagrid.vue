@@ -265,29 +265,31 @@ function toggleDetails(item: G) {
     <BCardFooter v-if="!props.hideFooter" class="p-4">
       <slot name="footer" />
 
-      <BRow v-if="!props.hidePagination" align-h="between" align-v="center">
-        <BCol cols="auto">
-          <select v-model="$datagrid.limit" class="form-select form-select-sm form-select-solid" disabled>
-            <BFormSelectOption :value="10">10</BFormSelectOption>
-          </select>
-        </BCol>
+      <template v-if="!props.hidePagination">
+        <BRow align-h="between" align-v="center" class="w-100">
+          <BCol cols="auto">
+            <select v-model="$datagrid.limit" class="form-select form-select-sm form-select-solid" disabled>
+              <BFormSelectOption :value="10">10</BFormSelectOption>
+            </select>
+          </BCol>
 
-        <BCol v-show="!$datagrid.loading" cols="auto">
-          <BPagination
-            v-model="$datagrid.page"
-            :disabled="$datagrid.loading"
-            :per-page="$datagrid.limit"
-            :total-rows="$datagrid.total"
-            class="mb-0"
-            no-goto-end-buttons
-            @update:model-value="emit('fetch', 'paginate')" />
-        </BCol>
+          <BCol v-show="!$datagrid.loading" cols="auto">
+            <BPagination
+              v-model="$datagrid.page"
+              :disabled="$datagrid.loading"
+              :per-page="$datagrid.limit"
+              :total-rows="$datagrid.total"
+              class="mb-0"
+              no-goto-end-buttons
+              @update:model-value="emit('fetch', 'paginate')" />
+          </BCol>
 
-        <BCol class="fs-7 text-muted" cols="auto">
-          <span v-if="$datagrid.loading">Loading...</span>
-          <FormatText v-else :template="paginationText.template" :values="paginationText.values" />
-        </BCol>
-      </BRow>
+          <BCol class="fs-7 text-muted" cols="auto">
+            <span v-if="$datagrid.loading">Loading...</span>
+            <FormatText v-else :template="paginationText.template" :values="paginationText.values" />
+          </BCol>
+        </BRow>
+      </template>
     </BCardFooter>
   </BCard>
 </template>
