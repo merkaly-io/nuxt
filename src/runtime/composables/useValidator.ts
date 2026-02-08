@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed, ref } from 'vue';
 import { validate as classValidate, getMetadataStorage } from 'class-validator';
 import type { ValidationError } from 'class-validator';
 
@@ -63,15 +63,17 @@ export function useValidator<T extends object>(instance: T) {
   const constraints = extractConstraints<T>(instance.constructor);
   const errors = reactive({}) as Record<keyof T, string>;
   const state = reactive({}) as Record<string, boolean | null>;
-  const dirty = computed(() => Object.values(errors).some((v) => v));
+  const validated = ref(false);
+  const valid = computed(() => validated.value && !Object.values(errors).some((v) => v));
   const attrs = computed(() => mergeAttrs<T>(constraints, state));
 
   async function validate(): Promise<boolean> {
     const plain = Object.assign(Object.create(Object.getPrototypeOf(instance)), form);
     const result: ValidationError[] = await classValidate(plain);
     applyErrors(result, errors as Record<string, string>, state);
+    validated.value = true;
     return result.length === 0;
   }
 
-  return { form, attrs, dirty, errors, validate };
+  return { form, attrs, valid, errors, validate };
 }
