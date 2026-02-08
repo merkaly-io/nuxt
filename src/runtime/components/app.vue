@@ -1,13 +1,21 @@
 <script lang="ts" setup>
 import { useRoute } from '#app';
-import { useAuth, watchOnce } from '#imports';
+import { useAuth, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
 import AuthMiddleware from '../middleware/auth';
+import { useNavigation } from '../composables/useNavigation';
 
 const $route = useRoute();
 const { isLoading } = useAuth();
+const { hook } = useNuxtApp();
 
 // Ejecutar middleware una sola vez cuando `isLoading` cambia
 watchOnce(isLoading, () => AuthMiddleware($route, $route));
+
+// Breadcrumb navigation management
+const { regenerate, flushRegenerate } = useNavigation();
+
+addRouteMiddleware('navigation', (to) => regenerate(to), { global: true });
+hook('page:finish', () => flushRegenerate());
 </script>
 
 <template>
