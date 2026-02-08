@@ -43,24 +43,25 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     return typeof item === 'function' ? item() : item;
   }
 
-  // Computed property for navigation items with full path and text
-  const items = computed(() => {
+  // All resolved items (unfiltered, used for current page)
+  const all = computed(() => {
     let uri = '';
 
-    return list.value
-      .map((item) => {
-        const { text, path, loading } = resolve(item);
-        uri = normalizePath(uri, path);
+    return list.value.map((item) => {
+      const { text, path, loading } = resolve(item);
+      uri = normalizePath(uri, path);
 
-        return { path: uri, text, loading };
-      })
-      .filter(({ text, loading }) => text != null && !loading); // Exclude null/undefined text and loading items
+      return { path: uri, text, loading: !!loading };
+    });
+  });
+
+  // Filtered items for breadcrumb display (excludes loading and null text)
+  const items = computed(() => {
+    return all.value.filter(({ text, loading }) => text != null && !loading);
   });
 
   const current = computed(() => {
-    const length = items.value.length;
-
-    return items.value.at(length - 1);
+    return all.value.at(-1);
   });
 
   // Function to add a new page to the navigation list
