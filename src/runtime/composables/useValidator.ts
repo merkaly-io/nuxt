@@ -3,69 +3,73 @@ import { validate as classValidate, getMetadataStorage } from 'class-validator';
 import type { ValidationError } from 'class-validator';
 
 type FieldConstraints = { maxlength?: number; minlength?: number; required?: boolean };
+type FieldAttrs = FieldConstraints & { state?: boolean | null };
 
-export function useValidator<T extends object>(instance: T) {
-  const form = reactive(instance) as T;
+const handlers: Record<string, (entry: FieldConstraints, constraints: unknown[]) => void> = {
+  isLength(entry, [min, max]) {
+    if ((min as number) > 0) entry.minlength = min as number;
+    if (max != null) entry.maxlength = max as number;
+  },
+  isNotEmpty(entry) {
+    entry.required = true;
+  },
+};
 
-  const metadata = getMetadataStorage().getTargetValidationMetadatas(
-    instance.constructor,
-    '',
-    false,
-    false,
-  );
-
+function extractConstraints<T extends object>(constructor: Function): { [K in keyof T]?: FieldConstraints } {
+  const metadata = getMetadataStorage().getTargetValidationMetadatas(constructor, '', false, false);
   const constraints = {} as { [K in keyof T]?: FieldConstraints };
 
   for (const meta of metadata) {
     const prop = meta.propertyName as keyof T;
     if (!constraints[prop]) constraints[prop] = {};
 
-    if (meta.name === 'isLength') {
-      const [min, max] = meta.constraints as [number, number];
-      if (min > 0) constraints[prop]!.minlength = min;
-      if (max != null) constraints[prop]!.maxlength = max;
-    }
-
-    if (meta.name === 'isNotEmpty') {
-      constraints[prop]!.required = true;
-    }
+    const handler = handlers[meta.name!];
+    if (handler) handler(constraints[prop]!, meta.constraints ?? []);
   }
 
+  return constraints;
+}
+
+function applyErrors(result: ValidationError[], errors: Record<string, string>, state: Record<string, boolean | null>) {
+  for (const key of Object.keys(errors)) {
+    errors[key] = '';
+    state[key] = true;
+  }
+
+  for (const error of result) {
+    const messages = error.constraints ? Object.values(error.constraints) : [];
+    errors[error.property] = messages[0] || 'Invalid';
+    state[error.property] = false;
+  }
+}
+
+function mergeAttrs<T extends object>(
+  constraints: { [K in keyof T]?: FieldConstraints },
+  state: Record<string, boolean | null>,
+): { [K in keyof T]?: FieldAttrs } {
+  const result = {} as { [K in keyof T]?: FieldAttrs };
+  const keys = new Set([...Object.keys(constraints), ...Object.keys(state)]);
+
+  for (const key of keys) {
+    const prop = key as keyof T;
+    result[prop] = { ...constraints[prop], state: state[key] ?? null } as FieldAttrs;
+  }
+
+  return result;
+}
+
+export function useValidator<T extends object>(instance: T) {
+  const form = reactive(instance) as T;
+  const constraints = extractConstraints<T>(instance.constructor);
   const errors = reactive({}) as Record<keyof T, string>;
-
   const state = reactive({}) as Record<string, boolean | null>;
-
   const dirty = computed(() => Object.values(errors).some((v) => v));
-
-  type FieldAttrs = FieldConstraints & { state?: boolean | null };
-
-  const attrs = computed(() => {
-    const result = {} as { [K in keyof T]?: FieldAttrs };
-    const keys = new Set([...Object.keys(constraints), ...Object.keys(state)]);
-
-    for (const key of keys) {
-      const prop = key as keyof T;
-      result[prop] = { ...constraints[prop], state: state[key] ?? null } as FieldAttrs;
-    }
-
-    return result;
-  });
+  const attrs = computed(() => mergeAttrs<T>(constraints, state));
 
   async function validate(): Promise<boolean> {
     const plain = Object.assign(Object.create(Object.getPrototypeOf(instance)), form);
     const result: ValidationError[] = await classValidate(plain);
-
-    for (const key of Object.keys(errors)) {
-      (errors as Record<string, string>)[key] = '';
-      state[key] = true;
-    }
-
-    for (const error of result) {
-      const messages = error.constraints ? Object.values(error.constraints) : [];
-      (errors as Record<string, string>)[error.property] = messages[0] || 'Invalid';
-      state[error.property] = false;
-    }
-
+    applyErrors(result, errors as Record<string, string>, state);
     return result.length === 0;
   }
 
