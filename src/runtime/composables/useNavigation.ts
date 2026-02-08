@@ -40,7 +40,7 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     return resolved.value.at(-1);
   });
 
-  function flushRegenerate() {
+  function regenerate() {
     if (!pendingRoute.value) return;
 
     const route = pendingRoute.value;
@@ -57,7 +57,7 @@ export function useNavigation(page?: NavigationItemOrGetter) {
   }
 
   if (page) {
-    flushRegenerate();
+    regenerate();
 
     const { path } = resolve(page);
     const existingIndex = list.value.findIndex((i) => resolve(i).path === path);
@@ -69,9 +69,9 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     }
   }
 
-  function regenerate(route: { path: string }) {
+  function defer(route: { path: string }) {
     pendingRoute.value = route.path;
   }
 
-  return { current, items, regenerate, flushRegenerate };
+  return { current, items, defer, regenerate };
 }

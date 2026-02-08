@@ -12,10 +12,10 @@ const { hook } = useNuxtApp();
 watchOnce(isLoading, () => AuthMiddleware($route, $route));
 
 // Breadcrumb navigation management
-const { regenerate, flushRegenerate } = useNavigation();
+const { defer, regenerate } = useNavigation();
 
-addRouteMiddleware('navigation', (to) => regenerate(to), { global: true });
-hook('page:finish', () => flushRegenerate());
+addRouteMiddleware('navigation', (to) => defer(to), { global: true });
+hook('page:finish', () => regenerate());
 </script>
 
 <template>
