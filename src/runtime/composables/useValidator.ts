@@ -35,7 +35,7 @@ export function useValidator<T extends object>(instance: T) {
 
   const state = reactive({}) as Record<string, boolean | null>;
 
-  const pending = computed(() => Object.values(errors).some((v) => v));
+  const dirty = computed(() => Object.values(errors).some((v) => v));
 
   type FieldAttrs = FieldConstraints & { state?: boolean | null };
 
@@ -69,5 +69,5 @@ export function useValidator<T extends object>(instance: T) {
     return result.length === 0;
   }
 
-  return { form, attrs, errors, pending, validate };
+  return { form, attrs, dirty, errors, validate };
 }
