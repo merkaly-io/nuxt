@@ -1,50 +1,27 @@
 import { computed } from 'vue';
 import { useState } from '#imports';
-import type { RouteLocationNormalized } from 'vue-router';
 
-// Interface for navigation item
-
-/*
- * I prefer `null` instead `undefined` to avoid wrong usages,
- * null is when you don't want to show the Breadcrumb name
- * but you want to keep adding the URL to the breadcrumbs
- *
- * @see Project Pages
- */
-interface INavigationItem {
+interface NavigationItem {
   text: string | null;
   path: string;
   loading?: boolean;
 }
 
-type NavigationItemOrGetter = INavigationItem | (() => INavigationItem);
+type NavigationItemOrGetter = NavigationItem | (() => NavigationItem);
 
-// Composition function to use navigation in components
 export function useNavigation(page?: NavigationItemOrGetter) {
-  // Reactive list of navigation items (stores getters or plain objects)
   const list = useState<NavigationItemOrGetter[]>('breadcrumbs', () => []);
+  const pendingRoute = useState<string | null>('breadcrumbs:pending', () => null);
 
-  // Utility function to normalize paths and prevent repeated slashes
   function normalizePath(base: string, path: string): string {
-    path = String(path);
-
-    if (!path.startsWith('/')) {
-      path = '/' + path;
-    }
-
-    if (base.endsWith('/')) {
-      base = base.slice(0, -1);
-    }
-
-    return base + path;
+    return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
   }
 
-  function resolve(item: NavigationItemOrGetter): INavigationItem {
+  function resolve(item: NavigationItemOrGetter): NavigationItem {
     return typeof item === 'function' ? item() : item;
   }
 
-  // All resolved items (unfiltered, used for current page)
-  const all = computed(() => {
+  const resolved = computed(() => {
     let uri = '';
 
     return list.value.map((item) => {
@@ -55,26 +32,21 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     });
   });
 
-  // Filtered items for breadcrumb display (excludes loading and null text)
   const items = computed(() => {
-    return all.value.filter(({ text, loading }) => text != null && !loading);
+    return resolved.value.filter(({ text, loading }) => text != null && !loading);
   });
 
   const current = computed(() => {
-    return all.value.at(-1);
+    return resolved.value.at(-1);
   });
 
-  // Shared pending route for deferred regeneration (avoids flicker during navigation)
-  const pendingRoute = useState<string | null>('breadcrumbs:pending', () => null);
-
-  // Apply deferred trim based on pending route
   function flushRegenerate() {
     if (!pendingRoute.value) return;
 
     const route = pendingRoute.value;
     pendingRoute.value = null;
 
-    const itemIndex = all.value.findLastIndex((value) => route.startsWith(value.path));
+    const itemIndex = resolved.value.findLastIndex((value) => route.startsWith(value.path));
 
     if (itemIndex >= 0) {
       list.value = list.value.slice(0, itemIndex + 1);
@@ -84,7 +56,6 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     list.value = [];
   }
 
-  // Register page if provided
   if (page) {
     flushRegenerate();
 
@@ -98,8 +69,7 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     }
   }
 
-  // Store the target route for deferred regeneration
-  function regenerate(route: RouteLocationNormalized) {
+  function regenerate(route: { path: string }) {
     pendingRoute.value = route.path;
   }
 
