@@ -37,7 +37,7 @@ const classList = computed(() => [
   <template v-if="props.text">
     <span :class="{ 'flex-row-reverse': props.reversed }" class="d-flex align-items-center">
       <component :is="props.tag" :class="classList" />
-      <span class="ps-1" v-text="props.text" />
+      <span :class="fontColor" class="ps-1" v-text="props.text" />
     </span>
   </template>
 

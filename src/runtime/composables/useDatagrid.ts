@@ -18,6 +18,7 @@ export interface DataGrid<C = unknown> {
   limit: number;
   loading: boolean;
   page: number;
+  search: string;
   total: number;
   fn: {
     addItem: (item: C) => DataGridItem<C>[];
@@ -31,6 +32,7 @@ interface OptionArgs<D> {
   items?: D[];
   limit?: number;
   loading?: boolean;
+  search?: string;
   total?: number;
 }
 
@@ -39,6 +41,7 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
     columns: params.columns,
     error: params.error ?? null,
     items: params.items ?? [],
+    search: params.search,
     limit: params.limit ?? 10,
     loading: params.loading ?? false,
     page: 1,

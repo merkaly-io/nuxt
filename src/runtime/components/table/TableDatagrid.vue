@@ -106,7 +106,11 @@ function toggleDetails(item: G) {
     <BCardHeader class="align-items-center p-4">
       <BCardTitle>
         <slot name="search">
-          <InputSearch :disabled="$datagrid.loading" class="w-250px" />
+          <InputSearch
+            v-model="$datagrid.search"
+            :disabled="$datagrid.loading"
+            class="w-250px"
+            @change="emit('fetch', 'search')" />
         </slot>
       </BCardTitle>
 
@@ -162,7 +166,7 @@ function toggleDetails(item: G) {
 
     <BTableSimple
       :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
-      class="mb-0"
+      class="mb-0 overflow-auto"
       hover
       responsive="lg"
       small
