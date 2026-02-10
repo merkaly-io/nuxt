@@ -29,8 +29,10 @@ const $datagrid = defineModel<DataGrid<G>>({ type: Object, required: true });
 const instance = getCurrentInstance();
 const canFetch = Boolean(instance?.vnode?.props?.onFetch);
 const canFilter = Boolean(slots.filters);
-const hasDetails = computed(() => Boolean(slots['details']));
-const hasActions = computed(() => Boolean(slots['actions']));
+
+const hasDetailsSlot = computed(() => Boolean(slots['details']));
+const hasActionsSlot = computed(() => Boolean(slots['actions']));
+const hasBulkSlot = computed(() => Boolean(slots['bulk']));
 
 const visibleColumns = computed(() => Object.entries($datagrid.value.columns));
 
@@ -73,9 +75,11 @@ const visibleItems = computed(() => {
   return $datagrid.value.items.slice(start, paginationText.value.values.final);
 });
 
+const selectedItems = computed(() => $datagrid.value.items.filter(it => it._checked));
+
 const checkboxAllAttrs = computed(() => {
   const attrs: Record<string, any> = {};
-  const values = $datagrid.value.items.map(it => it._checked);
+  const values = selectedItems.value.map(it => it._checked);
 
   const allChecked = values.length > 0 && values.every(Boolean);
   const someChecked = values.some(Boolean);
@@ -87,7 +91,7 @@ const checkboxAllAttrs = computed(() => {
 });
 
 function toggleCheckAll() {
-  const allChecked = $datagrid.value.items.every(it => it._checked);
+  const allChecked = $datagrid.value.items.every((it) => it._checked);
   $datagrid.value.items.forEach(it => it._checked = !allChecked);
 }
 
@@ -106,6 +110,12 @@ function toggleDetails(item: G) {
   <BCard no-body>
     <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4">
       <BCardTitle>
+        <div v-if="hasBulkSlot && !props.hideSelect && selectedItems.length" class="w-35px">
+          <DropdownIcon icon="caret-down" size="sm" toggle-class="p-2">
+            <slot name="bulk" v-bind="{ items: selectedItems, count: selectedItems.length }" />
+          </DropdownIcon>
+        </div>
+
         <slot name="search">
           <InputSearch
             v-model="$datagrid.search"
@@ -174,7 +184,7 @@ function toggleDetails(item: G) {
       table-class="align-middle table-row-dashed gy-3 h-100">
       <BThead class="sticky-top z-index-1">
         <BTr class="text-start text-body-secondary fw-bold fs-7 text-uppercase gs-0">
-          <BTh v-if="hasDetails" class="p-0 w-25px" />
+          <BTh v-if="hasDetailsSlot" class="p-0 w-25px" />
 
           <BTh v-if="!props.hideSelect" class="w-40px px-0">
             <div class="form-check form-check-sm form-check-custom cell-checkbox">
@@ -195,7 +205,7 @@ function toggleDetails(item: G) {
             </BTh>
           </template>
 
-          <BTh v-if="hasActions" class="text-end px-3" />
+          <BTh v-if="hasActionsSlot" class="text-end px-3" />
         </BTr>
       </BThead>
 
@@ -218,7 +228,7 @@ function toggleDetails(item: G) {
       <BTbody v-else class="fw-semibold text-gray-600">
         <template v-for="(item, idx) in visibleItems" :key="idx">
           <BTr>
-            <BTd v-if="hasDetails" class="p-0 w-25px">
+            <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
               <BButton
                 class="w-25px h-100 rounded-0 p-0 bg-light bg-hover-light-secondary border-end border-dashed"
                 size="sm"
@@ -242,14 +252,14 @@ function toggleDetails(item: G) {
               </BTd>
             </template>
 
-            <BTd v-if="hasActions" class="text-end px-3">
-              <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body">
+            <BTd v-if="hasActionsSlot" class="text-end px-3">
+              <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body py-1 px-3">
                 <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
           </BTr>
 
-          <BTr v-if="hasDetails && item._showDetails">
+          <BTr v-if="hasDetailsSlot && item._showDetails">
             <BTd :colspan="tableColspan" class="p-0">
               <slot
                 :index="idx"
