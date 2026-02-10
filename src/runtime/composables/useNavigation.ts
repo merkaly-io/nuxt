@@ -2,9 +2,10 @@ import { computed } from 'vue';
 import { useState } from '#imports';
 
 interface NavigationItem {
-  text: string | null;
-  path: string;
+  disabled?: boolean;
   loading?: boolean;
+  path: string;
+  text: string | null;
 }
 
 type NavigationItemOrGetter = NavigationItem | (() => NavigationItem);
@@ -25,10 +26,10 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     let uri = '';
 
     return list.value.map((item) => {
-      const { text, path = '', loading } = resolve(item);
+      const { text, path = '', loading, disabled } = resolve(item);
       uri = normalizePath(uri, path);
 
-      return { path: uri, text, loading: !!loading };
+      return { disabled, loading: !!loading, path: uri, text };
     });
   });
 
