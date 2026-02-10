@@ -104,6 +104,11 @@ function toggleDetails(item: G) {
   record._showDetails = !record._showDetails;
   emit('toggle:item', item, Boolean(record._showDetails));
 }
+
+function emitSearch() {
+  $datagrid.value.page = 1;
+  emit('fetch', 'search');
+}
 </script>
 
 <template>
@@ -121,7 +126,7 @@ function toggleDetails(item: G) {
             v-model="$datagrid.search"
             :disabled="$datagrid.loading"
             class="max-w-250px"
-            @change="emit('fetch', 'search')" />
+            @change="emitSearch()" />
         </slot>
       </BCardTitle>
 
