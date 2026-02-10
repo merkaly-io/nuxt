@@ -14,32 +14,40 @@ export function useNavigation(page?: NavigationItemOrGetter) {
   const list = useState<NavigationItemOrGetter[]>('breadcrumbs', () => []);
   const pendingRoute = useState<string | null>('breadcrumbs:pending', () => null);
 
-  function normalizePath(base: string, path: string): string {
-    return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
-  }
+  /* ----------------------------- helpers ----------------------------- */
 
-  function resolve(item: NavigationItemOrGetter): NavigationItem {
-    return typeof item === 'function' ? item() : item;
-  }
+  const resolveItem = (item: NavigationItemOrGetter): NavigationItem =>
+    typeof item === 'function' ? item() : item;
 
-  const resolved = computed(() => {
+  const normalizePath = (base: string, path: string): string =>
+    `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+
+  const isVisibleItem = (item: NavigationItem) => item.text != null && !item.loading;
+
+  /* ---------------------------- computed ----------------------------- */
+
+  const resolved = computed<NavigationItem[]>(() => {
     let uri = '';
 
-    return list.value.map((item) => {
-      const { text, path = '', loading, disabled } = resolve(item);
-      uri = normalizePath(uri, path);
+    return list.value.map((rawItem) => {
+      const item = resolveItem(rawItem);
 
-      return { disabled, loading: !!loading, path: uri, text };
+      uri = normalizePath(uri, item.path ?? '');
+
+      return {
+        disabled: item.disabled,
+        loading: !!item.loading,
+        path: uri,
+        text: item.text,
+      };
     });
   });
 
-  const items = computed(() => {
-    return resolved.value.filter(({ text, loading }) => text != null && !loading);
-  });
+  const items = computed(() => resolved.value.filter(isVisibleItem));
 
-  const current = computed(() => {
-    return resolved.value.at(-1);
-  });
+  const current = computed(() => resolved.value.at(-1));
+
+  /* --------------------------- mutations ----------------------------- */
 
   function regenerate() {
     if (!pendingRoute.value) return;
@@ -47,32 +55,46 @@ export function useNavigation(page?: NavigationItemOrGetter) {
     const route = pendingRoute.value;
     pendingRoute.value = null;
 
-    const itemIndex = resolved.value.findLastIndex((value) => route.startsWith(value.path));
+    const index = findLastMatchingIndex(route);
 
-    if (itemIndex >= 0) {
-      list.value = list.value.slice(0, itemIndex + 1);
-      return;
-    }
-
-    list.value = [];
-  }
-
-  if (page) {
-    regenerate();
-
-    const { path } = resolve(page);
-    const existingIndex = list.value.findIndex((i) => resolve(i).path === path);
-
-    if (existingIndex >= 0) {
-      list.value[existingIndex] = page;
-    } else {
-      list.value.push(page);
-    }
+    list.value = index >= 0
+      ? list.value.slice(0, index + 1)
+      : [];
   }
 
   function defer(route: { path: string }) {
     pendingRoute.value = route.path;
   }
+
+  function findLastMatchingIndex(route: string): number {
+    return resolved.value.findLastIndex((item) =>
+      route.startsWith(item.path),
+    );
+  }
+
+  function upsertPage(page: NavigationItemOrGetter) {
+    const { path } = resolveItem(page);
+
+    const index = list.value.findIndex(
+      (item) => resolveItem(item).path === path,
+    );
+
+    if (index >= 0) {
+      list.value[index] = page;
+      return;
+    }
+
+    list.value.push(page);
+  }
+
+  /* --------------------------- bootstrap ----------------------------- */
+
+  if (!page) {
+    return { current, items, defer, regenerate };
+  }
+
+  regenerate();
+  upsertPage(page);
 
   return { current, items, defer, regenerate };
 }
