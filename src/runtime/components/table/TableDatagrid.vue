@@ -18,6 +18,7 @@ const slots = useSlots();
 
 const props = defineProps({
   emptyText: { type: String, default: () => 'No items found' },
+  hideHeader: { type: Boolean, default: false },
   hideFooter: { type: Boolean, default: false },
   hidePagination: { type: Boolean, default: false },
   hideSelect: { type: Boolean, default: false },
@@ -103,13 +104,13 @@ function toggleDetails(item: G) {
 
 <template>
   <BCard no-body>
-    <BCardHeader class="align-items-center p-4">
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4">
       <BCardTitle>
         <slot name="search">
           <InputSearch
             v-model="$datagrid.search"
             :disabled="$datagrid.loading"
-            class="w-250px"
+            class="max-w-250px"
             @change="emit('fetch', 'search')" />
         </slot>
       </BCardTitle>
