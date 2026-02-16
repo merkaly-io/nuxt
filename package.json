@@ -45,7 +45,7 @@
     "@auth0/auth0-spa-js": "^2.15.0",
     "@bootstrap-vue-next/nuxt": "^0.43.0",
     "@nuxt/devtools": "^3.2.1",
-    "@nuxt/eslint": "1.13.0",
+    "@nuxt/eslint": "1.15.1",
     "@nuxt/eslint-config": "^1.13.0",
     "@nuxt/fonts": "0.13.0",
     "@nuxt/image": "^2.0.0",
