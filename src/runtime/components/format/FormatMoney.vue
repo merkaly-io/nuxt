@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import { computed } from 'vue';
+import { useMoney } from '../../composables/useMoney';
 
 const props = defineProps({
   base: { type: Number, default: 1_00 },
@@ -12,18 +12,11 @@ const props = defineProps({
   value: { type: Number, default: 0 },
 });
 
-const price = computed(() => {
-  const price = props.value / props.base;
-  const money = price.toLocaleString(props.locale, {
-    style: props.mode,
-    currency: props.currency,
-  });
-
-  return {
-    currency: money[0],
-    value: money.slice(1, -3),
-    digits: money.slice(-3),
-  };
+const { price } = useMoney(() => props.value, {
+  base: () => props.base,
+  currency: () => props.currency,
+  locale: () => props.locale,
+  mode: () => props.mode,
 });
 </script>
 
