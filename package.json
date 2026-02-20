@@ -50,7 +50,7 @@
     "@nuxt/fonts": "0.13.0",
     "@nuxt/image": "^2.0.0",
     "@nuxt/kit": "^4.3.0",
-    "@nuxtjs/plausible": "^2.0.1",
+    "@nuxtjs/plausible": "^3.0.1",
     "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
     "@vueuse/components": "^14.2.0",
