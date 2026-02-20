@@ -102,12 +102,9 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     const jiti = createJiti(import.meta.url);
     const BootstrapConfig: BvnComponentProps = await jiti.import(bootstrapConfigPath)
       .then((m) => (m as { default?: BvnComponentProps }).default || {})
-      .catch((err: Error) => {
-        logger.error(`Failed to load bootstrap.config.ts:`, err.message);
-        return {};
-      });
+      .catch(() => ({}));
 
-    logger.info(`Bootstrap config keys: ${Object.keys(BootstrapConfig).join(', ') || '(empty)'}`)
+    logger.info(`Bootstrap config keys: ${Object.keys(BootstrapConfig).join(', ') || '(empty)'}`);
 
     nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), { plugin: { components: BootstrapConfig } });
 
