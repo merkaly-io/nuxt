@@ -12,7 +12,7 @@ const props = defineProps({
   value: { type: Number, default: 0 },
 });
 
-const { price } = useMoney(() => props.value, {
+const price = useMoney(() => props.value, {
   base: () => props.base,
   currency: () => props.currency,
   locale: () => props.locale,
@@ -23,7 +23,7 @@ const { price } = useMoney(() => props.value, {
 <template>
   <component :is="tag" class="format-money">
     <span class="currency" v-text="price.currency" />
-    <span class="value" v-text="price.value" />
+    <span class="value" v-text="price.amount" />
     <sup v-if="!props.hideDecimal" class="digits" v-text="price.digits" />
   </component>
 </template>

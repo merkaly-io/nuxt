@@ -1,5 +1,6 @@
-import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
+import { computed, toValue } from 'vue';
+import { formatMoney } from '../utils/formatMoney';
 
 interface UseMoneyOptions {
   base?: MaybeRefOrGetter<number>;
@@ -9,19 +10,10 @@ interface UseMoneyOptions {
 }
 
 export function useMoney(value: MaybeRefOrGetter<number>, options: UseMoneyOptions = {}) {
-  const price = computed(() => {
-    const amount = toValue(value) / toValue(options.base ?? 100);
-    const money = amount.toLocaleString(toValue(options.locale ?? 'en-US'), {
-      style: toValue(options.mode ?? 'currency'),
-      currency: toValue(options.currency ?? 'USD'),
-    });
-
-    return {
-      currency: money[0],
-      value: money.slice(1, -3),
-      digits: money.slice(-3),
-    };
-  });
-
-  return { price };
+  return computed(() => formatMoney(toValue(value), {
+    base: toValue(options.base),
+    currency: toValue(options.currency),
+    locale: toValue(options.locale),
+    mode: toValue(options.mode),
+  }));
 }
