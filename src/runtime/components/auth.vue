@@ -22,7 +22,6 @@ const redirect = params.get('redirect') as string;
 // Maneja el flujo de invitación a una organización
 // Reenvía a Auth0 incluyendo organization + invitation
 function handleInvite() {
-
   return $auth0.loginWithRedirect({ authorizationParams: { organization, invitation } });
 }
 
@@ -45,25 +44,17 @@ function handleCode() {
 }
 
 callOnce(async () => {
-  // 1️⃣ Si viene una invitación, priorizamos ese flujo
-  if (invitation && organization) {
-    return handleInvite();
-  }
+  // 1️⃣ Si Auth0 devolvió un error
+  if (error) return handleError();
 
-  // 2️⃣ Si Auth0 devolvió un error OAuth
-  if (error) {
-    return handleError();
-  }
+  // 2️⃣ Si estamos volviendo de Auth0 con code
+  if (code) return handleCode();
 
-  // 3️⃣ Si hay código de autorización OAuth
-  if (code) {
-    return handleCode();
-  }
+  // 3️⃣ Si es un invite inicial
+  if (invitation && organization) return handleInvite();
 
-  // 4️⃣ Fallback: login estándar
-  return $auth0.loginWithRedirect({
-    appState: { target: redirect || '/' },
-  });
+  // 4️⃣ Login normal
+  return $auth0.loginWithRedirect({ appState: { target: redirect || '/' } });
 });
 </script>
 

@@ -5,6 +5,9 @@ import { useAuth } from '../composables/useAuth';
 export default defineNuxtRouteMiddleware((to) => {
   const { isLoading, isAuthenticated } = useAuth();
   const { public: { merkaly } } = useRuntimeConfig();
+  const callbackPath = URL.canParse(merkaly.auth0.callbackUrl)
+    ? new URL(merkaly.auth0.callbackUrl).pathname
+    : merkaly.auth0.callbackUrl;
 
   // 1️⃣ No interferir mientras carga auth
   if (isLoading.value) {
@@ -12,7 +15,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // 2️⃣ No proteger callback
-  if (to.path === merkaly.auth0.callbackUrl) {
+  if (to.path === callbackPath) {
     return;
   }
 

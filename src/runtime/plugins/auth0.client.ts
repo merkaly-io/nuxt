@@ -6,6 +6,9 @@ import { useAuth } from '../composables/useAuth';
 
 export default defineNuxtPlugin(async ({ callHook, hook }) => {
   const { public: $config } = useRuntimeConfig();
+  const callbackPath = URL.canParse($config.merkaly.auth0.callbackUrl)
+    ? new URL($config.merkaly.auth0.callbackUrl).pathname
+    : $config.merkaly.auth0.callbackUrl;
 
   const auth0 = await createAuth0Client({
     cacheLocation: 'localstorage',
@@ -66,6 +69,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     },
   });
 
+  // @ts-expect-error Creating a lnkWthCntn fn
   auth0.linkWithConnection = (connection: string) => {
     return linkingClient.loginWithPopup({ authorizationParams: { connection } })
       .then(() => linkingClient.getIdTokenClaims())
@@ -87,7 +91,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   };
 
   // ---------- Bootstrap ----------
-  const isAuthCallback = window.location.pathname === $config.merkaly.auth0.callbackUrl;
+  const isAuthCallback = window.location.pathname === callbackPath;
 
   if (!isAuthCallback) {
     await Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
