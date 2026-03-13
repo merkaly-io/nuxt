@@ -106,8 +106,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2(@nuxt/cli@3.32.0(cac@6.7.14)(magicast@0.5.2))(@vue/compiler-core@3.5.28)(esbuild@0.27.3)(sass@1.97.0)(typescript@5.9.3)(vue-tsc@3.2.1(typescript@5.9.3))(vue@3.5.23(typescript@5.9.3))
       '@nuxt/schema':
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.4.2
+        version: 4.4.2
       '@nuxt/test-utils':
         specifier: ^4.0.0
         version: 4.0.0(magicast@0.5.2)(typescript@5.9.3)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.97.0)(terser@5.46.0)(yaml@2.8.2))(vitest@4.0.7(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.97.0)(terser@5.46.0)(yaml@2.8.2))
@@ -1214,6 +1214,10 @@ packages:
 
   '@nuxt/schema@4.3.0':
     resolution: {integrity: sha512-+Ps3exseMFH3MOapbBmDdpaHpPV7wqcB6+Ir9w8h91771HwMOWrQomAZpqDvw7FtFraoD5Xw7dhSKDhkwJRSmQ==}
+    engines: {node: ^14.18.0 || >=16.10.0}
+
+  '@nuxt/schema@4.4.2':
+    resolution: {integrity: sha512-/q6C7Qhiricgi+PKR7ovBnJlKTL0memCbA1CzRT+itCW/oeYzUfeMdQ35mGntlBoyRPNrMXbzuSUhfDbSCU57w==}
     engines: {node: ^14.18.0 || >=16.10.0}
 
   '@nuxt/telemetry@2.6.6':
@@ -2656,6 +2660,9 @@ packages:
 
   '@vue/shared@3.5.28':
     resolution: {integrity: sha512-cfWa1fCGBxrvaHRhvV3Is0MgmrbSCxYTXCSCau2I0a1Xw1N1pHAvkWCiXPRAqjvToILvguNyEwjevUqAuBQWvQ==}
+
+  '@vue/shared@3.5.30':
+    resolution: {integrity: sha512-YXgQ7JjaO18NeK2K9VTbDHaFy62WrObMa6XERNfNOkAhD1F1oDSf3ZJ7K6GqabZ0BvSDHajp8qfS5Sa2I9n8uQ==}
 
   '@vueuse/components@14.2.0':
     resolution: {integrity: sha512-Vl4VMqoYC3ea6zUTDS7Jyk7kz0T2i4L4kg+uLG1Fj3uZFfAidcWqZRVGfVyyaQkzMZHQcdpGBRSndyH4wxYEeg==}
@@ -5154,6 +5161,9 @@ packages:
   std-env@3.10.0:
     resolution: {integrity: sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg==}
 
+  std-env@4.0.0:
+    resolution: {integrity: sha512-zUMPtQ/HBY3/50VbpkupYHbRroTRZJPRLvreamgErJVys0ceuzMkD44J/QjqhHjOzK42GQ3QZIeFG1OYfOtKqQ==}
+
   storybook@10.1.11:
     resolution: {integrity: sha512-pKP5jXJYM4OjvNklGuHKO53wOCAwfx79KvZyOWHoi9zXUH5WVMFUe/ZfWyxXG/GTcj0maRgHGUjq/0I43r0dDQ==}
     hasBin: true
@@ -7160,7 +7170,7 @@ snapshots:
       '@nuxt/devalue': 2.0.2
       '@nuxt/kit': 4.3.0(magicast@0.5.2)
       '@unhead/vue': 2.1.2(vue@3.5.28(typescript@5.9.3))
-      '@vue/shared': 3.5.27
+      '@vue/shared': 3.5.30
       consola: 3.4.2
       defu: 6.1.4
       destr: 2.0.5
@@ -7222,11 +7232,19 @@ snapshots:
 
   '@nuxt/schema@4.3.0':
     dependencies:
-      '@vue/shared': 3.5.27
+      '@vue/shared': 3.5.30
       defu: 6.1.4
       pathe: 2.0.3
       pkg-types: 2.3.0
       std-env: 3.10.0
+
+  '@nuxt/schema@4.4.2':
+    dependencies:
+      '@vue/shared': 3.5.30
+      defu: 6.1.4
+      pathe: 2.0.3
+      pkg-types: 2.3.0
+      std-env: 4.0.0
 
   '@nuxt/telemetry@2.6.6(magicast@0.5.2)':
     dependencies:
@@ -8387,7 +8405,7 @@ snapshots:
       '@babel/types': 7.29.0
       '@vue/babel-helper-vue-transform-on': 2.0.1
       '@vue/babel-plugin-resolve-type': 2.0.1(@babel/core@7.28.6)
-      '@vue/shared': 3.5.28
+      '@vue/shared': 3.5.30
     optionalDependencies:
       '@babel/core': 7.28.6
     transitivePeerDependencies:
@@ -8563,7 +8581,7 @@ snapshots:
     dependencies:
       '@volar/language-core': 2.4.27
       '@vue/compiler-dom': 3.5.26
-      '@vue/shared': 3.5.27
+      '@vue/shared': 3.5.30
       alien-signals: 3.1.1
       muggle-string: 0.4.1
       path-browserify: 1.0.1
@@ -8573,7 +8591,7 @@ snapshots:
     dependencies:
       '@volar/language-core': 2.4.27
       '@vue/compiler-dom': 3.5.28
-      '@vue/shared': 3.5.28
+      '@vue/shared': 3.5.30
       alien-signals: 3.1.2
       muggle-string: 0.4.1
       path-browserify: 1.0.1
@@ -8652,6 +8670,8 @@ snapshots:
   '@vue/shared@3.5.27': {}
 
   '@vue/shared@3.5.28': {}
+
+  '@vue/shared@3.5.30': {}
 
   '@vueuse/components@14.2.0(vue@3.5.23(typescript@5.9.3))':
     dependencies:
@@ -11456,6 +11476,8 @@ snapshots:
   statuses@2.0.2: {}
 
   std-env@3.10.0: {}
+
+  std-env@4.0.0: {}
 
   storybook@10.1.11(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
