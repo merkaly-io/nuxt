@@ -64,7 +64,7 @@
     "class-validator": "^0.15.1",
     "eslint": "^9.39.1",
     "filesize": "^11.0.2",
-    "nuxt": "^4.3.0",
+    "nuxt": "^4.4.2",
     "reflect-metadata": "^0.2.2",
     "sass": "^1.97.0",
     "typescript": "~5.9.3",
