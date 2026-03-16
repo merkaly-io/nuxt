@@ -235,7 +235,7 @@ function emitSearch() {
           <BTr>
             <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
               <BButton
-                class="w-25px h-100 rounded-0 p-0 bg-light bg-hover-light-secondary border-end border-dashed"
+                class="w-25px h-100 rounded-0 p-0 border-end border-dashed"
                 size="sm"
                 variant="none"
                 @click="toggleDetails(item)">
