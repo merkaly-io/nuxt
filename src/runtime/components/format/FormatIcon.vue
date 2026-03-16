@@ -16,6 +16,10 @@ const props = defineProps({
   variant: { type: String as PropType<ColorVariant | string>, default: () => '' },
 });
 
+const slots = defineSlots();
+
+const hasContent = computed(() => Boolean(slots.default || props.text));
+
 const iconName = computed(() => `${props.provider}-${props.name}`);
 const iconMode = computed(() => `${props.provider}-${props.mode}`);
 const animateSpin = computed(() => props.spin ? `${props.provider}-spin` : undefined);
@@ -34,10 +38,12 @@ const classList = computed(() => [
 </script>
 
 <template>
-  <template v-if="props.text">
+  <template v-if="hasContent">
     <span :class="{ 'flex-row-reverse': props.reversed }" class="d-flex align-items-center">
       <component :is="props.tag" :class="classList" />
-      <span :class="fontColor" class="ps-1" v-text="props.text" />
+      <slot>
+        <span :class="fontColor" class="ps-1" v-text="props.text" />
+      </slot>
     </span>
   </template>
 

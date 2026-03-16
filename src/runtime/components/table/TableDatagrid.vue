@@ -112,7 +112,7 @@ function emitSearch() {
 </script>
 
 <template>
-  <BCard no-body>
+  <BCard class="border border-secondary-subtle" no-body>
     <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectedItems.length" class="w-35px">
