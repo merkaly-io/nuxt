@@ -65,13 +65,20 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
   meta: { name: '@merkaly/nuxt', configKey: 'merkaly', compatibility: { nuxt: '>=3.0.0' } },
 
-  moduleDependencies: {
-    '@bootstrap-vue-next/nuxt': {},
-    '@nuxt/eslint': {},
-    '@nuxt/fonts': {},
-    '@nuxt/image': {},
-    '@nuxtjs/plausible': {},
-    '@vueuse/nuxt': {},
+  moduleDependencies(nuxt) {
+    const dependencies: Record<string, object> = {
+      '@bootstrap-vue-next/nuxt': {},
+      '@nuxt/eslint': {},
+      '@nuxt/fonts': {},
+      '@nuxt/image': {},
+      '@vueuse/nuxt': {},
+    };
+
+    if (nuxt.options.merkaly?.plausible) {
+      dependencies['@nuxtjs/plausible'] = {};
+    }
+
+    return dependencies;
   },
 
   async setup(options, nuxt) {
@@ -84,7 +91,6 @@ export default defineNuxtModule<MerkalyModuleOptions>({
      */
     nuxt.options.runtimeConfig.public.merkaly = defu(options, nuxt.options.runtimeConfig.public.merkaly || {});
 
-    // Configurar modulos
     nuxt.options.plausible = defu({
       apiHost: 'https://analytics.merkaly.io',
       domain: options.plausible?.domain,
