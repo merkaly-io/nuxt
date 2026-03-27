@@ -75,19 +75,29 @@ const visibleItems = computed(() => {
   return $datagrid.value.items.slice(start, paginationText.value.values.final);
 });
 
-const selectedItems = computed(() => $datagrid.value.items.filter(it => it._checked));
+const selectionState = computed(() => {
+  const selectedItems: G[] = [];
 
-const checkboxAllAttrs = computed(() => {
-  const attrs: Record<string, any> = {};
-  const values = selectedItems.value.map(it => it._checked);
+  for (const item of $datagrid.value.items) {
+    if (item._checked) {
+      selectedItems.push(item);
+    }
+  }
 
-  const allChecked = values.length > 0 && values.every(Boolean);
-  const someChecked = values.some(Boolean);
+  const selectedCount = selectedItems.length;
+  const totalCount = $datagrid.value.items.length;
+  const allChecked = totalCount > 0 && selectedCount === totalCount;
+  const someChecked = selectedCount > 0;
 
-  attrs['checked'] = allChecked;
-  attrs['indeterminate'] = !allChecked && someChecked;
-
-  return attrs;
+  return {
+    allChecked,
+    checkboxAllAttrs: {
+      checked: allChecked,
+      indeterminate: !allChecked && someChecked,
+    },
+    selectedCount,
+    selectedItems,
+  };
 });
 
 function toggleCheckAll() {
@@ -109,15 +119,28 @@ function emitSearch() {
   $datagrid.value.page = 1;
   emit('fetch', 'search');
 }
+
+function getRowKey(item: G, idx: number): string | number {
+  return $datagrid.value.row?.(item, idx)?.key ?? idx;
+}
+
+function getRowAttrs(item: G, idx: number): Record<string, unknown> {
+  const row = $datagrid.value.row?.(item, idx);
+
+  return {
+    ...(row?.attrs ?? {}),
+    ...(row?.class ? { class: row.class } : {}),
+  };
+}
 </script>
 
 <template>
   <BCard no-body>
     <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4 position-relative">
       <BCardTitle>
-        <div v-if="hasBulkSlot && !props.hideSelect && selectedItems.length" class="w-35px">
+        <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
           <DropdownIcon icon="caret-down" size="sm" toggle-class="p-2">
-            <slot name="bulk" v-bind="{ items: selectedItems, count: selectedItems.length }" />
+            <slot name="bulk" v-bind="{ items: selectionState.selectedItems, count: selectionState.selectedCount }" />
           </DropdownIcon>
         </div>
 
@@ -205,12 +228,12 @@ function emitSearch() {
                 :disabled="$datagrid.loading"
                 class="form-check-input"
                 type="checkbox"
-                v-bind="checkboxAllAttrs"
+                v-bind="selectionState.checkboxAllAttrs"
                 @input="toggleCheckAll()">
             </div>
           </BTh>
 
-          <template v-for="(column, key) in $datagrid.columns" :key="key">
+          <template v-for="[key, column] in visibleColumns" :key="key">
             <BTh :class="[column.class, column.thClass]">
               <slot :name="`head[${key}]`" v-bind="{ column,  key }">
                 <span v-text="column.title ?? sentenceCase(key)" />
@@ -231,8 +254,8 @@ function emitSearch() {
       </BTbody>
 
       <BTbody v-else class="fw-semibold text-gray-600">
-        <template v-for="(item, idx) in visibleItems" :key="idx">
-          <BTr v-bind="$datagrid.rowAttrs?.(item)">
+        <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
+          <BTr v-bind="getRowAttrs(item, idx)">
             <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
               <BButton
                 class="w-25px h-100 rounded-0 p-0 border-end border-dashed"
@@ -249,10 +272,10 @@ function emitSearch() {
               </div>
             </BTd>
 
-            <template v-for="(column, key) in $datagrid.columns" :key="key">
+            <template v-for="[key, column] in visibleColumns" :key="key">
               <BTd :class="[column.class, column.tdClass]">
                 <slot :name="`row[${key}]`" v-bind="{ column, idx, item, key }">
-                  <span v-text="column.getter?.(item) || getItemValue(item, key)" />
+                  <span v-text="column.getter?.(item) ?? getItemValue(item, key)" />
                 </slot>
               </BTd>
             </template>

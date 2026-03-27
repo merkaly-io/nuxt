@@ -2,14 +2,22 @@ import { reactive } from 'vue';
 
 export interface ColumnDefinition<C = unknown> {
   class?: string;
-  getter?: (row: C) => any;
+  getter?: (row: C) => unknown;
   tdClass?: string;
   thClass?: string;
   title?: string;
-  type?: any;
+  type?: unknown;
 }
 
 export type DataGridItem<C> = C;
+export type DataGridRowAttrs = Record<string, unknown>;
+export type DataGridRowKey = string | number;
+
+export interface DataGridRowDefinition {
+  attrs?: DataGridRowAttrs;
+  class?: string;
+  key?: DataGridRowKey;
+}
 
 export interface DataGrid<C = unknown> {
   columns: Record<string, ColumnDefinition<C>>;
@@ -22,7 +30,7 @@ export interface DataGrid<C = unknown> {
   limit: number;
   loading: boolean;
   page: number;
-  rowAttrs: (item: C) => Record<string, unknown>;
+  row?: (item: C, index: number) => DataGridRowDefinition;
   search: string;
   total: number;
 }
@@ -33,7 +41,7 @@ interface OptionArgs<D> {
   items?: D[];
   limit?: number;
   loading?: boolean;
-  rowAttrs?: (item: D) => Record<string, unknown>;
+  row?: (item: D, index: number) => DataGridRowDefinition;
   search?: string;
   total?: number;
 }
@@ -62,8 +70,8 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
     limit: params.limit ?? 10,
     loading: params.loading ?? false,
     page: 1,
-    rowAttrs: params.rowAttrs,
-    search: params.search,
+    row: params.row,
+    search: params.search ?? '',
     total: params.total ?? 0,
   });
 
