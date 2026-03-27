@@ -113,7 +113,7 @@ function emitSearch() {
 
 <template>
   <BCard no-body>
-    <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4">
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4 position-relative">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectedItems.length" class="w-35px">
           <DropdownIcon icon="caret-down" size="sm" toggle-class="p-2">
@@ -178,6 +178,14 @@ function emitSearch() {
           </BButton>
         </template>
       </div>
+
+      <BProgress
+        v-if="$datagrid.loading"
+        :value="100"
+        animated
+        height="5px"
+        class="rounded-0 position-absolute w-100 start-0"
+        style="bottom: -6px; z-index: 10" />
     </BCardHeader>
 
     <BTableSimple
@@ -214,15 +222,7 @@ function emitSearch() {
         </BTr>
       </BThead>
 
-      <BTbody v-if="$datagrid.loading">
-        <BTd :colspan="tableColspan">
-          <div class="text-center">
-            <BSpinner variant="primary" />
-          </div>
-        </BTd>
-      </BTbody>
-
-      <BTbody v-else-if="!visibleItems.length">
+      <BTbody v-if="!visibleItems.length">
         <BTd :colspan="tableColspan">
           <slot name="empty">
             <div class="text-center text-muted" v-text="props.emptyText" />
@@ -232,7 +232,7 @@ function emitSearch() {
 
       <BTbody v-else class="fw-semibold text-gray-600">
         <template v-for="(item, idx) in visibleItems" :key="idx">
-          <BTr>
+          <BTr v-bind="$datagrid.rowAttrs?.(item)">
             <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
               <BButton
                 class="w-25px h-100 rounded-0 p-0 border-end border-dashed"

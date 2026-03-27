@@ -14,16 +14,17 @@ export type DataGridItem<C> = C;
 export interface DataGrid<C = unknown> {
   columns: Record<string, ColumnDefinition<C>>;
   error: unknown;
-  items: DataGridItem<C>[];
-  limit: number;
-  loading: boolean;
-  page: number;
-  search: string;
-  total: number;
   fn: {
     addItem: (item: C) => DataGridItem<C>[];
     removeItem: (predicate: (item: DataGridItem<C>, index: number) => boolean) => number;
   };
+  items: DataGridItem<C>[];
+  limit: number;
+  loading: boolean;
+  page: number;
+  rowAttrs: (item: C) => Record<string, unknown>;
+  search: string;
+  total: number;
 }
 
 interface OptionArgs<D> {
@@ -32,6 +33,7 @@ interface OptionArgs<D> {
   items?: D[];
   limit?: number;
   loading?: boolean;
+  rowAttrs?: (item: D) => Record<string, unknown>;
   search?: string;
   total?: number;
 }
@@ -40,13 +42,6 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
   const state = reactive({
     columns: params.columns,
     error: params.error ?? null,
-    items: params.items ?? [],
-    search: params.search,
-    limit: params.limit ?? 10,
-    loading: params.loading ?? false,
-    page: 1,
-    total: params.total ?? 0,
-
     fn: {
       addItem(item: D) {
         state.items.push(item as never);
@@ -63,6 +58,13 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
         return index;
       },
     },
+    items: params.items ?? [],
+    limit: params.limit ?? 10,
+    loading: params.loading ?? false,
+    page: 1,
+    rowAttrs: params.rowAttrs,
+    search: params.search,
+    total: params.total ?? 0,
   });
 
   return state as DataGrid<D>;
