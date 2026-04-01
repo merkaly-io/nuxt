@@ -1,21 +1,22 @@
 import {
-  addPlugin,
+  addComponentsDir,
   addImportsDir,
+  addPlugin,
   addRouteMiddleware,
   addTypeTemplate,
-  defineNuxtModule,
   createResolver,
-  addComponentsDir,
+  defineNuxtModule,
   useLogger,
 } from '@nuxt/kit';
-import { createJiti } from 'jiti';
 import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
+import type { Nuxt } from '@nuxt/schema';
 import { defu } from 'defu';
+import { createJiti } from 'jiti';
 import { existsSync } from 'node:fs';
 import svgLoader from 'vite-svg-loader';
 import 'reflect-metadata';
 
-// @ts-expect-error Types aren't exposed but they exists
+// @ts-expect-error Types aren't exposed but they exist
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
 
 // Re-export types for consumers
@@ -23,123 +24,205 @@ export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
 export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runtime/plugins/api.global';
 
 export interface MerkalyModuleOptions {
-  auth0: {
-    audience: string
-    callbackUrl: string
-    client: string
-    domain: string
-    logoutUrl?: string
-    params?: Omit<ClientAuthorizationParams, 'redirect_uri'>
-    requiresAuth: boolean
-  };
-  plausible?: {
-    domain: string,
-    localhost: string,
-  },
   api: {
     url: string;
     prefix?: string;
   };
+  auth0: {
+    audience: string;
+    callbackUrl: string;
+    client: string;
+    domain: string;
+    logoutUrl?: string;
+    params?: Omit<ClientAuthorizationParams, 'redirect_uri'>;
+    requiresAuth: boolean;
+  };
+  plausible?: {
+    domain: string;
+    localhost: string;
+  };
+  sentry: {
+    dsn: string;
+    project: string;
+    token: string;
+  };
 }
 
-export default defineNuxtModule<MerkalyModuleOptions>({
-  defaults: {
-    auth0: {
-      audience: '',
-      callbackUrl: '/auth',
-      client: '',
-      domain: '',
-      logoutUrl: '/',
-      params: {},
-      requiresAuth: false,
-    },
-    plausible: {
-      domain: '',
-      localhost: '',
-    },
-    api: {
-      url: '/',
-      prefix: '/',
-    },
+const defaultOptions: MerkalyModuleOptions = {
+  api: {
+    url: '/',
+    prefix: '/',
   },
+  auth0: {
+    audience: '',
+    callbackUrl: '/auth',
+    client: '',
+    domain: '',
+    logoutUrl: '/',
+    params: {},
+    requiresAuth: false,
+  },
+  plausible: {
+    domain: '',
+    localhost: '',
+  },
+  sentry: {
+    dsn: '',
+    project: '',
+    token: '',
+  },
+};
 
-  meta: { name: '@merkaly/nuxt', configKey: 'merkaly', compatibility: { nuxt: '>=3.0.0' } },
+function hasPlausibleConfig(options: MerkalyModuleOptions): boolean {
+  return Boolean(options.plausible?.domain);
+}
 
-  moduleDependencies(nuxt) {
-    const dependencies: Record<string, object> = {
-      '@bootstrap-vue-next/nuxt': {},
-      '@nuxt/eslint': {},
-      '@nuxt/fonts': {},
-      '@nuxt/image': {},
-      '@vueuse/nuxt': {},
+function hasSentryConfig(options: MerkalyModuleOptions): boolean {
+  return Boolean(options.sentry?.project && options.sentry?.token);
+}
+
+function buildModuleDependencies(options: MerkalyModuleOptions): Record<string, object> {
+  const dependencies: Record<string, object> = {
+    '@bootstrap-vue-next/nuxt': {},
+    '@nuxt/eslint': {},
+    '@nuxt/fonts': {},
+    '@nuxt/image': {},
+    '@vueuse/nuxt': {},
+  };
+
+  if (hasPlausibleConfig(options)) {
+    dependencies['@nuxtjs/plausible'] = {};
+  }
+
+  if (hasSentryConfig(options)) {
+    dependencies['@sentry/nuxt/module'] = {
+      org: 'merkaly',
+      project: options.sentry.project,
+      authToken: options.sentry.token,
     };
+  }
 
-    if (nuxt.options.merkaly?.plausible) {
-      dependencies['@nuxtjs/plausible'] = {};
-    }
+  return dependencies;
+}
 
-    return dependencies;
-  },
+function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions): void {
+  nuxt.options.runtimeConfig.public.merkaly = defu(
+    options,
+    nuxt.options.runtimeConfig.public.merkaly || {},
+  );
+}
 
-  async setup(options, nuxt) {
-    const moduleResolver = createResolver(import.meta.url);
-    const rootResolver = createResolver(nuxt.options.rootDir);
-
-    /**
-     * 🧩 1. Merge de configuración en runtimeConfig
-     *    (esto permite acceder desde el plugin via useRuntimeConfig().public.merkaly)
-     */
-    nuxt.options.runtimeConfig.public.merkaly = defu(options, nuxt.options.runtimeConfig.public.merkaly || {});
-
-    nuxt.options.plausible = defu({
+function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
+  nuxt.options.plausible = defu(
+    {
       apiHost: 'https://analytics.merkaly.io',
       domain: options.plausible?.domain,
       enableAutoOutboundTracking: true,
       enableAutoPageviews: true,
-      enabled: process.env.NODE_ENV === 'production', // ✅ Solo en producción
-      ignoredHostnames: ['localhost'].concat(options.plausible?.localhost || '').filter(Boolean),
-    }, nuxt.options.plausible || {});
+      enabled: process.env.NODE_ENV === 'production' && hasPlausibleConfig(options),
+      ignoredHostnames: ['localhost', options.plausible?.localhost].filter(Boolean),
+    },
+    nuxt.options.plausible || {},
+  );
+}
 
+async function loadBootstrapConfig(nuxt: Nuxt): Promise<BvnComponentProps> {
+  const rootDirResolver = createResolver(nuxt.options.rootDir);
+  const bootstrapConfigPath = rootDirResolver.resolve('bootstrap.config.ts');
+
+  if (!existsSync(bootstrapConfigPath)) {
+    return {};
+  }
+
+  const jiti = createJiti(import.meta.url);
+  const imported = await jiti.import(bootstrapConfigPath).catch(() => ({}));
+
+  return (imported as { default?: BvnComponentProps }).default || {};
+}
+
+function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): void {
+  nuxt.options.bootstrapVueNext = defu(
+    nuxt.options.bootstrapVueNext || {},
+    {
+      plugin: {
+        components,
+      },
+    },
+  );
+}
+
+function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, resolver: ReturnType<typeof createResolver>): void {
+  addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
+  addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
+
+  addRouteMiddleware({
+    global: options.auth0.requiresAuth,
+    name: 'auth',
+    path: resolver.resolve('./runtime/middleware/auth'),
+  });
+
+  addImportsDir(resolver.resolve('./runtime/composables'));
+  addImportsDir(resolver.resolve('./runtime/utils'));
+
+  addComponentsDir({
+    path: resolver.resolve('./runtime/components'),
+    prefix: 'MK',
+  });
+
+  addTypeTemplate({
+    filename: 'types/merkaly.d.ts',
+    src: resolver.resolve('./runtime/types/nuxt.d.ts'),
+  });
+}
+
+function configureVite(nuxt: Nuxt): void {
+  nuxt.options.vite = defu(
+    nuxt.options.vite || {},
+    {
+      plugins: [svgLoader()],
+    },
+  );
+}
+
+const merkalyModule = defineNuxtModule<MerkalyModuleOptions>({
+  defaults: defaultOptions,
+
+  meta: {
+    name: '@merkaly/nuxt',
+    configKey: 'merkaly',
+    compatibility: { nuxt: '>=3.14.0' },
+  },
+
+  moduleDependencies(nuxt): Record<string, object> {
+    const options: MerkalyModuleOptions = defu(
+      nuxt.options.merkaly || {},
+      defaultOptions,
+    );
+
+    return buildModuleDependencies(options);
+  },
+
+  async setup(options, nuxt) {
     const logger = useLogger('@merkaly/nuxt');
-    const bootstrapConfigPath = rootResolver.resolve('bootstrap.config.ts');
+    const resolver = createResolver(import.meta.url);
 
-    logger.info(`Loading bootstrap.config.ts from: ${bootstrapConfigPath} (exists: ${existsSync(bootstrapConfigPath)})`);
+    configureRuntimeConfig(nuxt, options);
+    configurePlausible(nuxt, options);
 
-    const jiti = createJiti(import.meta.url);
-    const BootstrapConfig: BvnComponentProps = await jiti.import(bootstrapConfigPath)
-      .then((m) => (m as { default?: BvnComponentProps }).default || {})
-      .catch(() => ({}));
+    if (hasSentryConfig(options)) {
+      logger.info('Loading Sentry config');
+    }
 
-    logger.info(`Bootstrap config keys: ${Object.keys(BootstrapConfig).join(', ') || '(empty)'}`);
+    const bootstrapComponentsConfig = await loadBootstrapConfig(nuxt);
 
-    nuxt.options['bootstrapVueNext'] = defu((nuxt.options['bootstrapVueNext'] || {}), { plugin: { components: BootstrapConfig } });
+    if (Object.keys(bootstrapComponentsConfig).length > 0) {
+      logger.info('Loading bootstrap.config.ts');
+    }
 
-    // Plugins
-    addPlugin({ src: moduleResolver.resolve('./runtime/plugins/api.global') });
-    addPlugin({ src: moduleResolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
-
-    // Middlewares
-    addRouteMiddleware({
-      global: options.auth0.requiresAuth,
-      name: 'auth',
-      path: moduleResolver.resolve('./runtime/middleware/auth'),
-    });
-
-    // Composables
-    addImportsDir(moduleResolver.resolve('./runtime/composables'));
-    addImportsDir(moduleResolver.resolve('./runtime/utils'));
-
-    addComponentsDir({
-      path: moduleResolver.resolve('./runtime/components'),
-      prefix: 'MK',
-    });
-
-    nuxt.options['vite'] = defu((nuxt.options['vite'] || {}), { plugins: [svgLoader()] });
-
-    // Type augmentations for $api and $auth0
-    addTypeTemplate({
-      filename: 'types/merkaly.d.ts',
-      src: moduleResolver.resolve('./runtime/types/nuxt.d.ts'),
-    });
+    configureBootstrapVueNext(nuxt, bootstrapComponentsConfig);
+    registerRuntimeFeatures(nuxt, options, resolver);
+    configureVite(nuxt);
   },
 });
+
+export default merkalyModule;
