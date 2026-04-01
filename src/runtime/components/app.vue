@@ -3,10 +3,13 @@ import { useRoute } from '#app';
 import { useAuth, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
+import { useColorMode } from '@vueuse/core';
 
 const $route = useRoute();
 const { isLoading } = useAuth();
 const { hook } = useNuxtApp();
+
+useColorMode({ attribute: 'data-bs-theme' });
 
 // Ejecutar middleware una sola vez cuando `isLoading` cambia
 watchOnce(isLoading, () => AuthMiddleware($route, $route));
@@ -19,10 +22,7 @@ hook('page:finish', () => regenerate());
 </script>
 
 <template>
-  <main>
-    <NuxtRouteAnnouncer />
-    <BOrchestrator />
-
+  <BApp>
     <!-- Mostramos spinner mientras auth se carga -->
     <slot v-if="isLoading" name="loading" />
 
@@ -30,5 +30,5 @@ hook('page:finish', () => regenerate());
     <slot v-else>
       <NuxtPage />
     </slot>
-  </main>
+  </BApp>
 </template>
