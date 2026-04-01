@@ -51,6 +51,7 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/kit": "^4.4.2",
     "@nuxtjs/plausible": "^3.0.1",
+    "@sentry/nuxt": "^10.47.0",
     "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
     "@vueuse/components": "^14.2.0",

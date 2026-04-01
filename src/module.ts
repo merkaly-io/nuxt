@@ -77,16 +77,13 @@ function hasPlausibleConfig(options: MerkalyModuleOptions): boolean {
   return Boolean(options.plausible?.domain);
 }
 
-function hasSentryConfig(options: MerkalyModuleOptions): boolean {
-  return Boolean(options.sentry?.project && options.sentry?.token);
-}
-
 function buildModuleDependencies(options: MerkalyModuleOptions): Record<string, object> {
   const dependencies: Record<string, object> = {
     '@bootstrap-vue-next/nuxt': {},
     '@nuxt/eslint': {},
     '@nuxt/fonts': {},
     '@nuxt/image': {},
+    '@sentry/nuxt/module': {},
     '@vueuse/nuxt': {},
   };
 
@@ -94,13 +91,9 @@ function buildModuleDependencies(options: MerkalyModuleOptions): Record<string, 
     dependencies['@nuxtjs/plausible'] = {};
   }
 
-  if (hasSentryConfig(options)) {
-    dependencies['@sentry/nuxt/module'] = {
-      org: 'merkaly',
-      project: options.sentry.project,
-      authToken: options.sentry.token,
-    };
-  }
+  const logger = useLogger('@merkaly/nuxt');
+
+  Object.keys(dependencies).forEach(it => logger.info(`Loaded ${it} module`));
 
   return dependencies;
 }
@@ -124,6 +117,16 @@ function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
     },
     nuxt.options.plausible || {},
   );
+}
+
+function configureSentry(nuxt: Nuxt, options: MerkalyModuleOptions): void {
+  nuxt.options.sentry = defu({
+    authToken: options.sentry.token,
+    org: 'merkaly',
+    project: options.sentry.project,
+  });
+
+  nuxt.options.sourcemap = { client: 'hidden' };
 }
 
 async function loadBootstrapConfig(nuxt: Nuxt): Promise<BvnComponentProps> {
@@ -153,7 +156,8 @@ function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): v
 
 function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, resolver: ReturnType<typeof createResolver>): void {
   addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
-  addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client'), mode: 'client' });
+  addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
+  addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
 
   addRouteMiddleware({
     global: options.auth0.requiresAuth,
@@ -208,10 +212,7 @@ const merkalyModule = defineNuxtModule<MerkalyModuleOptions>({
 
     configureRuntimeConfig(nuxt, options);
     configurePlausible(nuxt, options);
-
-    if (hasSentryConfig(options)) {
-      logger.info('Loading Sentry config');
-    }
+    configureSentry(nuxt, options);
 
     const bootstrapComponentsConfig = await loadBootstrapConfig(nuxt);
 
