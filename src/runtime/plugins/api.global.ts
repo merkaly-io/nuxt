@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useRuntimeConfig } from '#app';
+import { defineNuxtPlugin } from '#app';
 import type { Ref } from '#imports';
 import { useAuth } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
@@ -53,12 +53,10 @@ export interface ParamsOptions {
 export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = ParamsOptions & HooksOptions<TData, TMeta, TParams> & RefOptions & { params?: TParams }
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
-  const { public: $config } = useRuntimeConfig();
   const { tenant, token } = useAuth();
 
   await $fetch(url, {
-    // Determine the base URL
-    baseURL: new URL(options.prefix || $config.merkaly.api.prefix || '/', $config.merkaly.api.url).href,
+    baseURL: '/api',
 
     body: options?.body,
 

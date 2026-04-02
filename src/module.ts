@@ -3,6 +3,7 @@ import {
   addImportsDir,
   addPlugin,
   addRouteMiddleware,
+  addServerHandler,
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
@@ -158,6 +159,10 @@ function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, reso
   addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
+  addServerHandler({
+    handler: resolver.resolve('./runtime/server/middleware/proxy'),
+    middleware: true,
+  });
 
   addRouteMiddleware({
     global: options.auth0.requiresAuth,
