@@ -86,7 +86,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
         const { $api } = useNuxtApp();
 
-        return $api('/identities', { method: 'POST', prefix: '/', body });
+        return $api('/identities', { body, global: true, method: 'POST' });
       });
   };
 

@@ -1,6 +1,7 @@
 import { defineEventHandler, getRequestURL, proxyRequest } from 'h3';
 import { useRuntimeConfig } from '#imports';
 
+const GLOBAL_API_HEADER = 'x-merkaly-global';
 const API_PREFIX_PATTERN = /^\/api\/?/;
 const API_ROUTE_PATTERN = /^\/api(?:\/|$)/;
 const EDGE_SLASH_PATTERN = /^\/|\/$/g;
@@ -18,6 +19,14 @@ function resolveProxyPath(prefix: string, pathname: string, search: string) {
     .join('/')}${search}`;
 }
 
+function isGlobalRequest(value?: string | string[]) {
+  if (Array.isArray(value)) {
+    return value.includes('true');
+  }
+
+  return value === 'true';
+}
+
 export default defineEventHandler((event) => {
   if (!API_ROUTE_PATTERN.test(event.path)) {
     return;
@@ -26,7 +35,10 @@ export default defineEventHandler((event) => {
   const { public: $config } = useRuntimeConfig();
   const targetOrigin = new URL($config.merkaly.api.url);
   const url = getRequestURL(event);
-  const path = resolveProxyPath($config.merkaly.api.prefix, url.pathname, url.search);
+  const prefix = isGlobalRequest(event.node.req.headers[GLOBAL_API_HEADER])
+    ? ''
+    : $config.merkaly.api.prefix;
+  const path = resolveProxyPath(prefix, url.pathname, url.search);
 
   if (import.meta.dev && targetOrigin.hostname.endsWith('.test')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

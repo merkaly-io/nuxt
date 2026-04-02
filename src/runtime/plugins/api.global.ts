@@ -3,6 +3,8 @@ import type { Ref } from '#imports';
 import { useAuth } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
+const GLOBAL_API_HEADER = 'x-merkaly-global';
+
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
 type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
 type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = { data: TData, meta: TMeta, headers: FetchOptions['headers'], params: TParams }
@@ -39,11 +41,11 @@ export interface ParamsOptions {
 
   default?: () => unknown;
 
+  global?: boolean;
+
   headers?: FetchOptions['headers'];
 
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-
-  prefix?: string;
 
   query?: FetchOptions['query'];
 
@@ -63,6 +65,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     headers: {
       authorization: token.value ? `Bearer ${token.value}` : '',
       identity: tenant.value as string,
+      [GLOBAL_API_HEADER]: options.global ? 'true' : '',
       ...options?.headers,
     },
 
