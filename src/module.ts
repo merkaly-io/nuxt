@@ -127,7 +127,7 @@ function configureSentry(nuxt: Nuxt, options: MerkalyModuleOptions): void {
     project: options.sentry.project,
   });
 
-  nuxt.options.sourcemap = { client: 'hidden' };
+  nuxt.options.sourcemap = { client: 'hidden', server: true };
 }
 
 async function loadBootstrapConfig(nuxt: Nuxt): Promise<BvnComponentProps> {
