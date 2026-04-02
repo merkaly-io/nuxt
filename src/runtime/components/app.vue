@@ -18,17 +18,20 @@ watchOnce(isLoading, () => AuthMiddleware($route, $route));
 const { defer, regenerate } = useNavigation();
 
 addRouteMiddleware('navigation', (to) => defer(to), { global: true });
+
 hook('page:finish', () => regenerate());
 </script>
 
 <template>
-  <BApp>
-    <!-- Mostramos spinner mientras auth se carga -->
-    <slot v-if="isLoading" name="loading" />
+  <main>
+    <BApp>
+      <!-- Mostramos spinner mientras auth se carga -->
+      <slot v-if="isLoading" name="loading" />
 
-    <!-- Renderizamos páginas solo cuando isLoading = false -->
-    <slot v-else>
-      <NuxtPage />
-    </slot>
-  </BApp>
+      <!-- Renderizamos páginas solo cuando isLoading = false -->
+      <slot v-else>
+        <NuxtPage />
+      </slot>
+    </BApp>
+  </main>
 </template>
