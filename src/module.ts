@@ -155,10 +155,18 @@ function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): v
   );
 }
 
+function configureAppHead(nuxt: Nuxt) {
+  nuxt.options.app?.head?.script?.push({
+    crossorigin: 'anonymous',
+    src: 'https://kit.fontawesome.com/55a4b2f4e1.js',
+  });
+}
+
 function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, resolver: ReturnType<typeof createResolver>): void {
   addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
+
   addServerHandler({
     handler: resolver.resolve('./runtime/server/middleware/proxy'),
     middleware: true,
@@ -170,6 +178,7 @@ function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, reso
     path: resolver.resolve('./runtime/middleware/auth'),
   });
 
+  addImportsDir(resolver.resolve('./runtime/adapters'));
   addImportsDir(resolver.resolve('./runtime/composables'));
   addImportsDir(resolver.resolve('./runtime/utils'));
 
@@ -226,6 +235,7 @@ const merkalyModule = defineNuxtModule<MerkalyModuleOptions>({
     }
 
     configureBootstrapVueNext(nuxt, bootstrapComponentsConfig);
+    configureAppHead(nuxt);
     registerRuntimeFeatures(nuxt, options, resolver);
     configureVite(nuxt);
   },
