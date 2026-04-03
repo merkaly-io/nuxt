@@ -33,12 +33,15 @@ export default defineEventHandler((event) => {
   }
 
   const { public: $config } = useRuntimeConfig();
+
   const targetOrigin = new URL($config.merkaly.api.url);
   const url = getRequestURL(event);
   const prefix = isGlobalRequest(event.node.req.headers[GLOBAL_API_HEADER])
     ? ''
     : $config.merkaly.api.prefix;
+
   const path = resolveProxyPath(prefix, url.pathname, url.search);
+  event.node.req.headers['x-forwarded-host'] = url.host;
 
   if (import.meta.dev && targetOrigin.hostname.endsWith('.test')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
