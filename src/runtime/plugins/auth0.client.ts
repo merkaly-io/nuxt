@@ -1,4 +1,5 @@
-import { createAuth0Client, type User } from '@auth0/auth0-spa-js';
+import type { User, RedirectConnectAccountOptions } from '@auth0/auth0-spa-js';
+import { createAuth0Client } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
@@ -33,7 +34,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   // ---------- Callback ----------
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
-    .then(({ appState }) => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
+    .then(({ appState }: RedirectConnectAccountOptions) => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
       .then(() => void navigateTo(appState?.target || '/')))
     .catch(() => navigateTo('/'));
 
@@ -70,24 +71,20 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   });
 
   // @ts-expect-error Creating a lnkWthCntn fn
-  auth0.linkWithConnection = (connection: string) => {
-    return linkingClient.loginWithPopup({ authorizationParams: { connection } })
-      .then(() => linkingClient.getIdTokenClaims())
-      .then((claims) => {
-        if (!claims?.sub) {
-          throw new Error('Failed to get ID token for linking');
-        }
+  auth0.linkWithConnection = async (connection: string) => {
+    await linkingClient.loginWithPopup({ authorizationParams: { connection } });
+    const claims = await linkingClient.getIdTokenClaims();
 
-        // sub format: "provider|user_id" (e.g., "github|16559276")
-        const [provider, ...userIdParts] = claims.sub.split('|');
-        const userId = userIdParts.join('|');
+    if (!claims?.sub) {
+      throw new Error('Failed to get ID token for linking');
+    }
+    // sub format: "provider|user_id" (e.g., "GitHub|16559276")
+    const [provider, ...userIdParts] = claims.sub.split('|');
+    const userId = userIdParts.join('|');
+    const body = { provider, userId };
+    const { $api } = useNuxtApp();
 
-        const body = { provider, userId };
-
-        const { $api } = useNuxtApp();
-
-        return $api('/identities', { body, global: true, method: 'POST' });
-      });
+    return await $api('/identities', { body, global: true, method: 'POST' });
   };
 
   // ---------- Bootstrap ----------

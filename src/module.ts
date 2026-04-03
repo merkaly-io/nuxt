@@ -202,7 +202,7 @@ function configureVite(nuxt: Nuxt): void {
   );
 }
 
-const merkalyModule = defineNuxtModule<MerkalyModuleOptions>({
+export default defineNuxtModule<MerkalyModuleOptions>({
   defaults: defaultOptions,
 
   meta: {
@@ -240,5 +240,3 @@ const merkalyModule = defineNuxtModule<MerkalyModuleOptions>({
     configureVite(nuxt);
   },
 });
-
-export default merkalyModule;
