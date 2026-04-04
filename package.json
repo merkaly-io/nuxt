@@ -84,7 +84,7 @@
     "vue-tsc": "^3.2.1"
   },
   "optionalDependencies": {
-    "defu": "^6.1.4"
+    "defu": "^6.1.5"
   },
   "packageManager": "pnpm@10.28.2",
   "engines": {
