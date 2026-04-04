@@ -36,8 +36,6 @@
     "lint": "eslint .",
     "prepack": "pnpm build",
     "prepare": "nuxt-module-build prepare",
-    "release:notes": "changelogen --release",
-    "release": "pnpm lint && pnpm test && pnpm build && changelogen --release && npm publish --access public && git push --follow-tags",
     "test": "vitest run",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
     "test:watch": "vitest watch"
@@ -88,6 +86,7 @@
   "optionalDependencies": {
     "defu": "^6.1.4"
   },
+  "packageManager": "pnpm@10.28.2",
   "engines": {
     "node": ">=20.0.0"
   }

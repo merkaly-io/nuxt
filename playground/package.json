@@ -21,5 +21,6 @@
     "@storybook/addon-vitest": "10.1.10",
     "eslint-plugin-storybook": "10.1.10",
     "storybook": "10.2.10"
-  }
+  },
+  "packageManager": "pnpm@10.28.2"
 }

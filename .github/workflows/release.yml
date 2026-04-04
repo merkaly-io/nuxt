@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag revision
+        run: |
+          git fetch origin master --force --tags
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/master
+
+      - name: Validate tag version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")"
+          test "$TAG_VERSION" = "$PACKAGE_VERSION"
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            playground/pnpm-lock.yaml
+          registry-url: https://registry.npmjs.org
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install module dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install playground dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./playground
+
+      - name: Prepare module
+        run: pnpm dev:prepare
+
+      - name: Lint code
+        run: pnpm lint
+        continue-on-error: true
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build module
+        run: pnpm build
+
+      - name: Publish package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  github_release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            playground/pnpm-lock.yaml
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install module dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install playground dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./playground
+
+      - name: Generate release notes
+        run: |
+          CURRENT_TAG="${GITHUB_REF_NAME}"
+          PREVIOUS_TAG="$(git tag --sort=-version:refname | grep -Fxv "$CURRENT_TAG" | head -n 1)"
+          if [ -n "$PREVIOUS_TAG" ]; then
+            pnpm exec changelogen --from "$PREVIOUS_TAG" --to "$CURRENT_TAG" --no-output > release-notes.md
+          else
+            pnpm exec changelogen --to "$CURRENT_TAG" --no-output > release-notes.md
+          fi
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md

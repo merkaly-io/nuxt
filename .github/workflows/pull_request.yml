@@ -15,20 +15,23 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup node env 🏗
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            playground/pnpm-lock.yaml
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 10
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install Module deps 🛠️
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
         working-directory: ./
 
       - name: Install Playground deps 🛠️
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
         working-directory: ./playground
 
       - name: Run Prepare 🛠️
