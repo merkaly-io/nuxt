@@ -32,10 +32,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            playground/pnpm-lock.yaml
           registry-url: https://registry.npmjs.org
 
       - name: Enable Corepack
@@ -82,10 +78,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            playground/pnpm-lock.yaml
 
       - name: Enable Corepack
         run: corepack enable
