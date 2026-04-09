@@ -12,16 +12,12 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup node env 🏗
         uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            playground/pnpm-lock.yaml
+          node-version: 24
 
       - name: Enable Corepack
         run: corepack enable
