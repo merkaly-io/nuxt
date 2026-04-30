@@ -10,6 +10,12 @@ export interface ColumnDefinition<C = unknown> {
 }
 
 export type DataGridItem<C> = C;
+export type DataGridAddItemMode = 'append' | 'prepend';
+
+export interface DataGridAddItemOptions {
+  mode?: DataGridAddItemMode;
+}
+
 export type DataGridRowAttrs = Record<string, unknown>;
 export type DataGridRowKey = string | number;
 
@@ -23,7 +29,7 @@ export interface DataGrid<C = unknown> {
   columns: Record<string, ColumnDefinition<C>>;
   error: unknown;
   fn: {
-    addItem: (item: C) => DataGridItem<C>[];
+    addItem: (item: C, options?: DataGridAddItemOptions) => DataGridItem<C>[];
     removeItem: (predicate: (item: DataGridItem<C>, index: number) => boolean) => number;
   };
   items: DataGridItem<C>[];
@@ -51,8 +57,15 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
     columns: params.columns,
     error: params.error ?? null,
     fn: {
-      addItem(item: D) {
-        state.items.push(item as never);
+      addItem(item: D, options: DataGridAddItemOptions = {}) {
+        const mode = options.mode ?? 'append';
+
+        if (mode === 'prepend') {
+          state.items.unshift(item as never);
+        } else if (mode === 'append') {
+          state.items.push(item as never);
+        }
+
         return state.items as D[];
       },
 
