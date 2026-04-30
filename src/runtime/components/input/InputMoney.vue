@@ -6,7 +6,7 @@ import { Money3Component } from 'v-money3';
 const money = defineModel<Numberish>({
   default: () => 0,
   get: v => v / 100,
-  set: v => v * 100,
+  set: v => Math.trunc(v * 100),
   type: [String, Number],
 });
 
