@@ -206,8 +206,8 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         v-if="$datagrid.loading"
         :value="100"
         animated
-        height="5px"
         class="rounded-0 position-absolute w-100 start-0"
+        height="5px"
         style="bottom: -6px; z-index: 10" />
     </BCardHeader>
 
@@ -281,7 +281,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
             </template>
 
             <BTd v-if="hasActionsSlot" class="text-end px-3">
-              <DropdownIcon toggle-class="border border-secondary-subtle border-dashed text-body py-1 px-3">
+              <DropdownIcon icon="caret-down" text="Actions" toggle-class="py-1 px-3" variant="light-dark">
                 <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
