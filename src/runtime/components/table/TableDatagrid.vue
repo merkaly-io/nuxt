@@ -234,7 +234,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
           </BTh>
 
           <template v-for="[key, column] in visibleColumns" :key="key">
-            <BTh :class="[column.class, column.thClass]">
+            <BTh :class="[column.class, column.thClass, 'text-nowrap']">
               <slot :name="`head[${key}]`" v-bind="{ column,  key }">
                 <span v-text="column.title ?? sentenceCase(key)" />
               </slot>
@@ -253,7 +253,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         </BTd>
       </BTbody>
 
-      <BTbody v-else class="fw-semibold text-gray-600">
+      <BTbody v-else class="fw-semibold text-gray-600 text-nowrap">
         <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
           <BTr v-bind="getRowAttrs(item, idx)">
             <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
