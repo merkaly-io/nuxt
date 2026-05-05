@@ -34,7 +34,10 @@ const hasDetailsSlot = computed(() => Boolean(slots['details']));
 const hasActionsSlot = computed(() => Boolean(slots['actions']));
 const hasBulkSlot = computed(() => Boolean(slots['bulk']));
 
-const visibleColumns = computed(() => Object.entries($datagrid.value.columns));
+// Only show specific columns when visible is not defined
+const visibleColumns = computed(() => Object.entries($datagrid.value.columns).filter(({ 1: column }) => {
+  return column.visible !== false;
+}));
 
 const tableColspan = computed(() => {
   const baseColumns = 2; // left + right empty columns

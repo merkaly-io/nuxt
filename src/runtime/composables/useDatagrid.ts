@@ -7,6 +7,7 @@ export interface ColumnDefinition<C = unknown> {
   thClass?: string;
   title?: string;
   type?: unknown;
+  visible?: boolean;
 }
 
 export type DataGridItem<C> = C;
@@ -21,7 +22,7 @@ export type DataGridRowKey = string | number;
 
 export interface DataGridRowDefinition {
   attrs?: DataGridRowAttrs;
-  class?: string;
+  class?: string | Record<string, unknown>;
   key?: DataGridRowKey;
 }
 
