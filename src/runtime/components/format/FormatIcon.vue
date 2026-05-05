@@ -35,17 +35,22 @@ const classList = computed(() => [
   fontSize.value,
   fontColor.value,
 ].filter(Boolean));
+
+defineOptions({
+  inheritAttrs: false,
+})
 </script>
 
 <template>
   <template v-if="hasContent">
     <span :class="{ 'flex-row-reverse': props.reversed }" class="d-flex align-items-center">
-      <component :is="props.tag" :class="classList" />
+      <component :is="props.tag" :class="classList" v-bind="$attrs" />
+
       <slot>
         <span :class="fontColor" class="ps-1" v-text="props.text" />
       </slot>
     </span>
   </template>
 
-  <component :is="props.tag" v-else :class="classList" />
+  <component :is="props.tag" v-else :class="classList" v-bind="$attrs"/>
 </template>
