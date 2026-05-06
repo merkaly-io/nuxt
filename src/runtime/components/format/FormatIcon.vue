@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import type { ColorVariant } from 'bootstrap-vue-next';
+import type { ColorVariant, AlignmentVertical, AlignmentHorizontal } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { computed } from 'vue';
 
 const props = defineProps({
+  alignV: { type: String as PropType<AlignmentVertical>, default: () => 'center' },
+  alignH: { type: String as PropType<AlignmentHorizontal>, default: () => 'start' },
   mode: { type: String, default: 'duotone' },
   name: { type: String, required: true },
   opacity: { type: [String, Number], default: () => '' },
@@ -36,14 +38,21 @@ const classList = computed(() => [
   fontColor.value,
 ].filter(Boolean));
 
+const wrapperClass = computed(() => [
+  'd-flex',
+  `justify-content-${props.alignH}`,
+  `align-items-${props.alignV}`,
+  { 'flex-row-reverse': props.reversed },
+]);
+
 defineOptions({
   inheritAttrs: false,
-})
+});
 </script>
 
 <template>
   <template v-if="hasContent">
-    <span :class="{ 'flex-row-reverse': props.reversed }" class="d-flex align-items-center">
+    <span :class="wrapperClass">
       <component :is="props.tag" :class="classList" v-bind="$attrs" />
 
       <slot>
@@ -52,5 +61,5 @@ defineOptions({
     </span>
   </template>
 
-  <component :is="props.tag" v-else :class="classList" v-bind="$attrs"/>
+  <component :is="props.tag" v-else :class="classList" v-bind="$attrs" />
 </template>
