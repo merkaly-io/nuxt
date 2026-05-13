@@ -24,5 +24,5 @@ export function useCounterUp(target: MaybeRefOrGetter<number>, options: UseCount
 
   onBeforeUnmount(() => tween?.kill());
 
-  return computed(() => Math.trunc(counter.value));
+  return computed(() => counter.value);
 }
