@@ -10,19 +10,37 @@ type UseCounterUpOptions = {
 };
 
 export function useCounterUp(target: MaybeRefOrGetter<number>, options: UseCounterUpOptions = {}) {
-  const { duration = 1, ease = 'power2.out' } = options;
-  const counter = reactive({ value: 0 });
+  const { duration = 0.8, decimals = 0, ease = 'power2.out' } = options;
+
+  const counter = reactive({
+    value: toValue(target) || 0,
+  });
 
   let tween: gsap.core.Tween | undefined;
+  let initialized = false;
 
-  watchImmediate(() => toValue(target), (value) => {
+  watchImmediate(
+    () => toValue(target),
+    (value) => {
+      const nextValue = Number(value) || 0;
+
+      if (!initialized) {
+        counter.value = nextValue;
+        initialized = true;
+        return;
+      }
+
       tween?.kill();
 
-      tween = gsap.to(counter, { value, duration, ease });
+      tween = gsap.to(counter, {
+        value: nextValue,
+        duration,
+        ease,
+      });
     },
   );
 
   onBeforeUnmount(() => tween?.kill());
 
-  return computed(() => counter.value);
+  return computed(() => Number(counter.value.toFixed(decimals)));
 }

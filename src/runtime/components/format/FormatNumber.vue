@@ -14,7 +14,9 @@ const props = defineProps({
   },
 });
 
-const counter = useCounterUp(toRef(props, 'value'));
+const counter = useCounterUp(toRef(props, 'value'), {
+  decimals: props.maxFractionDigits ?? 0,
+});
 
 const number = computed(() =>
   Intl.NumberFormat('en-US', {
