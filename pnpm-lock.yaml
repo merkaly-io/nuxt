@@ -12,8 +12,8 @@ importers:
         specifier: ^2.19.0
         version: 2.19.0
       '@bootstrap-vue-next/nuxt':
-        specifier: ^0.44.1
-        version: 0.44.1(bootstrap-vue-next@0.44.1(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.2)
+        specifier: ^0.45.3
+        version: 0.45.3(bootstrap-vue-next@0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.2)
       '@nuxt/devtools':
         specifier: ^3.2.1
         version: 3.2.1(vite@7.3.1(@types/node@25.7.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.99.0)(terser@5.46.0)(yaml@2.8.2))(vue@3.5.23(typescript@5.9.3))
@@ -60,8 +60,8 @@ importers:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       bootstrap-vue-next:
-        specifier: ^0.44.1
-        version: 0.44.1(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
+        specifier: ^0.45.3
+        version: 0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
       change-case:
         specifier: ^5
         version: 5.4.4
@@ -314,10 +314,10 @@ packages:
       commander:
         optional: true
 
-  '@bootstrap-vue-next/nuxt@0.44.1':
-    resolution: {integrity: sha512-eVK1ua9xqhqfy0YKGPjz5iJ6Mnz/aGJpRaYdQL7Fm4XMSvLkqKS6qc0aoNNGNDadS4TiaZtQUA62qHUe2k8+Sg==}
+  '@bootstrap-vue-next/nuxt@0.45.3':
+    resolution: {integrity: sha512-nTyzqPLxZSjOmpiEoDm76hCqlu+5b6xuWdlFhuk0v6FxqcD4jdqVHHJ/+/2Y5V2GfISWVL+reCG7/FEga1oz7w==}
     peerDependencies:
-      bootstrap-vue-next: ^0.44.1
+      bootstrap-vue-next: ^0.45.3
 
   '@capsizecss/unpack@4.0.0':
     resolution: {integrity: sha512-VERIM64vtTP1C4mxQ5thVT9fK0apjPFobqybMtA1UdUujWka24ERHbRHFGmpbbhp73MhV+KSsHQH9C6uOTdEQA==}
@@ -1249,6 +1249,10 @@ packages:
 
   '@nuxt/kit@3.21.4':
     resolution: {integrity: sha512-XDWhQJsA5hpdFpVSmImQIVXcsANJI07TjT1LZC/AUKJxl/dcM52Rq4uU+b3uqyVl4LZR1fODSDEzLxcdXq4Rmg==}
+    engines: {node: '>=18.12.0'}
+
+  '@nuxt/kit@3.21.5':
+    resolution: {integrity: sha512-eGo9DjJ9NzKMbJpFU/UTd4c5iOSYuivghKD8W/jVGHs7kew+hdSMvUy401IfQB7EObKPvt/WXEutAIaTg9OsyA==}
     engines: {node: '>=18.12.0'}
 
   '@nuxt/kit@4.4.2':
@@ -3393,8 +3397,8 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
-  bootstrap-vue-next@0.44.1:
-    resolution: {integrity: sha512-0j6j28np8S3npqji+ysli0vmXwFauSDLMjfpr5XjAU4GZnw5SAqeKzkkvqVG+LB0qij61cF2oNoFdtV2Xb8BNg==}
+  bootstrap-vue-next@0.45.3:
+    resolution: {integrity: sha512-I+/M+cqyWU79014E4WjIEMRQRu/O2FQLJAlyAamVjbZ41v3QpljVNt9EF8skmQAztoWFNeGvpHrzLw6MATJDKA==}
     peerDependencies:
       '@floating-ui/vue': '*'
       '@internationalized/date': '*'
@@ -4598,6 +4602,10 @@ packages:
 
   jiti@2.6.1:
     resolution: {integrity: sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==}
+    hasBin: true
+
+  jiti@2.7.0:
+    resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
   jose@6.2.2:
@@ -6878,10 +6886,10 @@ snapshots:
       cac: 6.7.14
       citty: 0.2.1
 
-  '@bootstrap-vue-next/nuxt@0.44.1(bootstrap-vue-next@0.44.1(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.2)':
+  '@bootstrap-vue-next/nuxt@0.45.3(bootstrap-vue-next@0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.2)':
     dependencies:
-      '@nuxt/kit': 3.21.2(magicast@0.5.2)
-      bootstrap-vue-next: 0.44.1(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
+      '@nuxt/kit': 3.21.5(magicast@0.5.2)
+      bootstrap-vue-next: 0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3))
     transitivePeerDependencies:
       - magicast
 
@@ -7463,7 +7471,7 @@ snapshots:
       https-proxy-agent: 7.0.6
       node-fetch: 2.7.0
       nopt: 8.1.0
-      semver: 7.7.4
+      semver: 7.8.0
       tar: 7.5.11
     transitivePeerDependencies:
       - encoding
@@ -7537,7 +7545,7 @@ snapshots:
 
   '@nuxt/devtools-kit@2.7.0(magicast@0.5.2)(vite@7.3.1(@types/node@25.7.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.99.0)(terser@5.46.0)(yaml@2.8.2))':
     dependencies:
-      '@nuxt/kit': 3.21.4(magicast@0.5.2)
+      '@nuxt/kit': 3.21.5(magicast@0.5.2)
       execa: 8.0.1
       vite: 7.3.1(@types/node@25.7.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.99.0)(terser@5.46.0)(yaml@2.8.2)
     transitivePeerDependencies:
@@ -7579,7 +7587,7 @@ snapshots:
       magicast: 0.5.2
       pathe: 2.0.3
       pkg-types: 2.3.1
-      semver: 7.7.4
+      semver: 7.8.0
 
   '@nuxt/devtools@3.2.1(vite@7.3.1(@types/node@25.7.0)(jiti@2.6.1)(lightningcss@1.31.1)(sass@1.99.0)(terser@5.46.0)(yaml@2.8.2))(vue@3.5.23(typescript@5.9.3))':
     dependencies:
@@ -7852,6 +7860,32 @@ snapshots:
       rc9: 3.0.1
       scule: 1.3.0
       semver: 7.7.4
+      tinyglobby: 0.2.16
+      ufo: 1.6.4
+      unctx: 2.5.0
+      untyped: 2.0.0
+    transitivePeerDependencies:
+      - magicast
+
+  '@nuxt/kit@3.21.5(magicast@0.5.2)':
+    dependencies:
+      c12: 3.3.4(magicast@0.5.2)
+      consola: 3.4.2
+      defu: 6.1.7
+      destr: 2.0.5
+      errx: 0.1.0
+      exsolve: 1.0.8
+      ignore: 7.0.5
+      jiti: 2.7.0
+      klona: 2.0.6
+      knitwork: 1.3.0
+      mlly: 1.8.2
+      ohash: 2.0.11
+      pathe: 2.0.3
+      pkg-types: 2.3.1
+      rc9: 3.0.1
+      scule: 1.3.0
+      semver: 7.8.0
       tinyglobby: 0.2.16
       ufo: 1.6.4
       unctx: 2.5.0
@@ -9308,7 +9342,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.49.0
       debug: 4.4.3
       minimatch: 9.0.5
-      semver: 7.7.4
+      semver: 7.8.0
       tinyglobby: 0.2.16
       ts-api-utils: 2.4.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -9323,7 +9357,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.56.0
       debug: 4.4.3
       minimatch: 9.0.5
-      semver: 7.7.4
+      semver: 7.8.0
       tinyglobby: 0.2.16
       ts-api-utils: 2.4.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -10093,7 +10127,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-vue-next@0.44.1(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)):
+  bootstrap-vue-next@0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.1.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.30)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)):
     dependencies:
       '@floating-ui/core': 1.7.5
       bootstrap: 5.3.8(@popperjs/core@2.11.8)
@@ -10222,7 +10256,7 @@ snapshots:
       dotenv: 17.4.2
       exsolve: 1.0.8
       giget: 3.2.0
-      jiti: 2.6.1
+      jiti: 2.7.0
       ohash: 2.0.11
       pathe: 2.0.3
       perfect-debounce: 2.1.0
@@ -11484,6 +11518,8 @@ snapshots:
 
   jiti@2.6.1: {}
 
+  jiti@2.7.0: {}
+
   jose@6.2.2: {}
 
   js-tokens@4.0.0: {}
@@ -11613,7 +11649,7 @@ snapshots:
       get-port-please: 3.2.0
       h3: 1.15.6
       http-shutdown: 1.2.2
-      jiti: 2.6.1
+      jiti: 2.7.0
       mlly: 1.8.2
       node-forge: 1.3.3
       pathe: 1.1.2
@@ -11849,7 +11885,7 @@ snapshots:
       hookable: 5.5.3
       httpxy: 0.1.7
       ioredis: 5.10.0
-      jiti: 2.6.1
+      jiti: 2.7.0
       klona: 2.0.6
       knitwork: 1.3.0
       listhen: 1.9.0
@@ -11869,7 +11905,7 @@ snapshots:
       rollup: 4.59.0
       rollup-plugin-visualizer: 6.0.11(rollup@4.59.0)
       scule: 1.3.0
-      semver: 7.7.4
+      semver: 7.8.0
       serve-placeholder: 2.0.2
       serve-static: 2.2.1
       source-map: 0.7.6
@@ -12969,7 +13005,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.0.0
       detect-libc: 2.1.2
-      semver: 7.7.4
+      semver: 7.8.0
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
