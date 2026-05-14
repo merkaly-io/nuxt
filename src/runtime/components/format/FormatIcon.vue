@@ -4,13 +4,14 @@ import type { PropType } from 'vue';
 import { computed } from 'vue';
 
 const props = defineProps({
-  alignV: { type: String as PropType<AlignmentVertical>, default: () => 'center' },
   alignH: { type: String as PropType<AlignmentHorizontal>, default: () => 'start' },
+  alignV: { type: String as PropType<AlignmentVertical>, default: () => 'center' },
   mode: { type: String, default: 'duotone' },
   name: { type: String, required: true },
   opacity: { type: [String, Number], default: () => '' },
   provider: { type: String, default: 'fa' },
   reversed: { type: Boolean, default: false },
+  rotate: { type: [Number, String] as PropType<'90' | 90 | '180' | 180 | '270' | 270>, default: undefined },
   size: { type: String, default: () => '' },
   spin: { type: Boolean, default: false },
   tag: { type: String, default: () => 'i' },
@@ -26,12 +27,14 @@ const iconName = computed(() => `${props.provider}-${props.name}`);
 const iconMode = computed(() => `${props.provider}-${props.mode}`);
 const animateSpin = computed(() => props.spin ? `${props.provider}-spin` : undefined);
 const iconOpacity = computed(() => props.opacity ? `opacity-${props.opacity}` : undefined);
+const iconRotate = computed(() => props.rotate ? `fa-rotate-${props.rotate}` : undefined);
 const fontSize = computed(() => props.size ? `fs-${props.size}` : undefined);
 const fontColor = computed(() => props.variant ? `text-${props.variant}` : undefined);
 
 const classList = computed(() => [
   iconName.value,
   iconMode.value,
+  iconRotate.value,
   animateSpin.value,
   iconOpacity.value,
   fontSize.value,
