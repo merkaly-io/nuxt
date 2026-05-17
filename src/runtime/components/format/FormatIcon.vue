@@ -6,7 +6,7 @@ import { computed } from 'vue';
 const props = defineProps({
   alignH: { type: String as PropType<AlignmentHorizontal>, default: () => 'start' },
   alignV: { type: String as PropType<AlignmentVertical>, default: () => 'center' },
-  mode: { type: String, default: 'duotone' },
+  mode: { type: String, default: 'regular' },
   name: { type: String, required: true },
   opacity: { type: [String, Number], default: () => '' },
   provider: { type: String, default: 'fa' },
