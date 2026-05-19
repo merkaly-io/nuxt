@@ -93,8 +93,8 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
       v-money3:
-        specifier: ^3.24.1
-        version: 3.24.1(vue@3.5.23(typescript@5.9.3))
+        specifier: ^3.26.0
+        version: 3.26.0(vue@3.5.23(typescript@5.9.3))
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.0(vue@3.5.23(typescript@5.9.3))
@@ -6263,8 +6263,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  v-money3@3.24.1:
-    resolution: {integrity: sha512-nGnxS06jkNsVzkuMQJ/0we6PSA4HO7jH1B7NeCF3Tv7Xm61poEUW7D1fdXXWR0IWLWneMSsCt3d4YQo6fTeBZA==}
+  v-money3@3.26.0:
+    resolution: {integrity: sha512-bazcYyJldQ9KPiGdGOfsiNfGIdUiDAUiH1J7GU1l+cyLUUZzCW0/0AJTh7lYx4s9SLLJc8ObxBsl2HwaRB54zQ==}
     peerDependencies:
       vue: '>= 3.2.0'
 
@@ -13525,7 +13525,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  v-money3@3.24.1(vue@3.5.23(typescript@5.9.3)):
+  v-money3@3.26.0(vue@3.5.23(typescript@5.9.3)):
     dependencies:
       vue: 3.5.23(typescript@5.9.3)
 
