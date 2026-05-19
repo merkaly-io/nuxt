@@ -1,37 +1,36 @@
 <script generic="T extends Record<string, any>" lang="ts" setup>
 import type { PropType } from 'vue';
-import type { Size } from 'bootstrap-vue-next';
 import { computed, onBeforeMount } from 'vue';
+import type { Size } from 'bootstrap-vue-next';
 import { useDebounceFn } from '@vueuse/core';
 import type { OptionConsumer, VueSelectProps } from 'vue-select';
 import VSelect from 'vue-select';
 import FormatIcon from '../format/FormatIcon.vue';
 
 const emit = defineEmits<{
-  (e: 'search', v: string): any;
-  (e: 'request:selected', v: string): any;
+  (e: 'request:selected' | 'search', v: string): unknown;
 }>();
 
 const props = defineProps({
   debounce: { type: Number, default: () => 250 },
   disabled: { type: Boolean, default: () => false },
-  fieldDisabled: { type: Function as PropType<(item: T) => boolean> },
-  fieldSort: { type: Function as PropType<(item: T) => string>, default: (it: any) => it.fieldText },
-  fieldText: { type: Function as PropType<(item: T) => string>, default: ((it: any) => it.name) },
-  fieldValue: { type: Function as PropType<(item: T) => unknown>, default: ((it: any) => it._id) },
+  fieldDisabled: { type: Function as PropType<(item: T) => boolean>, default: undefined },
+  fieldSort: { type: Function as PropType<(item: T) => string>, default: (it: Record<string, unknown>) => it.fieldText },
+  fieldText: { type: Function as PropType<(item: T) => string>, default: ((it: Record<string, unknown>) => it.name) },
+  fieldValue: { type: Function as PropType<(item: T) => unknown>, default: ((it: Record<string, unknown>) => it._id) },
   filterable: { type: Boolean, default: () => true },
   loading: { type: Boolean, default: () => false },
   multiple: { type: Boolean, default: () => false },
   noClear: { type: Boolean, default: () => false },
   noCloseOnSelect: { type: Boolean, default: () => false },
   options: { type: Array as PropType<T[]>, default: () => [] },
-  placeholder: { type: String },
-  selectedItem: { type: Object as PropType<T>, default: undefined },
+  placeholder: { type: String, default: () => undefined },
   required: { type: Boolean, default: () => false },
+  selectedItem: { type: Object as PropType<T>, default: undefined },
   size: { type: String as PropType<Size>, default: () => undefined },
 });
 
-const model = defineModel<any>({ type: [String, Object, Number, Boolean, Array], default: null });
+const model = defineModel({ type: [String, Object, Number, Boolean, Array], default: null });
 
 onBeforeMount(() => {
   if (props.selectedItem) return;
@@ -78,7 +77,7 @@ const mergedOptions = computed<T[]>(() => {
   if (!selected) return options;
 
   const filtered = options.filter(
-      (item) => props.fieldValue(item) !== props.fieldValue(selected),
+    (item) => props.fieldValue(item) !== props.fieldValue(selected),
   );
 
   return [selected, ...filtered];
@@ -103,19 +102,31 @@ const bindAttrs = computed<Partial<VueSelectProps>>(() => ({
 
 const bindOn = {
   search: (value: string) => {
-    value && debouncedFn(value);
+    if (value) debouncedFn(value);
 
     return value;
   },
 };
 
 const debouncedFn = useDebounceFn((value: string) => emit('search', value), props.debounce);
+
+const isRequired = computed(() => {
+  const isEmpty = props.multiple
+    ? !model.value?.length
+    : !model.value;
+
+  return props.required && isEmpty ? true : undefined;
+});
 </script>
 
 <template>
   <VSelect v-model="model" v-bind="bindAttrs" v-on="bindOn">
-    <template #search="scope: any">
-      <input class="vs__search" v-bind="scope.attributes" v-on="scope.events" />
+    <template #search="scope">
+      <input
+        :required="isRequired"
+        class="vs__search"
+        v-bind="scope.attributes"
+        v-on="scope.events">
     </template>
 
     <template #option="scope">
