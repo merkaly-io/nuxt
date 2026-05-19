@@ -82,7 +82,7 @@
     "changelogen": "^0.6.2",
     "eslint-plugin-storybook": "^10.1.11",
     "vitest": "^4.1.0",
-    "vue-tsc": "^3.2.1"
+    "vue-tsc": "^3.3.1"
   },
   "optionalDependencies": {
     "defu": "^6.1.5"
