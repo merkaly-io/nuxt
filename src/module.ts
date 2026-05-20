@@ -4,6 +4,7 @@ import {
   addPlugin,
   addRouteMiddleware,
   addServerHandler,
+  addTemplate,
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
@@ -24,6 +25,13 @@ import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/Bootst
 export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
 export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runtime/plugins/api.global';
 
+export interface MerkalyI18nLocale {
+  code: string;
+  config: Record<string, unknown>;
+  language: string;
+  name: string;
+}
+
 export interface MerkalyModuleOptions {
   api: {
     url: string;
@@ -37,6 +45,10 @@ export interface MerkalyModuleOptions {
     logoutUrl?: string;
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>;
     requiresAuth: boolean;
+  };
+  i18n?: {
+    defaultLocale: string;
+    locales: MerkalyI18nLocale[];
   };
   plausible?: {
     domain: string;
@@ -62,6 +74,10 @@ const defaultOptions: MerkalyModuleOptions = {
     logoutUrl: '/',
     params: {},
     requiresAuth: false,
+  },
+  i18n: {
+    defaultLocale: 'en-US',
+    locales: [],
   },
   plausible: {
     domain: '',
@@ -107,6 +123,41 @@ function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions): void
   );
 }
 
+function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): void {
+  const hasI18nConfig = Boolean(options.i18n?.defaultLocale && options.i18n.locales.length > 0);
+
+  if (!hasI18nConfig) return;
+
+  const template = addTemplate({
+    filename: 'merkaly/i18n.config.mjs',
+    getContents: () => {
+      const messages = Object.fromEntries(
+        options.i18n!.locales.map(locale => [locale.code, locale.config]),
+      );
+
+      return `
+        export default defineI18nConfig(() => ({
+          fallbackLocale: ${JSON.stringify(options.i18n!.defaultLocale)},
+          locale: ${JSON.stringify(options.i18n!.defaultLocale)},
+          messages: ${JSON.stringify(messages, null, 2)},
+        }));`;
+    },
+  });
+
+  const nuxtOptions = nuxt.options as typeof nuxt.options & {
+    i18n?: Record<string, unknown>;
+  };
+
+  nuxtOptions.i18n = defu(nuxtOptions.i18n || {}, {
+    defaultLocale: options.i18n!.defaultLocale,
+    detectBrowserLanguage: { useCookie: true },
+    locales: options.i18n!.locales.map(({ code, name, language }) => ({ code, name, language })),
+    restructureDir: '.',
+    strategy: 'no_prefix',
+    vueI18n: template.dst,
+  });
+}
+
 function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
   // @ts-expect-error plausible not defined
   nuxt.options.plausible = defu(
@@ -145,7 +196,7 @@ function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): v
   );
 }
 
-function configureAppHead(nuxt: Nuxt) {
+function configureAppHead(nuxt: Nuxt): void {
   nuxt.options.app?.head?.script?.push({
     crossorigin: 'anonymous',
     src: 'https://kit.fontawesome.com/55a4b2f4e1.js',
@@ -229,13 +280,14 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     const resolver = createResolver(import.meta.url);
 
     configureRuntimeConfig(nuxt, options);
+    configureI18n(nuxt, options);
     configurePlausible(nuxt, options);
     configureSentry(nuxt, options);
 
     const bootstrapComponentsConfig = await loadBootstrapConfig(nuxt);
 
     if (Object.keys(bootstrapComponentsConfig).length > 0) {
-      logger.info('Loading bootstrap.config.ts');
+      logger.success('Loading bootstrap.config.ts');
     }
 
     configureBootstrapVueNext(nuxt, bootstrapComponentsConfig);
