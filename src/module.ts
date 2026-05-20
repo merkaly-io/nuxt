@@ -28,7 +28,7 @@ export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runt
 
 export interface MerkalyI18nLocale {
   code: string;
-  config: Record<string, unknown>;
+  file: string;
   language: string;
   name: string;
 }
@@ -111,8 +111,10 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
     return template.dst;
   };
 
+  nuxt.options.alias['merkaly-i18n'] = resolve(nuxt.options.buildDir, 'merkaly-i18n');
+
   const vueI18n = writeTemplate(
-    'i18n.config.mjs',
+    'merkaly-i18n/config.mjs',
     `export default defineI18nConfig(() => (${JSON.stringify({
       fallbackLocale: options.i18n.defaultLocale,
       legacy: false,
@@ -120,21 +122,12 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
     }, null, 2)}))\n`,
   );
 
-  for (const locale of options.i18n.locales) {
-    writeTemplate(
-      `merkaly-i18n/locales/${locale.code}.mjs`,
-      `export default defineI18nLocale(() => (${JSON.stringify(locale.config, null, 2)}))\n`,
-    );
-  }
-
-  nuxt.options.alias['merkaly-i18n'] = resolve(nuxt.options.buildDir, 'merkaly-i18n');
-
   // @ts-expect-error hook already exists
   nuxt.hook('i18n:registerModule', register => register({
-    langDir: resolve(nuxt.options.buildDir, 'merkaly-i18n/locales'),
+    langDir: nuxt.options.rootDir,
     locales: options.i18n!.locales.map(locale => ({
       code: locale.code,
-      file: `${locale.code}.mjs`,
+      file: locale.file,
       language: locale.language,
       name: locale.name,
     })),
