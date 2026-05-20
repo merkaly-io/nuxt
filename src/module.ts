@@ -84,6 +84,7 @@ function buildModuleDependencies(options: MerkalyModuleOptions): Record<string, 
     '@nuxt/eslint': {},
     '@nuxt/fonts': {},
     '@nuxt/image': {},
+    '@nuxtjs/i18n': {},
     '@sentry/nuxt/module': {},
     '@vueuse/nuxt': {},
   };
@@ -107,6 +108,7 @@ function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions): void
 }
 
 function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
+  // @ts-expect-error plausible not defined
   nuxt.options.plausible = defu(
     {
       apiHost: 'https://analytics.merkaly.io',
@@ -116,6 +118,8 @@ function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
       enabled: process.env.NODE_ENV === 'production' && hasPlausibleConfig(options),
       ignoredHostnames: ['localhost', options.plausible?.localhost].filter(Boolean),
     },
+
+    // @ts-expect-error plausible not defined
     nuxt.options.plausible || {},
   );
 }
@@ -128,20 +132,6 @@ function configureSentry(nuxt: Nuxt, options: MerkalyModuleOptions): void {
   });
 
   nuxt.options.sourcemap = { client: 'hidden', server: true };
-}
-
-async function loadBootstrapConfig(nuxt: Nuxt): Promise<BvnComponentProps> {
-  const rootDirResolver = createResolver(nuxt.options.rootDir);
-  const bootstrapConfigPath = rootDirResolver.resolve('bootstrap.config.ts');
-
-  if (!existsSync(bootstrapConfigPath)) {
-    return {};
-  }
-
-  const jiti = createJiti(import.meta.url);
-  const imported = await jiti.import(bootstrapConfigPath).catch(() => ({}));
-
-  return (imported as { default?: BvnComponentProps }).default || {};
 }
 
 function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): void {
@@ -160,6 +150,15 @@ function configureAppHead(nuxt: Nuxt) {
     crossorigin: 'anonymous',
     src: 'https://kit.fontawesome.com/55a4b2f4e1.js',
   });
+}
+
+function configureVite(nuxt: Nuxt): void {
+  nuxt.options.vite = defu(
+    nuxt.options.vite || {},
+    {
+      plugins: [svgLoader()],
+    },
+  );
 }
 
 function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, resolver: ReturnType<typeof createResolver>): void {
@@ -193,13 +192,18 @@ function registerRuntimeFeatures(nuxt: Nuxt, options: MerkalyModuleOptions, reso
   });
 }
 
-function configureVite(nuxt: Nuxt): void {
-  nuxt.options.vite = defu(
-    nuxt.options.vite || {},
-    {
-      plugins: [svgLoader()],
-    },
-  );
+async function loadBootstrapConfig(nuxt: Nuxt): Promise<BvnComponentProps> {
+  const rootDirResolver = createResolver(nuxt.options.rootDir);
+  const bootstrapConfigPath = rootDirResolver.resolve('bootstrap.config.ts');
+
+  if (!existsSync(bootstrapConfigPath)) {
+    return {};
+  }
+
+  const jiti = createJiti(import.meta.url);
+  const imported = await jiti.import(bootstrapConfigPath).catch(() => ({}));
+
+  return (imported as { default?: BvnComponentProps }).default || {};
 }
 
 export default defineNuxtModule<MerkalyModuleOptions>({
