@@ -4,7 +4,6 @@ import {
   addPlugin,
   addRouteMiddleware,
   addServerHandler,
-  addTemplate,
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
@@ -128,34 +127,23 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): void {
 
   if (!hasI18nConfig) return;
 
-  const template = addTemplate({
-    filename: 'merkaly/i18n.config.mjs',
-    getContents: () => {
-      const messages = Object.fromEntries(
-        options.i18n!.locales.map(locale => [locale.code, locale.config]),
-      );
-
-      return `
-        export default defineI18nConfig(() => ({
-          fallbackLocale: ${JSON.stringify(options.i18n!.defaultLocale)},
-          locale: ${JSON.stringify(options.i18n!.defaultLocale)},
-          messages: ${JSON.stringify(messages, null, 2)},
-        }));`;
-    },
-  });
-
   const nuxtOptions = nuxt.options as typeof nuxt.options & {
     i18n?: Record<string, unknown>;
   };
 
-  nuxtOptions.i18n = defu(nuxtOptions.i18n || {}, {
+  nuxtOptions.i18n = {
     defaultLocale: options.i18n!.defaultLocale,
     detectBrowserLanguage: { useCookie: true },
     locales: options.i18n!.locales.map(({ code, name, language }) => ({ code, name, language })),
     restructureDir: '.',
     strategy: 'no_prefix',
-    vueI18n: template.dst,
-  });
+    vueI18n: {
+      fallbackLocale: options.i18n!.defaultLocale,
+      legacy: false,
+      locale: options.i18n!.defaultLocale,
+      messages: Object.fromEntries(options.i18n!.locales.map(locale => [locale.code, locale.config])),
+    },
+  };
 }
 
 function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
