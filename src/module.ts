@@ -4,6 +4,7 @@ import {
   addPlugin,
   addRouteMiddleware,
   addServerHandler,
+  addTemplate,
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
@@ -13,7 +14,8 @@ import type { ClientAuthorizationParams } from '@auth0/auth0-spa-js';
 import type { Nuxt } from '@nuxt/schema';
 import { defu } from 'defu';
 import { createJiti } from 'jiti';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import svgLoader from 'vite-svg-loader';
 import 'reflect-metadata';
 
@@ -93,13 +95,67 @@ function hasPlausibleConfig(options: MerkalyModuleOptions): boolean {
   return Boolean(options.plausible?.domain);
 }
 
-function buildModuleDependencies(options: MerkalyModuleOptions): Record<string, object> {
+function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
+  if (!options.i18n?.defaultLocale || options.i18n.locales.length === 0) return {};
+
+  const writeTemplate = (filename: string, contents: string): string => {
+    const template = addTemplate({
+      filename,
+      getContents: () => contents,
+      write: true,
+    });
+
+    mkdirSync(dirname(template.dst), { recursive: true });
+    writeFileSync(template.dst, contents);
+
+    return template.dst;
+  };
+
+  const vueI18n = writeTemplate(
+    'i18n.config.mjs',
+    `export default defineI18nConfig(() => (${JSON.stringify({
+      fallbackLocale: options.i18n.defaultLocale,
+      legacy: false,
+      locale: options.i18n.defaultLocale,
+    }, null, 2)}))\n`,
+  );
+
+  for (const locale of options.i18n.locales) {
+    writeTemplate(
+      `merkaly-i18n/locales/${locale.code}.mjs`,
+      `export default defineI18nLocale(() => (${JSON.stringify(locale.config, null, 2)}))\n`,
+    );
+  }
+
+  nuxt.options.alias['merkaly-i18n'] = resolve(nuxt.options.buildDir, 'merkaly-i18n');
+
+  // @ts-expect-error hook already exists
+  nuxt.hook('i18n:registerModule', register => register({
+    langDir: resolve(nuxt.options.buildDir, 'merkaly-i18n/locales'),
+    locales: options.i18n!.locales.map(locale => ({
+      code: locale.code,
+      file: `${locale.code}.mjs`,
+      language: locale.language,
+      name: locale.name,
+    })),
+  }));
+
+  return {
+    defaultLocale: options.i18n.defaultLocale,
+    detectBrowserLanguage: { useCookie: true },
+    restructureDir: '.',
+    strategy: 'no_prefix',
+    vueI18n,
+  };
+}
+
+function buildModuleDependencies(nuxt: Nuxt, options: MerkalyModuleOptions): Record<string, object> {
   const dependencies: Record<string, object> = {
     '@bootstrap-vue-next/nuxt': {},
     '@nuxt/eslint': {},
     '@nuxt/fonts': {},
     '@nuxt/image': {},
-    '@nuxtjs/i18n': {},
+    '@nuxtjs/i18n': { overrides: configureI18n(nuxt, options) },
     '@sentry/nuxt/module': {},
     '@vueuse/nuxt': {},
   };
@@ -120,30 +176,6 @@ function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions): void
     options,
     nuxt.options.runtimeConfig.public.merkaly || {},
   );
-}
-
-function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): void {
-  const hasI18nConfig = Boolean(options.i18n?.defaultLocale && options.i18n.locales.length > 0);
-
-  if (!hasI18nConfig) return;
-
-  const nuxtOptions = nuxt.options as typeof nuxt.options & {
-    i18n?: Record<string, unknown>;
-  };
-
-  nuxtOptions.i18n = {
-    defaultLocale: options.i18n!.defaultLocale,
-    detectBrowserLanguage: { useCookie: true },
-    locales: options.i18n!.locales.map(({ code, name, language }) => ({ code, name, language })),
-    restructureDir: '.',
-    strategy: 'no_prefix',
-    vueI18n: {
-      fallbackLocale: options.i18n!.defaultLocale,
-      legacy: false,
-      locale: options.i18n!.defaultLocale,
-      messages: Object.fromEntries(options.i18n!.locales.map(locale => [locale.code, locale.config])),
-    },
-  };
 }
 
 function configurePlausible(nuxt: Nuxt, options: MerkalyModuleOptions): void {
@@ -260,7 +292,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
       defaultOptions,
     );
 
-    return buildModuleDependencies(options);
+    return buildModuleDependencies(nuxt, options);
   },
 
   async setup(options, nuxt) {
@@ -268,7 +300,6 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     const resolver = createResolver(import.meta.url);
 
     configureRuntimeConfig(nuxt, options);
-    configureI18n(nuxt, options);
     configurePlausible(nuxt, options);
     configureSentry(nuxt, options);
 
