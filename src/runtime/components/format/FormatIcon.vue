@@ -59,7 +59,7 @@ defineOptions({
       <component :is="props.tag" :class="classList" v-bind="$attrs" />
 
       <slot>
-        <span :class="fontColor" class="ps-1" v-text="props.text" />
+        <span :class="[fontColor, `${props.reversed ? 'pe-1' : 'ps-1'}`]" v-text="props.text" />
       </slot>
     </span>
   </template>
