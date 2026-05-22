@@ -21,6 +21,7 @@ import 'reflect-metadata';
 
 // @ts-expect-error Types aren't exposed but they exist
 import type { BvnComponentProps } from 'bootstrap-vue-next/dist/src/types/BootstrapVueOptions';
+import type { NotivueConfig } from 'notivue';
 
 // Re-export types for consumers
 export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
@@ -111,10 +112,10 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
     return template.dst;
   };
 
-  nuxt.options.alias['merkaly-i18n'] = resolve(nuxt.options.buildDir, 'merkaly-i18n');
+  nuxt.options.alias['i18n'] = resolve(nuxt.options.buildDir, 'i18n');
 
   const vueI18n = writeTemplate(
-    'merkaly-i18n/config.mjs',
+    'i18n/config.mjs',
     `export default defineI18nConfig(() => (${JSON.stringify({
       fallbackLocale: options.i18n.defaultLocale,
       legacy: false,
@@ -122,7 +123,6 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
     }, null, 2)}))\n`,
   );
 
-  // @ts-expect-error hook already exists
   nuxt.hook('i18n:registerModule', register => register({
     langDir: nuxt.options.rootDir,
     locales: options.i18n!.locales.map(locale => ({
@@ -151,6 +151,7 @@ function buildModuleDependencies(nuxt: Nuxt, options: MerkalyModuleOptions): Rec
     '@nuxtjs/i18n': { overrides: configureI18n(nuxt, options) },
     '@sentry/nuxt/module': {},
     '@vueuse/nuxt': {},
+    'notivue/nuxt': {},
   };
 
   if (hasPlausibleConfig(options)) {
@@ -201,12 +202,24 @@ function configureSentry(nuxt: Nuxt, options: MerkalyModuleOptions): void {
 function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps): void {
   nuxt.options.bootstrapVueNext = defu(
     nuxt.options.bootstrapVueNext || {},
-    {
-      plugin: {
-        components,
-      },
-    },
+    { plugin: { components } },
   );
+}
+
+function configureNotiVue(nuxt: Nuxt): void {
+  nuxt.options.css.push('notivue/notification.css');
+  nuxt.options.css.push('notivue/animations.css');
+  nuxt.options.css.push('notivue/notification-progress.css');
+
+  // @ts-expect-error Add support for notivue
+  nuxt.options.notivue = {
+    centerOnMobile: true,
+    clearOnSwipe: true,
+    enqueue: true,
+    fullWidth: false,
+    limit: 3,
+    pauseOnHover: true,
+  } as NotivueConfig;
 }
 
 function configureAppHead(nuxt: Nuxt): void {
@@ -292,6 +305,7 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     const logger = useLogger('@merkaly/nuxt');
     const resolver = createResolver(import.meta.url);
 
+    configureNotiVue(nuxt);
     configureRuntimeConfig(nuxt, options);
     configurePlausible(nuxt, options);
     configureSentry(nuxt, options);

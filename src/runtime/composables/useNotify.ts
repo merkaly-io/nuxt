@@ -1,9 +1,9 @@
-import type { ColorVariant } from 'bootstrap-vue-next';
+import { push } from 'notivue';
 
 export interface NotifyOptions {
   title?: string;
-  message: string;
-  variant?: ColorVariant;
+  message?: string;
+  variant: 'success' | 'danger' | 'warning' | 'info';
 }
 
 export interface NotifyConfirmOptions extends NotifyOptions {
@@ -12,7 +12,17 @@ export interface NotifyConfirmOptions extends NotifyOptions {
 }
 
 export async function toast(options: NotifyOptions) {
-  window.alert('[toast]');
+  const toastByVariant = {
+    success: push.success,
+    danger: push.error,
+    warning: push.warning,
+    info: push.info,
+  } satisfies Record<NotifyOptions['variant'], typeof push.success>;
+
+  return toastByVariant[options.variant]({
+    title: options.title,
+    message: options.message,
+  });
 }
 
 export function alert(options: NotifyOptions) {

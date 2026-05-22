@@ -4,6 +4,7 @@ import { useAuth, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
 import { useColorMode } from '@vueuse/core';
+import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivue';
 
 const $route = useRoute();
 const { isLoading } = useAuth();
@@ -24,6 +25,12 @@ hook('page:finish', () => regenerate());
 
 <template>
   <main>
+    <Notivue v-slot="item">
+      <Notification :item="item" :theme="pastelTheme" title>
+        <NotificationProgress :item="item" />
+      </Notification>
+    </Notivue>
+
     <BApp>
       <!-- Mostramos spinner mientras auth se carga -->
       <slot v-if="isLoading" name="loading" />
