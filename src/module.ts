@@ -219,6 +219,7 @@ function configureNotiVue(nuxt: Nuxt): void {
     fullWidth: false,
     limit: 3,
     pauseOnHover: true,
+    position: 'top-right',
   } as NotivueConfig;
 }
 
