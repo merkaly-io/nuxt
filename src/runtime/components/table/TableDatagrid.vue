@@ -256,7 +256,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         </BTd>
       </BTbody>
 
-      <BTbody v-else class="fw-semibold text-gray-600 text-nowrap">
+      <BTbody v-else class="fw-semibold text-nowrap">
         <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
           <BTr v-bind="getRowAttrs(item, idx)">
             <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
