@@ -8,7 +8,7 @@ const props = defineProps({
 });
 
 const bindAttrs = computed(() => {
-  const attrs: Record<string, any> = {
+  const attrs: Record<string, unknown> = {
     day: 'numeric',
     month: 'short',
     relative: props.format === 'relative' || undefined,

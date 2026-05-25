@@ -1,6 +1,6 @@
 import { reactive, computed, ref } from 'vue';
-import { validate as classValidate, getMetadataStorage } from 'class-validator';
 import type { ValidationError } from 'class-validator';
+import { validate as classValidate, getMetadataStorage } from 'class-validator';
 
 type FieldConstraints = { maxlength?: number; minlength?: number; required?: boolean };
 type FieldAttrs = FieldConstraints & { state?: boolean | null };
@@ -15,7 +15,7 @@ const handlers: Record<string, (entry: FieldConstraints, constraints: unknown[])
   },
 };
 
-function extractConstraints<T extends object>(constructor: Function): { [K in keyof T]?: FieldConstraints } {
+function extractConstraints<T extends object>(constructor: () => void): { [K in keyof T]?: FieldConstraints } {
   const metadata = getMetadataStorage().getTargetValidationMetadatas(constructor, '', false, false);
   const constraints = {} as { [K in keyof T]?: FieldConstraints };
 
@@ -60,6 +60,7 @@ function mergeAttrs<T extends object>(
 
 export function useValidator<T extends object>(instance: T) {
   const form = reactive(instance) as T;
+  // @ts-expect-error IGNORED BECAUSE TS LINT
   const constraints = extractConstraints<T>(instance.constructor);
   const errors = reactive({}) as Record<keyof T, string>;
   const state = reactive({}) as Record<string, boolean | null>;

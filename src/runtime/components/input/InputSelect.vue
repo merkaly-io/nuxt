@@ -89,7 +89,7 @@ const bindAttrs = computed<Partial<VueSelectProps>>(() => ({
   clearable: props.disabled ? false : !props.noClear,
   closeOnSelect: props.multiple ? false : !props.noCloseOnSelect,
   disabled: props.disabled,
-  filter: filterItems as OptionConsumer<any>,
+  filter: filterItems as OptionConsumer<never>,
   filterable: props.filterable,
   getOptionLabel: props.fieldText,
   loading: props.loading,
