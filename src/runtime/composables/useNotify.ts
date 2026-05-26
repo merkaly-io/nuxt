@@ -17,10 +17,16 @@ export interface NotifyAlertOptions extends NotifyOptions {
   okText?: string;
 }
 
-export function useNotify() {
+export interface NotifyApi {
+  alert(options: NotifyAlertOptions): void;
+  confirm(options: NotifyConfirmOptions): void;
+  toast(options: NotifyOptions): unknown;
+}
+
+export function useNotify(): NotifyApi {
   const $modal = useModal();
 
-  function toast(options: NotifyOptions) {
+  function toast(options: NotifyOptions): unknown {
     const toastByVariant = {
       success: push.success,
       danger: push.error,
@@ -34,7 +40,7 @@ export function useNotify() {
     });
   }
 
-  function alert(options: NotifyAlertOptions) {
+  function alert(options: NotifyAlertOptions): void {
 
     const instance = $modal.create({
       body: options.message,
@@ -44,10 +50,10 @@ export function useNotify() {
       title: options.title || 'Alert',
     });
 
-    return instance.show();
+    instance.show();
   }
 
-  function confirm(options: NotifyConfirmOptions) {
+  function confirm(options: NotifyConfirmOptions): void {
     const instance = $modal.create({
       body: options.message,
       cancelTitle: options.cancelText || 'Cancel',
@@ -58,7 +64,7 @@ export function useNotify() {
       title: options.title || 'Confirm',
     });
 
-    return instance.show();
+    instance.show();
   }
 
   return { toast, alert, confirm };
