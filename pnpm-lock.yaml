@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@auth0/auth0-spa-js':
-        specifier: ^2.19.0
-        version: 2.19.0
+        specifier: ^2.20.0
+        version: 2.20.0
       '@bootstrap-vue-next/nuxt':
         specifier: ^0.45.3
         version: 0.45.3(bootstrap-vue-next@0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.3.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.0.0(@vue/compiler-sfc@3.5.34)(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.3)
@@ -157,8 +157,8 @@ packages:
   '@auth0/auth0-auth-js@1.6.0':
     resolution: {integrity: sha512-/WYYNlsqhWA6I60pMVLFVeOgjOUCLdJThEAsjN8pAgYY09BTxbPaRIEVDgGu6ckoJpkmKvEYlHPO/vwRNrvX6w==}
 
-  '@auth0/auth0-spa-js@2.19.0':
-    resolution: {integrity: sha512-I2/wlIJ6Ch3X1AekG7w9F2wM5SbsnPX0MX0B67MM9vgqbLeSP8wfK1cuc279nmTEKnIxxDzcKHC6stWg/0fYQQ==}
+  '@auth0/auth0-spa-js@2.20.0':
+    resolution: {integrity: sha512-XKIfFgsz4M1h2qyGhxLb33k1i8eL7Nost+EmYIOY5givxZuzWOCmhzmwnXjprqYsT+dRGu6ORT29IuTd1rwDYQ==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -5214,8 +5214,8 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
-  jose@6.2.2:
-    resolution: {integrity: sha512-d7kPDd34KO/YnzaDOlikGpOurfF0ByC2sEV4cANCtdqLlTfBlw2p14O/5d/zv40gJPbIQxfES3nSx1/oYNyuZQ==}
+  jose@6.2.3:
+    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -5734,8 +5734,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  oauth4webapi@3.8.5:
-    resolution: {integrity: sha512-A8jmyUckVhRJj5lspguklcl90Ydqk61H3dcU0oLhH3Yv13KpAliKTt5hknpGGPZSSfOwGyraNEFmofDYH+1kSg==}
+  oauth4webapi@3.8.6:
+    resolution: {integrity: sha512-iwemM91xz8nryHti2yTmg5fhyEMVOkOXwHNqbvcATjyajb5oQxCQzrNOA6uElRHuMhQQTKUyFKV9y/CNyg25BQ==}
 
   object-deep-merge@2.0.0:
     resolution: {integrity: sha512-3DC3UMpeffLTHiuXSy/UG4NOIYTLlY9u3V82+djSCLYClWobZiS4ivYzpIUWrRY/nfsJ8cWsKyG3QfyLePmhvg==}
@@ -5772,8 +5772,8 @@ packages:
     resolution: {integrity: sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw==}
     engines: {node: '>=20'}
 
-  openid-client@6.8.2:
-    resolution: {integrity: sha512-uOvTCndr4udZsKihJ68H9bUICrriHdUVJ6Az+4Ns6cW55rwM5h0bjVIzDz2SxgOI84LKjFyjOFvERLzdTUROGA==}
+  openid-client@6.8.4:
+    resolution: {integrity: sha512-QSw0BA08piujetEwfZsHoTrDpMEha7GDZDicQqVwX4u0ChCjefvjDB++TZ8BTg76UpwhzIQgdvvfgfl3HpCSAw==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -7599,10 +7599,10 @@ snapshots:
 
   '@auth0/auth0-auth-js@1.6.0':
     dependencies:
-      jose: 6.2.2
-      openid-client: 6.8.2
+      jose: 6.2.3
+      openid-client: 6.8.4
 
-  '@auth0/auth0-spa-js@2.19.0':
+  '@auth0/auth0-spa-js@2.20.0':
     dependencies:
       '@auth0/auth0-auth-js': 1.6.0
       browser-tabs-lock: 1.3.0
@@ -13015,7 +13015,7 @@ snapshots:
 
   jiti@2.7.0: {}
 
-  jose@6.2.2: {}
+  jose@6.2.3: {}
 
   js-tokens@4.0.0: {}
 
@@ -13702,7 +13702,7 @@ snapshots:
       pathe: 2.0.3
       tinyexec: 1.1.2
 
-  oauth4webapi@3.8.5: {}
+  oauth4webapi@3.8.6: {}
 
   object-deep-merge@2.0.0: {}
 
@@ -13744,10 +13744,10 @@ snapshots:
       powershell-utils: 0.1.0
       wsl-utils: 0.3.1
 
-  openid-client@6.8.2:
+  openid-client@6.8.4:
     dependencies:
-      jose: 6.2.2
-      oauth4webapi: 3.8.5
+      jose: 6.2.3
+      oauth4webapi: 3.8.6
 
   optionator@0.9.4:
     dependencies:
