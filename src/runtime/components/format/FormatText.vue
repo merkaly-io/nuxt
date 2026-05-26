@@ -1,11 +1,12 @@
 <script lang="ts" setup>
+import type { PropType } from 'vue';
 import { computed, useSlots } from 'vue';
 
 const props = defineProps({
-  fallback: { type: String, required: false },
+  fallback: { type: String, required: false, default: () => undefined },
   tag: { type: String, default: () => 'span' },
   template: { type: String, required: true },
-  values: { type: Object as PropType<Record<string, unknown>>, required: false },
+  values: { type: Object as PropType<object>, required: false, default: () => ({}) },
 });
 
 const slots = useSlots();

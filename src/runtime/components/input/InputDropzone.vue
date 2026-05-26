@@ -50,7 +50,7 @@ function handleFileChange(files: File[]) {
         class="d-none"
         type="file"
         @change="e => handleFileChange((e.target as HTMLInputElement).files)"
-    />
+    >
 
     <div class="dz-message needsclick" @click="triggerInput">
       <i class="ki-duotone ki-file-up text-primary fs-3x">

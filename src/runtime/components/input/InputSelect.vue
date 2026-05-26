@@ -145,12 +145,12 @@ const isRequired = computed(() => {
       <span :required="props.required || undefined" />
     </template>
 
-    <template #spinner="{ loading }">
-      <BSpinner v-if="loading" class="spinner" variant="primary" />
+    <template #spinner="{ loading: isLoading }">
+      <BSpinner v-if="isLoading" class="spinner" variant="primary" />
     </template>
 
-    <template #no-options="{ search, searching, loading }">
-      <span v-if="loading">Searching for "{{ search }}"</span>
+    <template #no-options="{ search, searching, loading: isLoading }">
+      <span v-if="isLoading">Searching for "{{ search }}"</span>
       <span v-else-if="searching">No results for "{{ search }}"</span>
       <span v-else>Type to search</span>
     </template>

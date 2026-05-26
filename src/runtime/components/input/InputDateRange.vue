@@ -29,11 +29,11 @@ const presets = [
 
 const selectedPreset = ref<PresetKey>(model.value?.preset || props.preset);
 
-const getDateRange = (preset: PresetKey): Omit<DateRange, 'preset'> => {
+const getDateRange = (key: PresetKey): Omit<DateRange, 'preset'> => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  switch (preset) {
+  switch (key) {
     case 'today':
       return { start: today, end: today };
     case 'yesterday': {
@@ -103,11 +103,11 @@ onBeforeMount(() => selectPreset(props.preset));
       <span class="fs-7 fw-bold text-gray-800">Date Range</span>
     </div>
 
-    <template v-for="preset in presets" :key="preset.key">
-      <BDropdownItem :active="selectedPreset === preset.key" @click="selectPreset(preset.key)">
+    <template v-for="item in presets" :key="item.key">
+      <BDropdownItem :active="selectedPreset === item.key" @click="selectPreset(item.key)">
         <div class="d-flex align-items-center gap-2">
-          <FormatIcon :name="preset.icon" class="text-gray-500" />
-          <span v-text="preset.label" />
+          <FormatIcon :name="item.icon" class="text-gray-500" />
+          <span v-text="item.label" />
         </div>
       </BDropdownItem>
     </template>
