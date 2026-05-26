@@ -30,14 +30,11 @@
   "scripts": {
     "build": "nuxt-module-build build",
     "build:stub": "nuxt-module-build build --stub",
-    "dev": "pnpm dev:prepare && cd playground && pnpm storybook",
-    "dev:build": "nuxi build playground",
-    "dev:prepare": "pnpm build:stub && nuxi prepare playground",
     "lint": "eslint .",
     "prepack": "pnpm build",
     "prepare": "nuxt-module-build prepare",
     "test": "vitest run",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
+    "test:types": "vue-tsc --noEmit",
     "test:watch": "vitest watch"
   },
   "dependencies": {

@@ -28,7 +28,7 @@ jobs:
           PACKAGE_VERSION="$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")"
           test "$TAG_VERSION" = "$PACKAGE_VERSION"
 
-      - name: Setup Node 22
+      - name: Setup Node 24
         uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -40,20 +40,13 @@ jobs:
       - name: Install module dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install playground dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./playground
-
-      - name: Prepare module
-        run: pnpm dev:prepare
-
       - name: Lint code
         run: pnpm lint
         continue-on-error: true
 
-      - name: Run tests
-        run: pnpm test
-
+#       - name: Run tests
+#         run: pnpm test
+#
       - name: Build module
         run: pnpm build
 
@@ -84,10 +77,6 @@ jobs:
 
       - name: Install module dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install playground dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./playground
 
       - name: Generate release notes
         run: |

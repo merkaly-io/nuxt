@@ -26,13 +26,6 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./
 
-      - name: Install Playground deps 🛠️
-        run: pnpm install --frozen-lockfile
-        working-directory: ./playground
-
-      - name: Run Prepare 🛠️
-        run: pnpm dev:prepare
-
       - name: Lint code 👀️
         run: pnpm lint
         continue-on-error: true
