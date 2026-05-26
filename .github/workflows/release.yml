@@ -66,7 +66,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node 22
+      - name: Setup Node 24
         uses: actions/setup-node@v6
         with:
           node-version: 24
