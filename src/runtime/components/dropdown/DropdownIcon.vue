@@ -8,7 +8,7 @@ const props = defineProps({
   size: { type: String as PropType<keyof BaseSize>, default: () => 'sm' },
   icon: { type: String, default: () => 'ellipsis-v' },
   text: { type: String, default: () => '' },
-  variant: { type: String as PropType<keyof BaseButtonVariant>, default: () => undefined },
+  variant: { type: String as PropType<keyof BaseButtonVariant>, default: () => 'light' },
   solid: { type: Boolean, default: () => false },
 });
 
