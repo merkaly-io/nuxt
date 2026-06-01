@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@auth0/auth0-spa-js':
-        specifier: ^2.20.0
-        version: 2.20.0
+        specifier: ^2.21.0
+        version: 2.21.0
       '@bootstrap-vue-next/nuxt':
         specifier: ^0.45.3
         version: 0.45.3(bootstrap-vue-next@0.45.3(@vueuse/core@14.3.0(vue@3.5.23(typescript@5.9.3)))(@vueuse/integrations@14.3.0(change-case@5.4.4)(fuse.js@7.3.0)(vue@3.5.23(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@5.1.0(@vue/compiler-sfc@3.5.35)(vite@7.3.3(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.31.1)(sass@1.100.0)(terser@5.47.1)(yaml@2.9.0))(vue@3.5.23(typescript@5.9.3)))(vue@3.5.23(typescript@5.9.3)))(magicast@0.5.3)
@@ -154,11 +154,11 @@ packages:
     peerDependencies:
       '@types/json-schema': ^7.0.15
 
-  '@auth0/auth0-auth-js@1.6.0':
-    resolution: {integrity: sha512-/WYYNlsqhWA6I60pMVLFVeOgjOUCLdJThEAsjN8pAgYY09BTxbPaRIEVDgGu6ckoJpkmKvEYlHPO/vwRNrvX6w==}
+  '@auth0/auth0-auth-js@1.7.0':
+    resolution: {integrity: sha512-SxF5WcPehbLOPwGrM+mqqVhnwZ3ZHEfM2wI/Yc3h0Kn1MM78seegxj7PrKoEMMRIfslDyHG+UNlOuobY8YOcKg==}
 
-  '@auth0/auth0-spa-js@2.20.0':
-    resolution: {integrity: sha512-XKIfFgsz4M1h2qyGhxLb33k1i8eL7Nost+EmYIOY5givxZuzWOCmhzmwnXjprqYsT+dRGu6ORT29IuTd1rwDYQ==}
+  '@auth0/auth0-spa-js@2.21.0':
+    resolution: {integrity: sha512-pqZnuM0p6sHvt2J7NzCkkbQzmyaM7hekv3swtnS7lGNjKrShmchraeaRbklgqzE40FlqB6dX+gq6mF61cRNAMg==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -7433,14 +7433,14 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.1
 
-  '@auth0/auth0-auth-js@1.6.0':
+  '@auth0/auth0-auth-js@1.7.0':
     dependencies:
       jose: 6.2.3
       openid-client: 6.8.4
 
-  '@auth0/auth0-spa-js@2.20.0':
+  '@auth0/auth0-spa-js@2.21.0':
     dependencies:
-      '@auth0/auth0-auth-js': 1.6.0
+      '@auth0/auth0-auth-js': 1.7.0
       browser-tabs-lock: 1.3.0
       dpop: 2.1.1
       es-cookie: 1.3.2
