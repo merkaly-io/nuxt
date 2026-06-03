@@ -118,6 +118,7 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions): object {
     'i18n/config.mjs',
     `export default defineI18nConfig(() => (${JSON.stringify({
       fallbackLocale: options.i18n.defaultLocale,
+      flatJson: true,
       legacy: false,
       locale: options.i18n.defaultLocale,
     }, null, 2)}))\n`,
