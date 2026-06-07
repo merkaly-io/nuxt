@@ -1,13 +1,18 @@
 import { defineNuxtPlugin } from '#app';
 import type { Ref } from '#imports';
-import { useAuth } from '#imports';
+import { useAuth, useTenant } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
 type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
-type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = { data: TData, meta: TMeta, headers: FetchOptions['headers'], params: TParams }
+type OnSuccessArgs<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = {
+  data: TData,
+  meta: TMeta,
+  headers: FetchOptions['headers'],
+  params: TParams
+}
 type OnCompleteArgs = { response?: FetchResponse<unknown>, request: RequestInfo }
 
 export interface RefOptions {
@@ -52,10 +57,21 @@ export interface ParamsOptions {
   timeout?: FetchOptions['timeout'];
 }
 
-export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams = object> = ParamsOptions & HooksOptions<TData, TMeta, TParams> & RefOptions & { params?: TParams }
+export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams = object> =
+  ParamsOptions
+  & HooksOptions<TData, TMeta, TParams>
+  & RefOptions
+  & { params?: TParams }
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
-  const { tenant, token } = useAuth();
+  const { token } = useAuth();
+  const { resolveTenant, tenant } = useTenant();
+
+  await resolveTenant();
+
+  if (!tenant.value) {
+    throw new Error('Missing tenant context');
+  }
 
   await $fetch(url, {
     baseURL: '/api',
@@ -64,7 +80,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
 
     headers: {
       authorization: token.value ? `Bearer ${token.value}` : '',
-      identity: tenant.value as string,
+      identity: tenant.value,
       [GLOBAL_API_HEADER]: options.global ? 'true' : '',
       ...options?.headers,
     },
