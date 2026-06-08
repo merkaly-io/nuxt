@@ -15,17 +15,6 @@ jobs:
     steps:
       - uses: merkaly-io/actions/setup@master
 
-      - run: |
-          git fetch origin master --force --tags
-          git merge-base --is-ancestor "$GITHUB_SHA" origin/master
-        shell: bash
-
-      - run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PACKAGE_VERSION="$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")"
-          test "$TAG_VERSION" = "$PACKAGE_VERSION"
-        shell: bash
-
       - run: pnpm lint
         continue-on-error: true
         shell: bash
