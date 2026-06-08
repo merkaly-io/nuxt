@@ -13,46 +13,27 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+      - uses: merkaly-io/actions/setup@master
 
-      - name: Validate tag revision
-        run: |
+      - run: |
           git fetch origin master --force --tags
           git merge-base --is-ancestor "$GITHUB_SHA" origin/master
+        shell: bash
 
-      - name: Validate tag version
-        run: |
+      - run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           PACKAGE_VERSION="$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")"
           test "$TAG_VERSION" = "$PACKAGE_VERSION"
+        shell: bash
 
-      - name: Setup Node 24
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install module dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint code
-        run: pnpm lint
+      - run: pnpm lint
         continue-on-error: true
+        shell: bash
 
-#       - name: Run tests
-#         run: pnpm test
-#
-      - name: Build module
-        run: pnpm build
+      - run: pnpm build
+        shell: bash
 
-      - name: Publish package
-        run: npm publish --access public
+      - uses: merkaly-io/actions/publish@master
 
   release:
     needs: publish
