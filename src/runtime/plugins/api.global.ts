@@ -68,7 +68,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
   const { tenant } = useTenant();
 
   if (!tenant.value && !options.global) {
-    throw new Error('Missing tenant context');
+    throw new Error(`Missing tenant context for: ${url}`);
   }
 
   await $fetch(url, {
