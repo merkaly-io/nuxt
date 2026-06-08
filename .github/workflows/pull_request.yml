@@ -11,24 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@v5
+      - uses: merkaly-io/actions/setup@master
 
-      - name: Setup node env 🏗
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install Module deps 🛠️
-        run: pnpm install --frozen-lockfile
-        working-directory: ./
-
-      - name: Lint code 👀️
-        run: pnpm lint
+      - run: pnpm lint
         continue-on-error: true
 
-      - name: Prepack code 🧪
-        run: pnpm prepack
+      - run: pnpm prepack

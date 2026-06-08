@@ -59,37 +59,5 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node 24
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install module dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate release notes
-        run: |
-          CURRENT_TAG="${GITHUB_REF_NAME}"
-          PREVIOUS_TAG="$(git tag --sort=-version:refname | grep -Fxv "$CURRENT_TAG" | head -n 1)"
-          if [ -n "$PREVIOUS_TAG" ]; then
-            pnpm exec changelogen --from "$PREVIOUS_TAG" --to "$CURRENT_TAG" --no-output > release-notes.md
-          else
-            pnpm exec changelogen --to "$CURRENT_TAG" --no-output > release-notes.md
-          fi
-
-      - name: Publish GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body_path: release-notes.md
+      - uses: merkaly-io/actions/release@master
