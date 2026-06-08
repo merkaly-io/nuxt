@@ -65,11 +65,9 @@ export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams
 
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { token } = useAuth();
-  const { resolveTenant, tenant } = useTenant();
+  const { tenant } = useTenant();
 
-  await resolveTenant();
-
-  if (!tenant.value) {
+  if (!tenant.value && !options.global) {
     throw new Error('Missing tenant context');
   }
 

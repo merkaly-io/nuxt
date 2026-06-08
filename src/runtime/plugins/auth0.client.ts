@@ -92,7 +92,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   if (!isAuthCallback) {
     await Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-      .then(() => hook('app:created', () => callHook('merkaly:auth', user.value)))
+      .then(() => hook('app:created', async () => {
+        await callHook('merkaly:tenant', user.value);
+        await callHook('merkaly:auth', user.value);
+      }))
       .catch(() => undefined);
   }
 

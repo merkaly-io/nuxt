@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useState } from '#imports';
 
 export const useAuth = () => {
-  const user = useState<User | null>('auth:user', () => null);
+  const user = useState<User | undefined>('auth:user', () => undefined);
   const token = useState<string | null>('auth:token', () => null);
   const isLoading = useState('auth:loading', () => true);
 

@@ -10,8 +10,8 @@ declare module '#app' {
   }
 
   interface RuntimeNuxtHooks {
-    'merkaly:auth': (user: User | null) => HookResult;
-    'merkaly:tenant': () => HookResult;
+    'merkaly:auth': (user?: User) => HookResult;
+    'merkaly:tenant': (user?: User) => HookResult;
   }
 }
 

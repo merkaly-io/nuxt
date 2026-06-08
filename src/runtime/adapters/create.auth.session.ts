@@ -1,4 +1,3 @@
-import { useAuth } from '#imports';
 import type { AdapterOptions } from '../utils/withAdapter';
 import { withAdapter } from '../utils/withAdapter';
 
@@ -15,16 +14,9 @@ interface CreateAuthSessionArgs extends AdapterOptions {
   params: object;
 }
 
-export const createAuthSession = withAdapter<CreateAuthSessionArgs>(() => {
-  const { token } = useAuth();
-
-  return {
-    default: () => ({} as AuthSessionData),
-    global: true,
-    headers: {
-      authorization: token.value ? `Bearer ${token.value}` : '',
-    },
-    method: 'POST',
-    uri: '/session',
-  };
-});
+export const createAuthSession = withAdapter<CreateAuthSessionArgs>(() => ({
+  default: () => ({} as AuthSessionData),
+  global: true,
+  method: 'POST',
+  uri: '/session',
+}));
