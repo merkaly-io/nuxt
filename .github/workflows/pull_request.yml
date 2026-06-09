@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,3 +21,5 @@ jobs:
         continue-on-error: true
 
       - run: pnpm prepack
+
+      - uses: merkaly-io/actions/dependabot@master
