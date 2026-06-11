@@ -32,10 +32,18 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
       .then((result: string) => (token.value = result))
       .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));
 
+  const initTenantContext = async () => {
+    await callHook('merkaly:tenant', user.value);
+    await callHook('merkaly:auth', user.value);
+  };
+
   // ---------- Callback ----------
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
     .then(({ appState }: RedirectConnectAccountOptions) => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-      .then(() => void navigateTo(appState?.target || '/')))
+      .then(async () => {
+        await initTenantContext();
+        void navigateTo(appState?.target || '/');
+      }))
     .catch(() => navigateTo('/'));
 
   // ---------- Login ----------
@@ -92,10 +100,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   if (!isAuthCallback) {
     await Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-      .then(() => hook('app:created', async () => {
-        await callHook('merkaly:tenant', user.value);
-        await callHook('merkaly:auth', user.value);
-      }))
+      .then(() => hook('app:created', initTenantContext))
       .catch(() => undefined);
   }
 
