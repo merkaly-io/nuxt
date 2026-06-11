@@ -54,6 +54,8 @@ export interface ParamsOptions {
 
   query?: FetchOptions['query'];
 
+  requiresTenant?: boolean;
+
   timeout?: FetchOptions['timeout'];
 }
 
@@ -68,7 +70,9 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
   const { tenant } = useTenant();
   const { public: { merkaly } } = useRuntimeConfig();
 
-  if (!tenant.value && !options.global && merkaly.auth0.requiresTenant) {
+  const requiresTenant = options.requiresTenant ?? merkaly.auth0.requiresTenant;
+
+  if (!tenant.value && !options.global && requiresTenant) {
     throw new Error(
       `[api] Tenant context is required but not set for: ${url}\n` +
       `This surface has requiresTenant: true. Possible causes:\n` +
