@@ -51,6 +51,7 @@ export interface MerkalyModuleOptions {
     logoutUrl?: string;
     params?: Omit<ClientAuthorizationParams, 'redirect_uri'>;
     requiresAuth: boolean;
+    requiresTenant: boolean;
   };
   i18n?: {
     defaultLocale: string;
@@ -85,6 +86,7 @@ const defaultOptions: MerkalyModuleOptions = {
     logoutUrl: '/',
     params: {},
     requiresAuth: false,
+    requiresTenant: false,
   },
   i18n: {
     defaultLocale: 'en-US',

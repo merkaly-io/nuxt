@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app';
+import { defineNuxtPlugin, useRuntimeConfig } from '#app';
 import type { Ref } from '#imports';
 import { useAuth, useTenant } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
@@ -66,9 +66,16 @@ export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams
 export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
   const { token } = useAuth();
   const { tenant } = useTenant();
+  const { public: { merkaly } } = useRuntimeConfig();
 
-  if (!tenant.value && !options.global) {
-    throw new Error(`Missing tenant context for: ${url}`);
+  if (!tenant.value && !options.global && merkaly.auth0.requiresTenant) {
+    throw new Error(
+      `[api] Tenant context is required but not set for: ${url}\n` +
+      `This surface has requiresTenant: true. Possible causes:\n` +
+      `  1. The request fired before the auth boot sequence completed (race condition).\n` +
+      `  2. setTenant() was never called in this surface's auth plugin.\n` +
+      `  3. The adapter should use { global: true } to bypass tenant enforcement.`,
+    );
   }
 
   await $fetch(url, {
