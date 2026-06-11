@@ -2,6 +2,7 @@ import { defineEventHandler, getRequestURL, proxyRequest } from 'h3';
 import { useRuntimeConfig } from '#imports';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
+const TENANT_HOST_HEADER = 'x-merkaly-host';
 const API_PREFIX_PATTERN = /^\/api\/?/;
 const API_ROUTE_PATTERN = /^\/api(?:\/|$)/;
 const EDGE_SLASH_PATTERN = /^\/|\/$/g;
@@ -41,7 +42,10 @@ export default defineEventHandler((event) => {
     : $config.merkaly.api.prefix;
 
   const path = resolveProxyPath(prefix, url.pathname, url.search);
+  // x-forwarded-host is overwritten by edge proxies (e.g. Railway), so the
+  // tenant host travels in a custom header the edge leaves untouched
   event.node.req.headers['x-forwarded-host'] = url.host;
+  event.node.req.headers[TENANT_HOST_HEADER] = url.host;
 
   if (import.meta.dev && targetOrigin.hostname.endsWith('.test')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
