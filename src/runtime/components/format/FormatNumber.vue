@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+// Renders a plain number (counts, units, percentages) with compact notation and a
+// count-up animation. It does NOT divide by any base — for monetary values (stored
+// as integer cents) use MKFormatMoney / formatMoney, which divide by 100 and add the
+// currency symbol. Passing a money field here would render the raw cents.
 import type { PropType } from 'vue';
 import { computed, toRef } from 'vue';
 import { useCounterUp } from '../../composables/useCounterUp';
