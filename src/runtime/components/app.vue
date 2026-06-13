@@ -25,7 +25,7 @@ hook('page:finish', () => regenerate());
 
 <template>
   <main>
-    <Notivue v-slot="item">
+    <Notivue v-slot="item" position="bottom-right">
       <Notification :item="item" :theme="pastelTheme" title>
         <NotificationProgress :item="item" />
       </Notification>
