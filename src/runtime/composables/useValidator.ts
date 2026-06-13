@@ -31,15 +31,25 @@ function extractConstraints<T extends object>(constructor: () => void): { [K in 
 }
 
 function applyErrors(result: ValidationError[], errors: Record<string, string>, state: Record<string, boolean | null>) {
-  for (const key of Object.keys(errors)) {
-    errors[key] = '';
-    state[key] = true;
-  }
+  const failures = new Map<string, string>();
 
   for (const error of result) {
     const messages = error.constraints ? Object.values(error.constraints) : [];
-    errors[error.property] = messages[0] || 'Invalid';
-    state[error.property] = false;
+    failures.set(error.property, messages[0] || 'Invalid');
+  }
+
+  const keys = new Set([...Object.keys(errors), ...failures.keys()]);
+
+  for (const key of keys) {
+    const message = failures.get(key) ?? '';
+    const isValid = !failures.has(key);
+
+    // Write only on real changes: resetting and re-applying the same values
+    // marks the attrs computed dirty on every validate(), re-rendering every
+    // bound input mid-typing — BFormInput then re-syncs its DOM value from
+    // the trimmed model and drops the trailing space the user just typed.
+    if (errors[key] !== message) errors[key] = message;
+    if (state[key] !== isValid) state[key] = isValid;
   }
 }
 
