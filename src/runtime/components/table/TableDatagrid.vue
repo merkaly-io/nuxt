@@ -1,6 +1,7 @@
 <script generic="G" lang="ts" setup>
 import { sentenceCase } from 'change-case';
 import { computed, getCurrentInstance, useSlots } from 'vue';
+import { useI18n } from 'vue-i18n';
 import DropdownIcon from '../dropdown/DropdownIcon.vue';
 import FormatIcon from '../format/FormatIcon.vue';
 import FormatText from '../format/FormatText.vue';
@@ -17,7 +18,7 @@ const emit = defineEmits<{
 const slots = useSlots();
 
 const props = defineProps({
-  emptyText: { type: String, default: () => 'No items found' },
+  emptyText: { type: String, default: undefined },
   hideHeader: { type: Boolean, default: false },
   hideFooter: { type: Boolean, default: false },
   hidePagination: { type: Boolean, default: false },
@@ -25,6 +26,8 @@ const props = defineProps({
 });
 
 const $datagrid = defineModel<DataGrid<G>>({ type: Object, required: true });
+
+const { t } = useI18n({ useScope: 'local' });
 
 const instance = getCurrentInstance();
 const canFetch = Boolean(instance?.vnode?.props?.onFetch);
@@ -59,7 +62,7 @@ const paginationText = computed(() => {
   const end = Math.min(page * limit, total);
 
   return {
-    template: 'Showing :current: to :final: of :total: items',
+    template: t('pagination'),
     values: {
       current: start,
       final: end,
@@ -251,7 +254,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
       <BTbody v-if="!visibleItems.length">
         <BTd :colspan="tableColspan">
           <slot name="empty">
-            <div class="text-center text-muted" v-text="props.emptyText" />
+            <div class="text-center text-muted" v-text="props.emptyText ?? t('empty')" />
           </slot>
         </BTd>
       </BTbody>
@@ -284,7 +287,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
             </template>
 
             <BTd v-if="hasActionsSlot" class="text-end px-3">
-              <DropdownIcon icon="caret-down" text="Actions" toggle-class="py-1 px-3" variant="light-dark">
+              <DropdownIcon icon="caret-down" :text="t('actions')" toggle-class="py-1 px-3" variant="light-dark">
                 <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
@@ -364,3 +367,18 @@ thead {
   }
 }
 </style>
+
+<i18n lang="json">
+{
+  "en": {
+    "empty": "No items found",
+    "actions": "Actions",
+    "pagination": "Showing :current: to :final: of :total: items"
+  },
+  "pt": {
+    "empty": "Nenhum item encontrado",
+    "actions": "Ações",
+    "pagination": "Mostrando :current: a :final: de :total: itens"
+  }
+}
+</i18n>
