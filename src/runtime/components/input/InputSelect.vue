@@ -149,10 +149,12 @@ const isRequired = computed(() => {
       <BSpinner v-if="isLoading" class="spinner" variant="primary" />
     </template>
 
-    <template #no-options="{ search, searching, loading: isLoading }">
-      <span v-if="isLoading">Searching for "{{ search }}"</span>
-      <span v-else-if="searching">No results for "{{ search }}"</span>
-      <span v-else>Type to search</span>
+    <template #no-options="scope">
+      <slot name="no-options" v-bind="scope">
+        <span v-if="scope.loading">Searching for "{{ scope.search }}"</span>
+        <span v-else-if="scope.searching">No results for "{{ scope.search }}"</span>
+        <span v-else>Type to search</span>
+      </slot>
     </template>
 
     <template #open-indicator="{ attributes }">
