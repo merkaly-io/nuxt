@@ -67,6 +67,8 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
           state.items.push(item as never);
         }
 
+        state.total += 1;
+
         return state.items as D[];
       },
 
@@ -75,6 +77,7 @@ export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
 
         if (index !== -1) {
           state.items.splice(index, 1);
+          state.total = Math.max(0, state.total - 1);
         }
 
         return index;
