@@ -142,7 +142,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 
 <template>
   <BCard no-body>
-    <BCardHeader v-if="!props.hideHeader" class="align-items-center p-4 position-relative">
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
           <DropdownIcon icon="caret-down" size="sm" toggle-class="p-2">
@@ -223,10 +223,10 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
       hover
       responsive="lg"
       small
-      table-class="align-middle table-row-dashed gy-3 h-100">
-      <BThead class="sticky-top z-index-1">
-        <BTr class="text-start text-body-secondary fw-bold fs-7 text-uppercase gs-0">
-          <BTh v-if="hasDetailsSlot" class="p-0 w-25px" />
+      table-class="align-middle table-row-dashed h-100">
+      <BThead class="sticky-top z-index-1 align-middle">
+        <BTr class="text-start text-body-secondary fw-bold text-uppercase">
+          <BTh v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;" />
 
           <BTh v-if="!props.hideSelect" class="w-40px px-0">
             <div class="form-check form-check-sm form-check-custom cell-checkbox">
@@ -262,13 +262,14 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
       <BTbody v-else class="fw-semibold text-nowrap">
         <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
           <BTr v-bind="getRowAttrs(item, idx)">
-            <BTd v-if="hasDetailsSlot" class="p-0 w-25px">
+            <BTd v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;">
               <BButton
                 class="w-25px h-100 rounded-0 p-0 border-end border-dashed"
                 size="sm"
                 variant="none"
                 @click="toggleDetails(item)">
-                <FormatIcon :name="item._showDetails ? 'chevron-down' : 'chevron-right'" size="sm" variant="primary" />
+                <FormatIcon :name="item._showDetails ? 'chevron-down' : 'chevron-right'" class="p-0" size="sm"
+                            variant="primary" />
               </BButton>
             </BTd>
 
@@ -287,7 +288,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
             </template>
 
             <BTd v-if="hasActionsSlot" class="text-end px-3">
-              <DropdownIcon icon="caret-down" :text="t('actions')" toggle-class="py-1 px-3" variant="light-dark">
+              <DropdownIcon :text="t('actions')" icon="caret-down" toggle-class="py-1 px-3" variant="light-dark">
                 <slot :index="idx" :item="item" name="actions" />
               </DropdownIcon>
             </BTd>
@@ -311,7 +312,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 
     </BTableSimple>
 
-    <BCardFooter v-if="!props.hideFooter" class="p-4">
+    <BCardFooter v-if="!props.hideFooter">
       <slot name="footer" />
 
       <template v-if="!props.hidePagination">
@@ -333,7 +334,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
               @update:model-value="emit('fetch', 'paginate')" />
           </BCol>
 
-          <BCol class="fs-7 text-muted" cols="auto">
+          <BCol class="text-muted" cols="auto">
             <span v-if="$datagrid.loading">Loading...</span>
             <FormatText v-else :template="paginationText.template" :values="paginationText.values" />
           </BCol>
@@ -355,15 +356,29 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
   }
 }
 
-thead {
-  background: var(--bs-body-bg);
+table {
 
-  &:before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: rgb(var(--bs-primary-rgb), .05);
+  thead {
+    font-size: .8rem;
+    background: var(--bs-body-bg);
+
+    &:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: rgb(var(--bs-primary-rgb), .05);
+    }
+
+    tr th:is(:first-child, :last-child) {
+      padding: 0 .75rem !important;
+    }
+  }
+
+  tbody {
+    tr td:is(:first-child, :last-child) {
+      padding: 0 .75rem !important;
+    }
   }
 }
 </style>
