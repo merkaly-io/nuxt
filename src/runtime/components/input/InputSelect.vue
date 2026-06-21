@@ -30,7 +30,7 @@ const props = defineProps({
   size: { type: String as PropType<Size>, default: () => undefined },
 });
 
-const model = defineModel({ type: [String, Object, Number, Boolean, Array], default: null });
+const model = defineModel({ type: [String, Object, Number, Boolean, Array], default: undefined });
 
 onBeforeMount(() => {
   if (props.selectedItem) return;
