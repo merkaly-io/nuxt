@@ -145,7 +145,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
     <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
-          <DropdownIcon icon="caret-down" size="sm" toggle-class="p-2">
+          <DropdownIcon icon="caret-down" toggle-class="p-2">
             <slot name="bulk" v-bind="{ items: selectionState.selectedItems, count: selectionState.selectedCount }" />
           </DropdownIcon>
         </div>
