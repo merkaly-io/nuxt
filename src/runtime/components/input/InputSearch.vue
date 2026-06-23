@@ -1,7 +1,20 @@
 <script lang="ts" setup>
+import { watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import FormatIcon from '../format/FormatIcon.vue';
 
+const props = defineProps({
+  debounce: { type: Number, default: () => 300 },
+});
+
 const search = defineModel({ type: String, default: () => String() });
+
+const emit = defineEmits<{ change: [] }>();
+
+// Debounce search-as-you-type so consumers fetch once the user pauses, not per keystroke.
+const emitChange = useDebounceFn(() => emit('change'), props.debounce);
+
+watch(search, () => emitChange());
 </script>
 
 <template>
