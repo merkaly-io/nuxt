@@ -294,6 +294,12 @@ function configureFontAwesome(nuxt: Nuxt) {
 function configureVite(nuxt: Nuxt) {
   nuxt.options.vite = defu(nuxt.options.vite || {}, {
     plugins: [svgLoader()],
+    // Force a single shared notivue instance so consumers don't have to declare
+    // `vite.resolve.dedupe: ['notivue']` themselves (avoids the duplicate-instance
+    // `useNotivueInstance()` error, especially when @merkaly/nuxt is linked locally).
+    resolve: {
+      dedupe: ['notivue'],
+    },
   });
 }
 
