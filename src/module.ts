@@ -22,6 +22,7 @@ import 'reflect-metadata';
 // @ts-expect-error Types aren't exposed but they exist
 import type { BvnComponentProps } from 'bootstrap-vue-next';
 import type { NotivueConfig } from 'notivue';
+import type { Strategies } from '@nuxtjs/i18n';
 
 // Re-export types for consumers
 export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
@@ -56,6 +57,13 @@ export interface MerkalyModuleOptions {
   i18n?: {
     defaultLocale: string;
     locales: MerkalyI18nLocale[];
+    /**
+     * URL routing strategy. Defaults to `'no_prefix'` so existing projects keep
+     * their current behavior (no locale segment in the URL). Set to a prefix
+     * variant to expose a locale segment (e.g. `/es/about`) without translating
+     * the route paths.
+     */
+    strategy?: Strategies;
   };
   plausible?: {
     domain: string;
@@ -91,6 +99,7 @@ const defaultOptions: MerkalyModuleOptions = {
   i18n: {
     defaultLocale: 'en-US',
     locales: [],
+    strategy: 'no_prefix',
   },
   plausible: {
     domain: '',
@@ -198,7 +207,7 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions) {
     defaultLocale: options.i18n!.defaultLocale,
     detectBrowserLanguage: { useCookie: true },
     restructureDir: '.',
-    strategy: 'no_prefix',
+    strategy: options.i18n!.strategy ?? 'no_prefix',
     vueI18n,
   };
 }
