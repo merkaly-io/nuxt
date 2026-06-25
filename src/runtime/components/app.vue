@@ -25,6 +25,8 @@ hook('page:finish', () => regenerate());
 
 <template>
   <main>
+    <NuxtLoadingIndicator color="var(--bs-primary)" :height="3" />
+
     <Notivue v-slot="item">
       <Notification :item="item" :theme="pastelTheme" title>
         <NotificationProgress :item="item" />
