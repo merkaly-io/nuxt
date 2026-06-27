@@ -34,10 +34,8 @@ hook('page:finish', () => regenerate());
     </Notivue>
 
     <BApp>
-      <!-- Mostramos spinner mientras auth se carga -->
       <slot v-if="isLoading" name="loading" />
 
-      <!-- Renderizamos páginas solo cuando isLoading = false -->
       <slot v-else>
         <NuxtPage />
       </slot>
