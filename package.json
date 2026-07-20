@@ -76,7 +76,7 @@
   },
   "devDependencies": {
     "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.4.8",
+    "@nuxt/schema": "^4.5.0",
     "@nuxt/test-utils": "^4.0.3",
     "changelogen": "^0.6.2",
     "eslint-plugin-storybook": "^10.5.0",
