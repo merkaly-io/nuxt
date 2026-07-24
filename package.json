@@ -40,7 +40,7 @@
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.24.0",
     "@bootstrap-vue-next/nuxt": "^0.45.5",
-    "@nuxt/devtools": "^3.2.4",
+    "@nuxt/devtools": "^3.3.1",
     "@nuxt/eslint": "1.16.0",
     "@nuxt/eslint-config": "^1.16.0",
     "@nuxt/fonts": "0.14.0",
