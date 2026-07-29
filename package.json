@@ -44,7 +44,7 @@
     "@nuxt/eslint": "1.16.0",
     "@nuxt/eslint-config": "^1.16.0",
     "@nuxt/fonts": "0.14.0",
-    "@nuxt/image": "^2.0.0",
+    "@nuxt/image": "^2.1.0",
     "@nuxt/kit": "^4.5.0",
     "@nuxtjs/i18n": "^10.5.0",
     "@nuxtjs/plausible": "^3.0.2",
