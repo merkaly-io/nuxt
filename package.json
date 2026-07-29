@@ -54,7 +54,7 @@
     "@vueuse/components": "^14.4.0",
     "@vueuse/core": "^14.3.0",
     "@vueuse/integrations": "^14.3.0",
-    "@vueuse/nuxt": "^14.3.0",
+    "@vueuse/nuxt": "^14.4.0",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.45.5",
     "change-case": "^5.4.4",
