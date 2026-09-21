@@ -51,7 +51,7 @@
     "@sentry/nuxt": "^10.75.0",
     "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
-    "@vueuse/components": "^14.4.0",
+    "@vueuse/components": "^15.0.0",
     "@vueuse/core": "^15.0.0",
     "@vueuse/integrations": "^14.4.0",
     "@vueuse/nuxt": "^15.0.0",
