@@ -3,11 +3,12 @@ import { useRoute } from '#app';
 import { useAuth, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
+import AuthError from './auth/AuthError.vue';
 import { useColorMode } from '@vueuse/core';
 import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivue';
 
 const $route = useRoute();
-const { isLoading } = useAuth();
+const { clear, error, isLoading, logout, retry } = useAuth();
 const { hook } = useNuxtApp();
 
 useColorMode({ attribute: 'data-bs-theme' });
@@ -35,6 +36,10 @@ hook('page:finish', () => regenerate());
 
     <BApp>
       <slot v-if="isLoading" name="loading" />
+
+      <slot v-else-if="error" :clear="clear" :error="error" :logout="logout" :retry="retry" name="error">
+        <AuthError :error="error" @logout="logout" @retry="retry" />
+      </slot>
 
       <slot v-else>
         <NuxtPage />
