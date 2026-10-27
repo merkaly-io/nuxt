@@ -1,4 +1,5 @@
 import { defineEventHandler, getRequestURL, proxyRequest } from 'h3';
+import type { IncomingHttpHeaders } from 'node:http';
 import { useRuntimeConfig } from '#imports';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
@@ -6,6 +7,7 @@ const TENANT_HOST_HEADER = 'x-merkaly-host';
 const API_PREFIX_PATTERN = /^\/api\/?/;
 const API_ROUTE_PATTERN = /^\/api(?:\/|$)/;
 const EDGE_SLASH_PATTERN = /^\/|\/$/g;
+const EDGE_HEADER_PATTERN = /^(cf-|cdn-loop$|true-client-ip$)/;
 
 function normalizeSegment(value: string) {
   return value.replace(EDGE_SLASH_PATTERN, '');
@@ -18,6 +20,12 @@ function resolveProxyPath(prefix: string, pathname: string, search: string) {
     .map(normalizeSegment)
     .filter(Boolean)
     .join('/')}${search}`;
+}
+
+function stripEdgeHeaders(headers: IncomingHttpHeaders) {
+  Object.keys(headers)
+    .filter((name) => EDGE_HEADER_PATTERN.test(name))
+    .forEach((name) => Reflect.deleteProperty(headers, name));
 }
 
 function isGlobalRequest(value?: string | string[]) {
@@ -46,6 +54,11 @@ export default defineEventHandler((event) => {
   // tenant host travels in a custom header the edge leaves untouched
   event.node.req.headers['x-forwarded-host'] = url.host;
   event.node.req.headers[TENANT_HOST_HEADER] = url.host;
+
+  // Cloudflare rejects requests to a proxied origin that already carry its
+  // own headers (cf-connecting-ip -> Error 1000), so drop the inbound edge
+  // headers before forwarding to the API
+  stripEdgeHeaders(event.node.req.headers);
 
   if (import.meta.dev && targetOrigin.hostname.endsWith('.test')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
