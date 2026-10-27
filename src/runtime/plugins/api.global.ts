@@ -30,7 +30,7 @@ export interface HooksOptions<TData = unknown, TMeta = Record<string, unknown>, 
 
   onComplete?(args: OnCompleteArgs): Promise<unknown> | unknown;
 
-  onError?(reason: Error): Promise<unknown> | unknown;
+  onError?(reason: Error, args: OnResponseArgs): Promise<unknown> | unknown;
 
   onFatal?(reason: Error): Promise<unknown> | unknown;
 
@@ -141,7 +141,7 @@ export default defineNuxtPlugin(({ provide }) => provide('api', async (url: stri
     onResponseError: async ({ response, request }) => {
       const { _data } = response;
 
-      await options.onError?.(_data);
+      await options.onError?.(_data, { response, request });
       if (options.error) options.error.value = _data;
 
       await options?.onComplete?.({ response, request });

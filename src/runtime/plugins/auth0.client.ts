@@ -1,9 +1,12 @@
-import type { User, RedirectConnectAccountOptions } from '@auth0/auth0-spa-js';
+import type { GenericError, User, RedirectConnectAccountOptions } from '@auth0/auth0-spa-js';
 import { createAuth0Client } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
+
+// Auth0 errors meaning "there is no session", not "something broke"
+const NO_SESSION_ERRORS = ['consent_required', 'interaction_required', 'invalid_grant', 'login_required', 'missing_refresh_token'];
 
 export default defineNuxtPlugin(async ({ callHook, hook }) => {
   const { public: $config } = useRuntimeConfig();
@@ -18,10 +21,12 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     useRefreshTokens: true,
   });
 
-  const { isLoading, user, token } = useAuth();
+  const { isLoading, user, token, fail } = useAuth();
 
   // clone while keeping prototype & methods
   const self0 = Object.assign(Object.create(Object.getPrototypeOf(auth0)), auth0);
+
+  let tokenError: GenericError | undefined;
 
   auth0.getUser = () => self0.getUser()
     .then((result: User) => (user.value = result))
@@ -29,22 +34,44 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   auth0.getTokenSilently = (options = {}) =>
     self0.getTokenSilently(defu({ authorizationParams: { audience: $config.merkaly.auth0.audience } }, options))
-      .then((result: string) => (token.value = result))
-      .catch((err: Error) => console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err));
+      .then((result: string) => {
+        tokenError = undefined;
+
+        return (token.value = result);
+      })
+      .catch((err: GenericError) => {
+        tokenError = err;
+
+        console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err);
+      });
+
+  const resolveIdentity = () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()]);
 
   const initTenantContext = async () => {
     await callHook('merkaly:tenant', user.value);
     await callHook('merkaly:auth', user.value);
   };
 
+  // A known user without a token is a real failure; a missing Auth0 session is not
+  // (anonymous visitors and the auth middleware already handle that case)
+  const startSession = () => {
+    if (user.value && !token.value && tokenError && !NO_SESSION_ERRORS.includes(tokenError.error)) {
+      return fail({ message: tokenError.error_description || tokenError.message, stage: 'token' });
+    }
+
+    return initTenantContext();
+  };
+
+  hook('merkaly:auth:retry', () => resolveIdentity().then(startSession));
+
   // ---------- Callback ----------
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
-    .then(({ appState }: RedirectConnectAccountOptions) => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-      .then(async () => {
-        await initTenantContext();
-        void navigateTo(appState?.target || '/');
-      }))
-    .catch(() => navigateTo('/'));
+    .then(async ({ appState }: RedirectConnectAccountOptions) => {
+      await resolveIdentity();
+      await startSession();
+
+      void navigateTo(appState?.target || '/');
+    }, (reason: GenericError) => fail({ message: reason.error_description || reason.message, stage: 'callback' }));
 
   // ---------- Login ----------
   auth0.loginWithRedirect = (options = {}) => self0.loginWithRedirect(defu(options, {
@@ -99,9 +126,9 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   const isAuthCallback = window.location.pathname === callbackPath;
 
   if (!isAuthCallback) {
-    await Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()])
-      .then(() => hook('app:created', initTenantContext))
-      .catch(() => undefined);
+    await resolveIdentity();
+
+    hook('app:created', startSession);
   }
 
   isLoading.value = false;
