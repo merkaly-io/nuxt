@@ -54,9 +54,16 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   // A known user without a token is a real failure; a missing Auth0 session is not
   // (anonymous visitors and the auth middleware already handle that case)
-  const startSession = () => {
+  const startSession = async () => {
     if (user.value && !token.value && tokenError && !NO_SESSION_ERRORS.includes(tokenError.error)) {
       return fail({ message: tokenError.error_description || tokenError.message, stage: 'token' });
+    }
+
+    // A cached user whose session is gone (e.g. missing refresh token) is logged out: drop the
+    // stale cache so protected pages send to login instead of calling the API without a token
+    if (user.value && !token.value && tokenError) {
+      user.value = undefined;
+      await self0.logout({ openUrl: false });
     }
 
     return initTenantContext();
