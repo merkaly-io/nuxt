@@ -22,6 +22,19 @@ A Nuxt module that provides Auth0 authentication integration and API utilities f
 
 Install the module to your Nuxt application:
 
+## Authentication and tenant boot
+
+Every surface can sign in; `auth0.requiresAuth` only decides whether pages require a login (globally, or per page with `definePageMeta({ requiresAuth: true })`). `auth0.requiresTenant` decides whether API calls require a tenant (`global: true` adapters bypass it).
+
+On boot the module restores an existing session (user and token) and then runs the app hooks in order, `merkaly:tenant` then `merkaly:auth`, with that user (or none). `MKApp` shows its `loading` slot until both finish; if a hook throws, it shows the `error` slot instead. The auth callback page renders right away so it can complete the login.
+
+| Surface | Login | Tenant | Boot |
+|---|---|---|---|
+| admin | required | required | `merkaly:tenant` creates the session and sets the tenant; without a session the auth middleware redirects to login. |
+| dashboard | required | not used | `merkaly:auth` loads the session; without a session it redirects to login. |
+| store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
+| www | optional | not used | No hooks; anonymous or signed-in. |
+
 ## Money formatting
 
 Money in Merkaly is stored as **integer cents**. `MKFormatMoney`, `MKInputMoney`,

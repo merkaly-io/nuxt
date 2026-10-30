@@ -33,10 +33,16 @@ export const useAuth = () => {
   const logout = () => nuxtApp.$auth0.logout();
 
   // Re-runs the auth bootstrap (token + tenant/auth hooks) registered by the auth0 plugin
+  // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
+    isLoading.value = true;
     clear();
 
-    await nuxtApp.callHook('merkaly:auth:retry');
+    try {
+      await nuxtApp.callHook('merkaly:auth:retry');
+    } finally {
+      isLoading.value = false;
+    }
   };
 
   // Records an auth bootstrap failure instead of logging the user out: MKApp renders
