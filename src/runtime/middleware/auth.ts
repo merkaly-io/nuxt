@@ -1,16 +1,18 @@
 // middleware/auth.global.ts
-import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig } from '#app';
+import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig, useState } from '#app';
 import { useAuth } from '../composables/useAuth';
 
 export default defineNuxtRouteMiddleware((to) => {
   const { isLoading, isAuthenticated } = useAuth();
+  const isStarting = useState('auth:starting', () => false);
   const { public: { merkaly } } = useRuntimeConfig();
   const callbackPath = URL.canParse(merkaly.auth0.callbackUrl)
     ? new URL(merkaly.auth0.callbackUrl).pathname
     : merkaly.auth0.callbackUrl;
 
-  // 1️⃣ No interferir mientras carga auth
-  if (isLoading.value) {
+  // 1️⃣ No interferir mientras carga auth (la identidad ya resuelta, con el tenant
+  // todavía en curso, sí se protege: es el mismo momento en que antes isLoading era false)
+  if (isLoading.value && !isStarting.value) {
     return;
   }
 

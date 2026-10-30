@@ -1,6 +1,6 @@
 import type { GenericError, User, RedirectConnectAccountOptions } from '@auth0/auth0-spa-js';
 import { createAuth0Client } from '@auth0/auth0-spa-js';
-import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp } from '#imports';
+import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp, useState } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
@@ -21,7 +21,9 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     useRefreshTokens: true,
   });
 
-  const { isLoading, user, token, fail } = useAuth();
+  const { error, isLoading, user, token, fail } = useAuth();
+  // Internal: true while the bootstrap session (tenant + auth hooks) is running
+  const isStarting = useState('auth:starting', () => false);
 
   // clone while keeping prototype & methods
   const self0 = Object.assign(Object.create(Object.getPrototypeOf(auth0)), auth0);
@@ -48,8 +50,16 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   const resolveIdentity = () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()]);
 
   const initTenantContext = async () => {
-    await callHook('merkaly:tenant', user.value);
-    await callHook('merkaly:auth', user.value);
+    try {
+      await callHook('merkaly:tenant', user.value);
+      await callHook('merkaly:auth', user.value);
+    } catch (reason) {
+      // A throwing handler must not leave the app stuck: surface it through the error slot,
+      // unless the app already reported its own failure via `fail(...)`
+      if (!error.value) {
+        await fail({ message: (reason as Error)?.message || String(reason), stage: 'tenant' });
+      }
+    }
   };
 
   // A known user without a token is a real failure; a missing Auth0 session is not
@@ -132,13 +142,28 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   // ---------- Bootstrap ----------
   const isAuthCallback = window.location.pathname === callbackPath;
 
-  if (!isAuthCallback) {
-    await resolveIdentity();
+  // The callback page must render to run `handleRedirectCallback`, so it is never gated
+  if (isAuthCallback) {
+    isLoading.value = false;
 
-    hook('app:created', startSession);
+    return { provide: { auth0 } };
   }
 
-  isLoading.value = false;
+  await resolveIdentity();
+
+  // Identity is known: the auth middleware may run from here on (see middleware/auth.ts),
+  // but the app stays in the loading state until the tenant context exists
+  isStarting.value = true;
+
+  hook('app:created', async () => {
+    try {
+      await startSession();
+    } finally {
+      // Always leave the loading state: failures are rendered by the error slot
+      isStarting.value = false;
+      isLoading.value = false;
+    }
+  });
 
   return { provide: { auth0 } };
 });
