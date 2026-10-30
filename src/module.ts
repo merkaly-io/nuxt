@@ -65,6 +65,18 @@ export interface MerkalyModuleOptions {
      */
     strategy?: Strategies;
   };
+  /**
+   * Default currency/locale for `MKFormatMoney`, `MKInputMoney` and
+   * `useMoneyFormat()`. Apps can override it at runtime with
+   * `setMoneyDefaults()` (e.g. after loading the organization) and per
+   * component with the `currency` / `locale` props.
+   */
+  money?: {
+    /** ISO 4217 code, e.g. `BRL`. Defaults to `USD`. */
+    currency?: string;
+    /** BCP 47 locale, e.g. `pt-BR`. Defaults to `en-US`. */
+    locale?: string;
+  };
   plausible?: {
     domain: string;
     localhost: string;
@@ -100,6 +112,10 @@ const defaultOptions: MerkalyModuleOptions = {
     defaultLocale: 'en-US',
     locales: [],
     strategy: 'no_prefix',
+  },
+  money: {
+    currency: 'USD',
+    locale: 'en-US',
   },
   plausible: {
     domain: '',
@@ -223,6 +239,7 @@ function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions) {
       api: options.api,
       auth0: options.auth0,
       i18n: options.i18n,
+      money: options.money,
       plausible: options.plausible,
       sentry: {
         dsn: options.sentry.dsn,

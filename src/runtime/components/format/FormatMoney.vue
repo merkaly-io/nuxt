@@ -1,37 +1,36 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { computed } from 'vue';
-import { formatMoney } from '../../utils/formatMoney';
+import { useMoneyFormat } from '../../composables/useMoneyFormat';
 
 const props = defineProps({
   base: { type: Number, default: 1_00 },
-  currency: { type: String, default: () => 'USD' },
+  /** ISO 4217 code (`BRL`) or, for backward compatibility, a symbol (`$`). Falls back to the app default. */
+  currency: { type: String, default: undefined },
   hideDecimal: { type: Boolean, default: () => false },
-  locale: { type: String, default: () => 'en-US' },
+  /** BCP 47 locale (`pt-BR`). Falls back to the app default. */
+  locale: { type: String, default: undefined },
   mode: { type: String as PropType<Intl.NumberFormatOptionsStyle>, default: 'currency' },
   tag: { type: String, default: 'span' },
   value: { type: Number, default: 0 },
 });
 
-const money = computed(() => formatMoney(props.value, {
+const { formatParts } = useMoneyFormat();
+
+const price = computed(() => formatParts(props.value, {
   base: props.base,
   currency: props.currency,
   locale: props.locale,
   mode: props.mode,
 }));
-
-const price = computed(() => ({
-  currency: money.value[0],
-  amount: money.value.slice(1, -3),
-  digits: money.value.slice(-3),
-}));
 </script>
 
 <template>
-  <component :is="tag" class="format-money">
-    <span class="currency" v-text="price.currency" />
+  <component :is="props.tag" class="format-money">
+    <span v-if="price.prefix" class="currency" v-text="price.prefix" />
     <span class="value" v-text="price.amount" />
-    <sup v-if="!props.hideDecimal" class="digits" v-text="price.digits" />
+    <sup v-if="!props.hideDecimal && price.digits" class="digits" v-text="price.digits" />
+    <span v-if="price.suffix" class="currency" v-text="price.suffix" />
   </component>
 </template>
 
