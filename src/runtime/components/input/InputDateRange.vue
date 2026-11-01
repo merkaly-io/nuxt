@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { computed, onBeforeMount, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import FormatIcon from '../format/FormatIcon.vue';
 
 type PresetKey = 'today' | 'yesterday' | 'last7days' | 'last30days' | 'thisMonth' | 'lastMonth';
@@ -18,13 +19,15 @@ const props = defineProps({
 
 const model = defineModel<DateRange>();
 
+const { locale, t } = useI18n({ useScope: 'local' });
+
 const presets = [
-  { key: 'today', label: 'Today', icon: 'calendar-day' },
-  { key: 'yesterday', label: 'Yesterday', icon: 'calendar-minus' },
-  { key: 'last7days', label: 'Last 7 days', icon: 'calendar-week' },
-  { key: 'last30days', label: 'Last 30 days', icon: 'calendar' },
-  { key: 'thisMonth', label: 'This month', icon: 'calendar-check' },
-  { key: 'lastMonth', label: 'Last month', icon: 'calendar-xmark' },
+  { key: 'today', icon: 'calendar-day' },
+  { key: 'yesterday', icon: 'calendar-minus' },
+  { key: 'last7days', icon: 'calendar-week' },
+  { key: 'last30days', icon: 'calendar' },
+  { key: 'thisMonth', icon: 'calendar-check' },
+  { key: 'lastMonth', icon: 'calendar-xmark' },
 ] as const;
 
 const selectedPreset = ref<PresetKey>(model.value?.preset || props.preset);
@@ -66,7 +69,9 @@ const getDateRange = (key: PresetKey): Omit<DateRange, 'preset'> => {
 };
 
 const currentPresetLabel = computed(() => {
-  return presets.find((p) => p.key === selectedPreset.value)?.label || 'Select';
+  const preset = presets.find((p) => p.key === selectedPreset.value);
+
+  return preset ? t(preset.key) : t('select');
 });
 
 const formatDateRange = computed(() => {
@@ -74,11 +79,11 @@ const formatDateRange = computed(() => {
   const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
 
   if (range.start.getTime() === range.end.getTime()) {
-    return range.start.toLocaleDateString('en', { ...options, year: 'numeric' });
+    return range.start.toLocaleDateString(locale.value, { ...options, year: 'numeric' });
   }
 
-  const startStr = range.start.toLocaleDateString('en', options);
-  const endStr = range.end.toLocaleDateString('en', { ...options, year: 'numeric' });
+  const startStr = range.start.toLocaleDateString(locale.value, options);
+  const endStr = range.end.toLocaleDateString(locale.value, { ...options, year: 'numeric' });
   return `${startStr} - ${endStr}`;
 });
 
@@ -100,14 +105,14 @@ onBeforeMount(() => selectPreset(props.preset));
     </template>
 
     <div class="px-3 py-2 border-bottom">
-      <span class="fs-7 fw-bold text-gray-800">Date Range</span>
+      <span class="fs-7 fw-bold text-gray-800" v-text="t('title')" />
     </div>
 
     <template v-for="item in presets" :key="item.key">
       <BDropdownItem :active="selectedPreset === item.key" @click="selectPreset(item.key)">
         <div class="d-flex align-items-center gap-2">
           <FormatIcon :name="item.icon" class="text-gray-500" />
-          <span v-text="item.label" />
+          <span v-text="t(item.key)" />
         </div>
       </BDropdownItem>
     </template>
@@ -117,8 +122,35 @@ onBeforeMount(() => selectPreset(props.preset));
     <BDropdownItem disabled>
       <div class="d-flex align-items-center gap-2 text-muted">
         <FormatIcon name="calendar-plus" />
-        <span>Custom range (coming soon)</span>
+        <span v-text="t('custom')" />
       </div>
     </BDropdownItem>
   </BDropdown>
 </template>
+
+<i18n lang="json">
+{
+  "en": {
+    "title": "Date range",
+    "select": "Select",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7days": "Last 7 days",
+    "last30days": "Last 30 days",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "custom": "Custom range (coming soon)"
+  },
+  "pt": {
+    "title": "Período",
+    "select": "Selecionar",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "last7days": "Últimos 7 dias",
+    "last30days": "Últimos 30 dias",
+    "thisMonth": "Este mês",
+    "lastMonth": "Mês passado",
+    "custom": "Período personalizado (em breve)"
+  }
+}
+</i18n>
