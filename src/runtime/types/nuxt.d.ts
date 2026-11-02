@@ -3,9 +3,13 @@ import type { Auth0Client, User } from '@auth0/auth0-spa-js';
 import type { ApiOptions } from '../plugins/api.global';
 import type { AuthErrorContext } from '../composables/useAuth';
 
+type MerkalyAuth0Client = Auth0Client & {
+  linkWithConnection: (connection: string) => Promise<unknown>; // added by the auth0 plugin
+};
+
 declare module '#app' {
   interface NuxtApp {
-    $auth0: Auth0Client;
+    $auth0: MerkalyAuth0Client;
     $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T>;
     $gmap: never;
   }
@@ -20,7 +24,7 @@ declare module '#app' {
 
 declare module 'vue' {
   interface ComponentCustomProperties {
-    $auth0: Auth0Client;
+    $auth0: MerkalyAuth0Client;
     $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T>;
     $gmap: never;
   }
