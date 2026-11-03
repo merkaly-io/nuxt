@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useRuntimeConfig } from '#app';
+import { defineNuxtPlugin, useRequestURL, useRuntimeConfig } from '#app';
 import type { Ref } from '#imports';
 import { useAuth, useTenant } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
@@ -65,94 +65,111 @@ export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams
   & RefOptions
   & { params?: TParams }
 
-export default defineNuxtPlugin(({ provide }) => provide('api', async (url: string, options: ApiOptions = {}) => {
-  const { token } = useAuth();
-  const { tenant } = useTenant();
-  const { public: { merkaly } } = useRuntimeConfig();
+// SSR calls skip the Nuxt proxy (an internal call would carry the server host) and reach the API directly
+function serverBaseURL(api: { url: string, prefix?: string }, global?: boolean) {
+  const prefix = global ? '' : (api.prefix ?? '').replace(/^\/+|\/+$/g, '');
 
-  const requiresTenant = options.requiresTenant ?? merkaly.auth0.requiresTenant;
+  return prefix ? `${api.url.replace(/\/+$/, '')}/${prefix}` : api.url;
+}
 
-  if (!tenant.value && !options.global && requiresTenant) {
-    throw new Error(
-      `[api] Tenant context is required but not set for: ${url}\n` +
-      `This surface has requiresTenant: true. Possible causes:\n` +
-      `  1. The request fired before the auth boot sequence completed (race condition).\n` +
-      `  2. setTenant() was never called in this surface's auth plugin.\n` +
-      `  3. The adapter should use { global: true } to bypass tenant enforcement.`,
-    );
+export default defineNuxtPlugin(({ provide }) => {
+  const requestHost = import.meta.server ? useRequestURL().host : undefined; // per request on the server
+
+  // Same as the proxy: local mkcert certificates of *.test APIs are not trusted by Node
+  if (import.meta.server && import.meta.dev && new URL(useRuntimeConfig().public.merkaly.api.url).hostname.endsWith('.test')) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
 
-  await $fetch(url, {
-    baseURL: '/api',
+  provide('api', async (url: string, options: ApiOptions = {}) => {
+    const { token } = useAuth();
+    const { tenant } = useTenant();
+    const { public: { merkaly } } = useRuntimeConfig();
 
-    body: options?.body,
+    const requiresTenant = options.requiresTenant ?? merkaly.auth0.requiresTenant;
 
-    headers: {
-      authorization: token.value ? `Bearer ${token.value}` : '',
-      identity: tenant.value,
-      [GLOBAL_API_HEADER]: options.global ? 'true' : '',
-      ...options?.headers,
-    },
+    if (!tenant.value && !options.global && requiresTenant) {
+      throw new Error(
+        `[api] Tenant context is required but not set for: ${url}\n` +
+        `This surface has requiresTenant: true. Possible causes:\n` +
+        `  1. The request fired before the auth boot sequence completed (race condition).\n` +
+        `  2. setTenant() was never called in this surface's auth plugin.\n` +
+        `  3. The adapter should use { global: true } to bypass tenant enforcement.`,
+      );
+    }
 
-    method: options?.method,
+    await $fetch(url, {
+      baseURL: import.meta.server ? serverBaseURL(merkaly.api, options.global) : '/api',
 
-    onRequest: async () => {
-      if (options.data) options.data.value = options.default?.();
-      if (options.meta) options.meta.value = {};
-      if (options.error) options.error.value = undefined;
-      if (options.loading) options.loading.value = true;
+      body: options?.body,
 
-      const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
-        .then((res) => res)
-        .catch(() => false); // si lanza excepción, tratamos como false
+      headers: {
+        authorization: token.value ? `Bearer ${token.value}` : '',
+        identity: tenant.value,
+        [GLOBAL_API_HEADER]: options.global ? 'true' : '',
+        ...(requestHost ? { 'x-merkaly-host': requestHost } : {}), // tenant host, as the proxy sends it
+        ...options?.headers,
+      },
 
-      if (result === false) {
-        options.controller?.abort?.('Request aborted by onBeforeSend');
-      }
-    },
+      method: options?.method,
 
-    onRequestError: async ({ error, response, request }) => {
-      await options.onFatal?.(error);
-      if (options.error) options.error.value = error;
+      onRequest: async () => {
+        if (options.data) options.data.value = options.default?.();
+        if (options.meta) options.meta.value = {};
+        if (options.error) options.error.value = undefined;
+        if (options.loading) options.loading.value = true;
 
-      await options?.onComplete?.({ response, request });
+        const result = await Promise.resolve(options?.onBeforeSend?.({ body: options.body, headers: options.headers, query: options.query }))
+          .then((res) => res)
+          .catch(() => false); // si lanza excepción, tratamos como false
 
-      if (options.loading) options.loading.value = false;
-    },
+        if (result === false) {
+          options.controller?.abort?.('Request aborted by onBeforeSend');
+        }
+      },
 
-    onResponse: async ({ response, request }) => {
-      const { status, _data, headers } = response;
-      const { data, meta } = (_data || {});
+      onRequestError: async ({ error, response, request }) => {
+        await options.onFatal?.(error);
+        if (options.error) options.error.value = error;
 
-      await options?.onResponse?.({ response, request });
+        await options?.onComplete?.({ response, request });
 
-      // ignorar errores
-      if (status >= 400) return;
+        if (options.loading) options.loading.value = false;
+      },
 
-      await options?.onSuccess?.({ data, meta, headers, params: options.params as object });
-      if (options.data) options.data.value = data;
-      if (options.meta) options.meta.value = meta;
+      onResponse: async ({ response, request }) => {
+        const { status, _data, headers } = response;
+        const { data, meta } = (_data || {});
 
-      await options?.onComplete?.({ response, request });
+        await options?.onResponse?.({ response, request });
 
-      if (options.loading) options.loading.value = false;
-    },
+        // ignorar errores
+        if (status >= 400) return;
 
-    onResponseError: async ({ response, request }) => {
-      const { _data } = response;
+        await options?.onSuccess?.({ data, meta, headers, params: options.params as object });
+        if (options.data) options.data.value = data;
+        if (options.meta) options.meta.value = meta;
 
-      await options.onError?.(_data, { response, request });
-      if (options.error) options.error.value = _data;
+        await options?.onComplete?.({ response, request });
 
-      await options?.onComplete?.({ response, request });
+        if (options.loading) options.loading.value = false;
+      },
 
-      if (options.loading) options.loading.value = false;
-    },
+      onResponseError: async ({ response, request }) => {
+        const { _data } = response;
 
-    query: options?.query,
+        await options.onError?.(_data, { response, request });
+        if (options.error) options.error.value = _data;
 
-    retry: false,
+        await options?.onComplete?.({ response, request });
 
-    signal: options.controller?.signal,
-  }).catch(reason => reason);
-}));
+        if (options.loading) options.loading.value = false;
+      },
+
+      query: options?.query,
+
+      retry: false,
+
+      signal: options.controller?.signal,
+    }).catch(reason => reason);
+  });
+});

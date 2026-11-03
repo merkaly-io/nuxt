@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
-import { reactive, ref } from 'vue';
-import { useNuxtApp } from '#imports';
+import { getCurrentInstance, onServerPrefetch, reactive, ref } from 'vue';
+import { useNuxtApp, useState } from '#imports';
 import type { ApiOptions } from '../plugins/api.global';
 
 export interface ComposableOptions<TData = unknown, TMeta = Record<string, unknown>> extends ApiOptions<TData, TMeta> {
@@ -37,9 +37,15 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
 
   const initialOptions = getOptions(params);
 
+  // Server-rendered pages keep the first result in the payload; SPA apps (ssr: false) never take this path
+  const nuxtApp = useNuxtApp();
+  const ssr = import.meta.server || nuxtApp.payload.serverRendered === true;
+  const key = `merkaly:api:${initialOptions.method}:${initialOptions.uri}:${JSON.stringify(initialOptions.query ?? {})}`;
+
   const loading = ref(false);
-  const data = ref<TData>(initialOptions.default?.() as TData);
-  const meta = ref<TMeta>({} as TMeta);
+  const data = ssr ? useState<TData>(`${key}:data`, () => initialOptions.default?.() as TData) : ref<TData>(initialOptions.default?.() as TData);
+  const meta = ssr ? useState<TMeta>(`${key}:meta`, () => ({} as TMeta)) : ref<TMeta>({} as TMeta);
+  const prefetched = ssr ? useState<boolean>(`${key}:prefetched`, () => false) : ref(false);
   const error = ref<Error | undefined>();
 
   const execute = async (args: Partial<TParams> = {}): Promise<void> => {
@@ -62,7 +68,11 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
   };
 
   if (initialOptions.immediate) {
-    void execute();
+    if (import.meta.server && getCurrentInstance()) {
+      onServerPrefetch(() => execute().then(() => void (prefetched.value = true))); // the render waits for it
+    } else if (!(nuxtApp.isHydrating && prefetched.value)) {
+      void execute(); // hydrating with server data: no second request
+    }
   }
 
   return {

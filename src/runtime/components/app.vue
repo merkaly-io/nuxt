@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useRoute } from '#app';
-import { useAuth, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
+import { computed } from 'vue';
+import { useAuth, useTenant, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
 import AuthError from './auth/AuthError.vue';
@@ -9,9 +10,13 @@ import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivu
 
 const $route = useRoute();
 const { clear, error, isLoading, logout, retry } = useAuth();
+const { fromServer } = useTenant();
 const { hook } = useNuxtApp();
 
 useColorMode({ attribute: 'data-bs-theme' });
+
+// SPA apps wait for auth + tenant; a page rendered on the server (tenant already known) shows right away
+const blocking = computed(() => isLoading.value && !fromServer.value);
 
 // Ejecutar middleware una sola vez cuando `isLoading` cambia
 watchOnce(isLoading, () => AuthMiddleware($route, $route));
@@ -35,7 +40,7 @@ hook('page:finish', () => regenerate());
     </Notivue>
 
     <BApp>
-      <slot v-if="isLoading" name="loading" />
+      <slot v-if="blocking" name="loading" />
 
       <slot v-else-if="error" :clear="clear" :error="error" :logout="logout" :retry="retry" name="error">
         <AuthError :error="error" @logout="logout" @retry="retry" />
