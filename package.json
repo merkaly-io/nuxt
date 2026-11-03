@@ -36,7 +36,7 @@
     "test:types": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@auth0/auth0-spa-js": "^2.29.0",
+    "@auth0/auth0-spa-js": "^2.30.0",
     "@bootstrap-vue-next/nuxt": "^1.0.0",
     "@nuxt/devtools": "^4.0.0",
     "@nuxt/eslint": "1.17.0",
