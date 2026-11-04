@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useRoute } from '#app';
 import { computed } from 'vue';
-import { useAuth, useTenant, watchOnce, addRouteMiddleware, useNuxtApp } from '#imports';
+import { useAuth, useTenant, watchOnce, addRouteMiddleware, useNuxtApp, useRuntimeConfig } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
 import AuthError from './auth/AuthError.vue';
@@ -12,11 +12,14 @@ const $route = useRoute();
 const { clear, error, isLoading, logout, retry } = useAuth();
 const { fromServer } = useTenant();
 const { hook } = useNuxtApp();
+const { public: { merkaly } } = useRuntimeConfig();
 
 useColorMode({ attribute: 'data-bs-theme' });
 
-// SPA apps wait for auth + tenant; a page rendered on the server (tenant already known) shows right away
-const blocking = computed(() => isLoading.value && !fromServer.value);
+// Apps that need a login or a tenant wait for auth + tenant; public apps (www) and pages already
+// resolved on the server (store) render right away, so their content and SEO reach the HTML
+const waitsForAuth = merkaly.auth0.requiresAuth || merkaly.auth0.requiresTenant;
+const blocking = computed(() => waitsForAuth && isLoading.value && !fromServer.value);
 
 // Ejecutar middleware una sola vez cuando `isLoading` cambia
 watchOnce(isLoading, () => AuthMiddleware($route, $route));

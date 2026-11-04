@@ -243,6 +243,7 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions) {
   });
 
   return {
+    baseUrl: options.seo?.url || undefined, // absolute hreflang and canonical links
     defaultLocale: options.i18n!.defaultLocale,
     detectBrowserLanguage: { useCookie: true },
     restructureDir: '.',
