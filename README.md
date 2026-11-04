@@ -71,7 +71,9 @@ export default defineNuxtConfig({
 ```
 
 The sitemap is only installed for indexable apps and is served at `/sitemap.xml`
-(linked from `robots.txt`).
+(linked from `robots.txt`), a single file for every locale. The `x-default`
+alternate points to `merkaly.i18n.defaultLocale`; the sitemap is installed after
+`@nuxtjs/i18n` so it reads those options.
 
 ## Money formatting
 
