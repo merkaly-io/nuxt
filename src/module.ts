@@ -7,6 +7,7 @@ import {
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
+  installModule,
   useLogger,
   addTemplate,
 } from '@nuxt/kit';
@@ -86,6 +87,16 @@ export interface MerkalyModuleOptions {
     project: string;
     token: string;
   };
+  seo?: {
+    /** robots.txt paths to block, e.g. the Auth0 callback. */
+    disallow?: string[];
+    /** Private apps (admin, dashboard) stay false: robots.txt Disallow, noindex meta and X-Robots-Tag. */
+    indexable?: boolean;
+    /** Generate /sitemap.xml from the pages, with hreflang from the i18n locales. */
+    sitemap?: boolean | { exclude?: string[] };
+    /** Public site URL, used in robots.txt and the sitemap. */
+    url?: string;
+  };
 }
 
 const MODULE_NAME = '@merkaly/nuxt';
@@ -125,6 +136,12 @@ const defaultOptions: MerkalyModuleOptions = {
     dsn: '',
     project: '',
     token: '',
+  },
+  seo: {
+    disallow: [],
+    indexable: false, // private unless the app opts in
+    sitemap: false,
+    url: '',
   },
 };
 
@@ -167,6 +184,12 @@ function buildModuleDependencies(nuxt: Nuxt, options: MerkalyModuleOptions): Mod
   if (hasPlausibleConfig(options)) {
     dependencies['@nuxtjs/plausible'] = {};
   }
+
+  configureSite(nuxt, options);
+
+  dependencies['@nuxtjs/robots'] = {
+    overrides: { disallow: options.seo?.disallow ?? [] },
+  };
 
   const logger = useLogger(MODULE_NAME);
 
@@ -225,6 +248,38 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions) {
     restructureDir: '.',
     strategy: options.i18n!.strategy ?? 'no_prefix',
     vueI18n,
+  };
+}
+
+// nuxt-site-config (used by robots and sitemap) reads it before those modules set up
+function configureSite(nuxt: Nuxt, options: MerkalyModuleOptions) {
+  // @ts-expect-error Site config isn't typed in Nuxt options until the module loads
+  nuxt.options.site = defu({
+    indexable: Boolean(options.seo?.indexable),
+    url: options.seo?.url || undefined,
+  }, nuxt.options.site || {});
+}
+
+function configureSitemap(options: MerkalyModuleOptions) {
+  const exclude = typeof options.seo?.sitemap === 'object' ? options.seo.sitemap.exclude ?? [] : [];
+  const prefixed = hasI18nConfig(options) && options.i18n!.strategy && options.i18n!.strategy !== 'no_prefix';
+
+  if (!prefixed) {
+    return { exclude };
+  }
+
+  return {
+    autoI18n: { // locales are registered through a hook, so the sitemap module can't read them on its own
+      defaultLocale: options.i18n!.defaultLocale,
+      locales: options.i18n!.locales.map(locale => ({
+        _hreflang: locale.language,
+        _sitemap: locale.language,
+        code: locale.code,
+        language: locale.language,
+      })),
+      strategy: options.i18n!.strategy,
+    },
+    exclude,
   };
 }
 
@@ -420,6 +475,11 @@ export default defineNuxtModule<MerkalyModuleOptions>({
 
     configureNuxtOptions(nuxt, options);
     await configureExternalIntegrations(nuxt, logger);
+
+    if (options.seo?.indexable && options.seo.sitemap) {
+      await installModule('@nuxtjs/sitemap', configureSitemap(options)); // after i18n, so it reads the localized pages
+      logger.info('Loaded @nuxtjs/sitemap module');
+    }
     registerRuntimeFeatures(options, resolver);
   },
 });

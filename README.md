@@ -35,6 +35,31 @@ On boot the module restores an existing session (user and token) and then runs t
 | store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
 | www | optional | not used | No hooks; anonymous or signed-in. |
 
+## SEO: robots and sitemap
+
+Every app gets `@nuxtjs/robots`. Apps are **private by default**: in production
+`robots.txt` answers `Disallow: /` and pages carry the noindex meta and the
+`X-Robots-Tag` header (admin, dashboard). Outside production nothing is indexable.
+
+Public apps (www, store) opt in, and can also get `@nuxtjs/sitemap`, with
+`hreflang` built from `merkaly.i18n` when the strategy has a locale prefix:
+
+```ts
+export default defineNuxtConfig({
+  merkaly: {
+    seo: {
+      indexable: true,
+      url: 'https://www.merkaly.io',
+      disallow: ['/en/auth', '/es/auth', '/pt/auth'], // robots.txt
+      sitemap: { exclude: ['/en/auth', '/es/auth', '/pt/auth'] }, // or `true`
+    },
+  },
+});
+```
+
+The sitemap is only installed for indexable apps and is served at `/sitemap.xml`
+(linked from `robots.txt`).
+
 ## Money formatting
 
 Money in Merkaly is stored as **integer cents**. `MKFormatMoney`, `MKInputMoney`,
