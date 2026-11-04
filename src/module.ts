@@ -7,7 +7,6 @@ import {
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
-  installModule,
   useLogger,
   addTemplate,
 } from '@nuxt/kit';
@@ -191,6 +190,12 @@ function buildModuleDependencies(nuxt: Nuxt, options: MerkalyModuleOptions): Mod
     overrides: { disallow: options.seo?.disallow ?? [] },
   };
 
+  if (options.seo?.indexable && options.seo.sitemap) {
+    dependencies['@nuxtjs/sitemap'] = { // listed after i18n so it installs later and reads its options
+      overrides: configureSitemap(options),
+    };
+  }
+
   const logger = useLogger(MODULE_NAME);
 
   Object.keys(dependencies).forEach(dependency => {
@@ -246,6 +251,7 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions) {
     baseUrl: options.seo?.url || undefined, // absolute hreflang and canonical links
     defaultLocale: options.i18n!.defaultLocale,
     detectBrowserLanguage: { useCookie: true },
+    locales: options.i18n!.locales.map(locale => ({ code: locale.code, language: locale.language })), // for modules reading i18n options (sitemap); i18n loads them from the hook
     restructureDir: '.',
     strategy: options.i18n!.strategy ?? 'no_prefix',
     vueI18n,
@@ -281,6 +287,7 @@ function configureSitemap(options: MerkalyModuleOptions) {
       strategy: options.i18n!.strategy,
     },
     exclude,
+    sitemaps: false, // a single /sitemap.xml with hreflang, not one sitemap per locale
   };
 }
 
@@ -477,10 +484,6 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     configureNuxtOptions(nuxt, options);
     await configureExternalIntegrations(nuxt, logger);
 
-    if (options.seo?.indexable && options.seo.sitemap) {
-      await installModule('@nuxtjs/sitemap', configureSitemap(options)); // after i18n, so it reads the localized pages
-      logger.info('Loaded @nuxtjs/sitemap module');
-    }
     registerRuntimeFeatures(options, resolver);
   },
 });
