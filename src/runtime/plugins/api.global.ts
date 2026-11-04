@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useRequestURL, useRuntimeConfig } from '#app';
+import { defineNuxtPlugin, useNuxtApp, useRequestURL, useRuntimeConfig } from '#app';
 import type { Ref } from '#imports';
 import { useAuth, useTenant } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
@@ -80,8 +80,12 @@ export default defineNuxtPlugin(({ provide }) => {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
 
+  const nuxtApp = useNuxtApp();
+
   provide('api', async (url: string, options: ApiOptions = {}) => {
     const { token } = useAuth();
+
+    if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
     const { tenant } = useTenant();
     const { public: { merkaly } } = useRuntimeConfig();
 
