@@ -74,6 +74,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     if (user.value && !token.value && tokenError) {
       user.value = undefined;
       await self0.logout({ openUrl: false });
+
+      if ($config.merkaly.auth0.requiresAuth) { // protected surface: back to login, never a tokenless session call
+        return auth0.loginWithRedirect({ appState: { target: location.pathname + location.search } });
+      }
     }
 
     return initTenantContext();

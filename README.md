@@ -35,6 +35,19 @@ On boot the module restores an existing session (user and token) and then runs t
 | store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
 | www | optional | not used | No hooks; anonymous or signed-in. |
 
+### Session lifetime and Auth0 setup for a new app
+
+The SPA keeps the session with **refresh tokens** (`useRefreshTokens`, cached in `localStorage`, login with `offline_access`). The access token for the API lasts **2 hours** (`token_lifetime_for_web` of `https://api.merkaly.io`); before each API call the module asks Auth0 for the current token, which is cached and renewed with the refresh token once it expires. When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token.
+
+Every new Nuxt app needs this in Auth0 (done for admin, dashboard, store and www on 2026-11-04):
+
+1. **Application** (type SPA): allowed callback (`/auth`), logout and web origin URLs for each environment.
+2. **Refresh Token Rotation: on**, **Refresh Token Expiration: on**, with idle lifetime `2592000` (30 days) and maximum lifetime `7776000` (90 days). Never non-rotating or non-expiring.
+3. **API `https://api.merkaly.io`**: "Allow Offline Access" stays **on**; without it Auth0 issues no refresh tokens and every session ends after 2 hours.
+4. **Organizations**: apps that work inside a store (admin) require an organization at login; staff-only apps are filtered by the "Enforce surface access" post-login Action (role `MK_*`).
+
+These settings can be read and changed through the Management API (`merkaly.us.auth0.com`, the canonical domain, never the custom `auth.merkaly.io`).
+
 ## SEO: robots and sitemap
 
 Every app gets `@nuxtjs/robots`. Apps are **private by default**: in production
