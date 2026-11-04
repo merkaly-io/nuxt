@@ -1,89 +1,103 @@
 <script lang="ts" setup>
+import { useDropZone, useFileDialog } from '@vueuse/core';
 import { filesize } from 'filesize';
+import { computed, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
+export interface InputDropzoneRejection {
+  file: File;
+  reason: 'type' | 'size';
+}
+
+// Dumb file picker: drop or click, validates and emits the files; uploading is up to the consumer
 const props = defineProps({
-  accept: { type: Array<string>, default: () => [] },
+  accept: { type: Array<string>, default: () => [] }, // MIME types, e.g. image/png; empty accepts anything
+  disabled: { type: Boolean, default: false },
+  hint: { type: String, default: undefined },
+  maxSize: { type: Number, default: 0 }, // bytes; 0 means no limit
   multiple: { type: Boolean, default: false },
+  title: { type: String, default: undefined },
 });
 
-const dropZoneRef = ref<HTMLDivElement>();
-const fileInputRef = ref<HTMLInputElement>();
+const emit = defineEmits<{
+  reject: [rejections: InputDropzoneRejection[]];
+  select: [files: File[]];
+}>();
 
-const pictures = defineModel({ type: Array, default: () => [] });
+const { t } = useI18n({ useScope: 'local' });
 
-const { isOverDropZone } = useDropZone(dropZoneRef, {
-  dataTypes: props.accept,
+const dropZone = useTemplateRef<HTMLDivElement>('dropZone');
+
+const titleText = computed(() => props.title ?? t(props.multiple ? 'titleMany' : 'title'));
+const hintText = computed(() => props.hint ?? (props.maxSize ? t('hint', { size: filesize(props.maxSize) }) : ''));
+
+const { open, onChange } = useFileDialog({ accept: props.accept.join(','), multiple: props.multiple, reset: true });
+
+onChange(files => pick(files ? [...files] : []));
+
+const { isOverDropZone } = useDropZone(dropZone, {
   multiple: props.multiple,
-  onDrop: handleFileChange,
-  preventDefaultForUnhandled: false,
+  onDrop: files => pick(files ?? []),
+  preventDefaultForUnhandled: true,
 });
 
-function removePicture(id: string) {
-  pictures.value = pictures.value.filter(picture => picture._id !== id);
+function reasonOf(file: File): InputDropzoneRejection['reason'] | undefined {
+  if (props.accept.length && !props.accept.includes(file.type)) return 'type';
+  if (props.maxSize && file.size > props.maxSize) return 'size';
 }
 
-function triggerInput() {
-  fileInputRef.value?.click();
+function pick(files: File[]) {
+  if (props.disabled || !files.length) return;
+
+  const checked = (props.multiple ? files : files.slice(0, 1)).map(file => ({ file, reason: reasonOf(file) }));
+  const rejections = checked.filter((it): it is InputDropzoneRejection => Boolean(it.reason));
+  const accepted = checked.filter(it => !it.reason).map(it => it.file);
+
+  if (rejections.length) emit('reject', rejections);
+  if (accepted.length) emit('select', accepted);
 }
 
-function handleFileChange(files: File[]) {
-  if (!files.length) return;
-
-  const images = [...files].map(it => ({
-    alt: it.name,
-    id: crypto.randomUUID(),
-    name: it.name,
-    size: it.size,
-    url: (URL.createObjectURL(it)),
-  }));
-
-  return pictures.value.push(...images);
+function openDialog() {
+  if (!props.disabled) open();
 }
+
+defineExpose({ open: openDialog });
 </script>
 
 <template>
-  <div ref="dropZoneRef" :class="{'dz-drag-hover': isOverDropZone}" class="dropzone dz-clickable text-start">
-    <input
-        ref="fileInputRef"
-        :accept="props.accept.join(',')"
-        :multiple="props.multiple"
-        class="d-none"
-        type="file"
-        @change="e => handleFileChange((e.target as HTMLInputElement).files)"
-    >
+  <div
+      ref="dropZone"
+      :class="{ 'dz-drag-hover': isOverDropZone, 'opacity-50 pe-none': props.disabled }"
+      class="dropzone dz-clickable text-start"
+      @click="openDialog()">
+    <slot :dragging="isOverDropZone" :open="openDialog">
+      <div class="dz-message needsclick">
+        <i class="ki-duotone ki-file-up text-primary fs-3x">
+          <span class="path1" />
+          <span class="path2" />
+        </i>
 
-    <div class="dz-message needsclick" @click="triggerInput">
-      <i class="ki-duotone ki-file-up text-primary fs-3x">
-        <span class="path1" />
-        <span class="path2" />
-      </i>
+        <div class="ms-4">
+          <h3 class="fs-5 fw-bold text-gray-900 mb-1" v-text="titleText" />
 
-      <div class="ms-4">
-        <h3 class="fs-5 fw-bold text-gray-900 mb-1">Drop files here or click to upload.</h3>
-        <span class="fs-7 fw-semibold text-gray-400">Upload up to 10 files</span>
-      </div>
-    </div>
-
-    <template v-for="picture in pictures" :key="picture._id">
-      <div class="dz-preview border dz-image-preview">
-        <div class="dz-image">
-          <BImg :alt="picture.alt" :src="picture.url" class="w-100" />
+          <span v-if="hintText" class="fs-7 fw-semibold text-gray-500" v-text="hintText" />
         </div>
-
-        <div class="dz-details">
-          <div class="dz-size">
-            <span v-text="filesize(picture.size)" />
-          </div>
-
-          <div class="dz-filename">
-            <span v-text="picture.name" />
-          </div>
-        </div>
-
-        <span class="dz-remove" @click="removePicture(picture._id)">
-          <span>Remove file</span>
-        </span>
       </div>
-    </template>
+    </slot>
   </div>
 </template>
+
+<i18n lang="json">
+{
+  "en": {
+    "hint": "Up to {size}",
+    "title": "Drop a file here or click to choose",
+    "titleMany": "Drop files here or click to choose"
+  },
+  "pt": {
+    "hint": "Até {size}",
+    "title": "Solte um arquivo aqui ou clique para escolher",
+    "titleMany": "Solte os arquivos aqui ou clique para escolher"
+  }
+}
+</i18n>
