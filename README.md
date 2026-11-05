@@ -77,7 +77,7 @@ alternate points to `merkaly.i18n.defaultLocale`; the sitemap is installed after
 
 ## PostHog
 
-Product analytics with [PostHog](https://posthog.com), **EU region**, behind a
+Product analytics with [PostHog](https://posthog.com), **US region**, behind a
 first-party proxy. Set the project key and the module does the rest:
 
 ```ts
@@ -95,7 +95,7 @@ overrides it at runtime.
 
 **Client plugin.** Initializes `posthog-js` **only in production builds**
 (`nuxt dev` never sends events) with `api_host: '/phog'` and
-`ui_host: 'https://eu.posthog.com'`. It identifies the Auth0 user from
+`ui_host: 'https://us.posthog.com'`. It identifies the Auth0 user from
 `useAuth()` (`identify(sub, { email, name })`) and calls `posthog.reset()` on
 logout. The app can keep using `import posthog from 'posthog-js'` for
 `capture()`: the module dedupes `posthog-js` so the app and the plugin share
@@ -106,8 +106,8 @@ the initialized instance (keep `posthog-js` as an app dependency).
 
 | Path | Upstream |
 |---|---|
-| `/phog/static/*`, `/phog/array/*` | `https://eu-assets.i.posthog.com` |
-| everything else (`/e/`, `/batch/`, `/s/`, `/i/v1/*`, `/flags/`, `/decide/`...) | `https://eu.i.posthog.com` |
+| `/phog/static/*`, `/phog/array/*` | `https://us-assets.i.posthog.com` |
+| everything else (`/e/`, `/batch/`, `/s/`, `/i/v1/*`, `/flags/`, `/decide/`...) | `https://us.i.posthog.com` |
 
 - Path and query string are kept; `Host` is the upstream host (PostHog answers 401 otherwise).
 - Forwarded: `PostHog-*` headers, `Content-Type`, `Content-Encoding`, `User-Agent`, `Accept`, and `Authorization` only when it is a PostHog token (`Bearer phc_`, `phs_` or `phx_`).

@@ -81,7 +81,7 @@ export interface MerkalyModuleOptions {
     domain: string;
     localhost: string;
   };
-  /** PostHog project key (`phc_...`, EU region). Empty installs nothing. */
+  /** PostHog project key (`phc_...`, US region). Empty installs nothing. */
   posthog?: string;
   sentry: {
     dsn: string;

@@ -2,8 +2,8 @@ import type { H3Event } from 'h3';
 import { createError, defineEventHandler, getRequestHeader, getRequestWebStream, send, sendStream, setResponseHeaders, setResponseStatus } from 'h3';
 
 const PROXY_PREFIX = '/phog';
-const INGEST_ORIGIN = 'https://eu.i.posthog.com';
-const ASSETS_ORIGIN = 'https://eu-assets.i.posthog.com';
+const INGEST_ORIGIN = 'https://us.i.posthog.com';
+const ASSETS_ORIGIN = 'https://us-assets.i.posthog.com';
 const ASSETS_PATH_PATTERN = /^\/(static|array)\//;
 const POSTHOG_TOKEN_PATTERN = /^Bearer ph[csx]_/;
 const MAX_BODY_BYTES = 64 * 1024 * 1024; // session recordings

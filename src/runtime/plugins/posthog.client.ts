@@ -15,7 +15,7 @@ export default defineNuxtPlugin(() => {
 
   posthog.init($config.merkaly.posthog, {
     api_host: '/phog', // first-party proxy
-    ui_host: 'https://eu.posthog.com',
+    ui_host: 'https://us.posthog.com',
   });
 
   const { user } = useAuth();
