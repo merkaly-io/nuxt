@@ -81,6 +81,8 @@ export interface MerkalyModuleOptions {
     domain: string;
     localhost: string;
   };
+  /** PostHog project key (`phc_...`, US region). Empty installs nothing. */
+  posthog?: string;
   sentry: {
     dsn: string;
     project: string;
@@ -131,6 +133,7 @@ const defaultOptions: MerkalyModuleOptions = {
     domain: '',
     localhost: '',
   },
+  posthog: '',
   sentry: {
     dsn: '',
     project: '',
@@ -153,6 +156,10 @@ function hasI18nConfig(options: MerkalyModuleOptions) {
 
 function hasPlausibleConfig(options: MerkalyModuleOptions) {
   return Boolean(options.plausible?.domain);
+}
+
+function hasPosthogConfig(options: MerkalyModuleOptions) {
+  return Boolean(options.posthog);
 }
 
 function hasSentryBuildConfig(options: MerkalyModuleOptions) {
@@ -304,6 +311,7 @@ function configureRuntimeConfig(nuxt: Nuxt, options: MerkalyModuleOptions) {
       i18n: options.i18n,
       money: options.money,
       plausible: options.plausible,
+      posthog: options.posthog, // NUXT_PUBLIC_MERKALY_POSTHOG overrides it at runtime
       sentry: {
         dsn: options.sentry.dsn,
         project: options.sentry.project,
@@ -371,14 +379,14 @@ function configureFontAwesome(nuxt: Nuxt) {
   });
 }
 
-function configureVite(nuxt: Nuxt) {
+function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
   nuxt.options.vite = defu(nuxt.options.vite || {}, {
     plugins: [svgLoader()],
     // Force a single shared notivue instance so consumers don't have to declare
     // `vite.resolve.dedupe: ['notivue']` themselves (avoids the duplicate-instance
     // `useNotivueInstance()` error, especially when @merkaly/nuxt is linked locally).
     resolve: {
-      dedupe: ['notivue'],
+      dedupe: ['notivue', ...(hasPosthogConfig(options) ? ['posthog-js'] : [])], // app imports share the initialized posthog
     },
   });
 }
@@ -393,7 +401,7 @@ function configureNuxtOptions(nuxt: Nuxt, options: MerkalyModuleOptions) {
   }
 
   configureFontAwesome(nuxt);
-  configureVite(nuxt);
+  configureVite(nuxt, options);
 }
 
 function registerRuntimeFeatures(options: MerkalyModuleOptions, resolver: Resolver) {
@@ -402,11 +410,22 @@ function registerRuntimeFeatures(options: MerkalyModuleOptions, resolver: Resolv
   addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
 
+  if (hasPosthogConfig(options)) {
+    addPlugin({ src: resolver.resolve('./runtime/plugins/posthog.client') });
+  }
+
   // Register Server Handlers
   addServerHandler({
     handler: resolver.resolve('./runtime/server/middleware/proxy'),
     middleware: true,
   });
+
+  if (hasPosthogConfig(options)) {
+    addServerHandler({
+      handler: resolver.resolve('./runtime/server/routes/posthog'),
+      route: '/phog/**', // neutral name, ad blockers match /posthog and /analytics
+    });
+  }
 
   // Register Middlewares
   addRouteMiddleware({
@@ -485,5 +504,9 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     await configureExternalIntegrations(nuxt, logger);
 
     registerRuntimeFeatures(options, resolver);
+
+    if (hasPosthogConfig(options)) {
+      logger.info('Loaded PostHog (proxy /phog)'); // build log: key present, plugin and proxy registered
+    }
   },
 });

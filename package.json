@@ -65,6 +65,7 @@
     "gsap": "^3.15.0",
     "notivue": "^2.4.5",
     "nuxt": "^4.6.3",
+    "posthog-js": "^1.446.0",
     "reflect-metadata": "^0.2.2",
     "sass": "^1.107.1",
     "typescript": "~5.9.3",

@@ -75,6 +75,51 @@ The sitemap is only installed for indexable apps and is served at `/sitemap.xml`
 alternate points to `merkaly.i18n.defaultLocale`; the sitemap is installed after
 `@nuxtjs/i18n` so it reads those options.
 
+## PostHog
+
+Product analytics with [PostHog](https://posthog.com), **US region**, behind a
+first-party proxy. Set the project key and the module does the rest:
+
+```ts
+export default defineNuxtConfig({
+  merkaly: {
+    posthog: process.env.POSTHOG_KEY, // phc_...
+  },
+});
+```
+
+Without a key nothing is installed: no plugin, no proxy route and no
+`posthog-js` in the bundle. With a key it lands in
+`runtimeConfig.public.merkaly.posthog`, so `NUXT_PUBLIC_MERKALY_POSTHOG`
+overrides it at runtime.
+
+**Client plugin.** Initializes `posthog-js` **only in production builds**
+(`nuxt dev` never sends events) with `api_host: '/phog'` and
+`ui_host: 'https://us.posthog.com'`. It identifies the Auth0 user from
+`useAuth()` (`identify(sub, { email, name })`) and calls `posthog.reset()` on
+logout. The app can keep using `import posthog from 'posthog-js'` for
+`capture()`: the module dedupes `posthog-js` so the app and the plugin share
+the initialized instance (keep `posthog-js` as an app dependency).
+
+**Proxy `/phog/**`.** A Nitro server route, so apps must run as a Node server
+(`node .output/server`), not as static files.
+
+| Path | Upstream |
+|---|---|
+| `/phog/static/*`, `/phog/array/*` | `https://us-assets.i.posthog.com` |
+| everything else (`/e/`, `/batch/`, `/s/`, `/i/v1/*`, `/flags/`, `/decide/`...) | `https://us.i.posthog.com` |
+
+- Path and query string are kept; `Host` is the upstream host (PostHog answers 401 otherwise).
+- Forwarded: `PostHog-*` headers, `Content-Type`, `Content-Encoding`, `User-Agent`, `Accept`, and `Authorization` only when it is a PostHog token (`Bearer phc_`, `phs_` or `phx_`).
+- `X-Forwarded-For` gets the client IP appended, so PostHog geolocates the visitor and not the server.
+- **Cookies are never forwarded**, and PostHog `Set-Cookie` headers never reach the app domain.
+- The request body is streamed, up to **64 MB** (session recordings); larger bodies get `413`.
+- The response is streamed back with its status and cache headers.
+
+The path is `/phog` because ad blockers drop requests to paths such as
+`/posthog`, `/analytics`, `/tracking` or `/telemetry`; a first-party, neutral
+path keeps events flowing.
+
 ## Money formatting
 
 Money in Merkaly is stored as **integer cents**. `MKFormatMoney`, `MKInputMoney`,
