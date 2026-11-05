@@ -55,3 +55,9 @@ hook('page:finish', () => regenerate());
     </BApp>
   </main>
 </template>
+
+<style>
+:root {
+  --nv-z: 1090; /* toasts above Bootstrap sticky/fixed headers (1020/1030) and modals (1055), like .toast-container */
+}
+</style>
