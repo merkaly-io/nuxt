@@ -229,14 +229,12 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
           <BTh v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;" />
 
           <BTh v-if="!props.hideSelect" class="w-40px px-0">
-            <div class="form-check form-check-sm form-check-custom cell-checkbox">
-              <input
-                :disabled="$datagrid.loading"
-                class="form-check-input"
-                type="checkbox"
-                v-bind="selectionState.checkboxAllAttrs"
-                @input="toggleCheckAll()">
-            </div>
+            <BFormCheckbox
+              :disabled="$datagrid.loading"
+              :indeterminate="selectionState.checkboxAllAttrs.indeterminate"
+              :model-value="selectionState.allChecked"
+              class="form-check-sm form-check-custom cell-checkbox"
+              @update:model-value="toggleCheckAll()" />
           </BTh>
 
           <template v-for="[key, column] in visibleColumns" :key="key">
@@ -274,9 +272,10 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
             </BTd>
 
             <BTd v-if="!props.hideSelect" class="w-40px px-0">
-              <div class="form-check form-check-sm form-check-custom cell-checkbox">
-                <input v-model="item._checked" :disabled="$datagrid.loading" class="form-check-input" type="checkbox">
-              </div>
+              <BFormCheckbox
+                v-model="item._checked"
+                :disabled="$datagrid.loading"
+                class="form-check-sm form-check-custom cell-checkbox" />
             </BTd>
 
             <template v-for="[key, column] in visibleColumns" :key="key">
@@ -318,9 +317,9 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
       <template v-if="!props.hidePagination">
         <BRow align-h="between" align-v="center" class="w-100">
           <BCol cols="auto">
-            <select v-model="$datagrid.limit" class="form-select form-select-sm form-select-solid" disabled>
+            <BFormSelect v-model="$datagrid.limit" class="form-select-solid" disabled size="sm">
               <BFormSelectOption :value="10">10</BFormSelectOption>
-            </select>
+            </BFormSelect>
           </BCol>
 
           <BCol v-show="!$datagrid.loading" cols="auto">
