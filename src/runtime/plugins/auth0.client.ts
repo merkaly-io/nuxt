@@ -80,6 +80,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
       }
     }
 
+    if (!user.value && $config.merkaly.auth0.requiresAuth) { // anonymous on a protected surface: to login, never a tokenless session call (401 shown as "Access denied")
+      return auth0.loginWithRedirect({ appState: { target: location.pathname + location.search } });
+    }
+
     return initTenantContext();
   };
 
