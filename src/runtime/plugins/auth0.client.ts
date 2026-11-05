@@ -127,7 +127,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
     },
     cacheLocation: 'memory',
-    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L', // account.merkaly.io, the api checks this audience
+    clientId: '15yd1Ag668M0mQVbmjA60NaCD53UDIRQ', // auth.merkaly.io SPA, the api checks this audience
     domain: $config.merkaly.auth0.domain,
   });
 
