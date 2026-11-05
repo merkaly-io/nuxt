@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Numberish } from 'bootstrap-vue-next/dist/src/types/CommonTypes';
-import { computed } from 'vue';
+import { computed, useAttrs, useId } from 'vue';
 import { Money3Component } from 'v-money3';
 import { useMoneyFormat } from '../../composables/useMoneyFormat';
 import { isCurrencyCode } from '../../utils/formatMoney';
@@ -11,6 +11,10 @@ const money = defineModel<Numberish>({
   set: v => Math.trunc(v * 100),
   type: [String, Number],
 });
+
+const attrs = useAttrs();
+const generatedId = useId();
+const inputId = computed(() => (attrs.id as string | undefined) ?? generatedId); // v-money3 defaults to a random id: SSR and client differ
 
 // `decimal`, `placeholder`, `prefix` and `thousands` default to the resolved
 // currency/locale (props > setMoneyDefaults() > merkaly.money > USD/en-US).
@@ -67,6 +71,7 @@ const config = computed(() => ({
 
 <template>
   <Money3Component
+      :id="inputId"
       v-model.number="money"
       :max="props.max"
       :min="props.min"

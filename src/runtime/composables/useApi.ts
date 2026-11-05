@@ -68,9 +68,11 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
   };
 
   if (initialOptions.immediate) {
-    if (import.meta.server && getCurrentInstance()) {
-      onServerPrefetch(() => execute().then(() => void (prefetched.value = true))); // the render waits for it
-    } else if (!(nuxtApp.isHydrating && prefetched.value)) {
+    const instance = getCurrentInstance();
+
+    if (instance) onServerPrefetch(() => execute().then(() => void (prefetched.value = true))); // also on the client (never runs): Vue numbers useId by serverPrefetch boundaries
+
+    if (import.meta.server ? !instance : !(nuxtApp.isHydrating && prefetched.value)) {
       void execute(); // hydrating with server data: no second request
     }
   }
