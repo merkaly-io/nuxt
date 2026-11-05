@@ -145,9 +145,6 @@ importers:
       changelogen:
         specifier: ^0.6.2
         version: 0.6.2(magicast@0.5.5)
-      eslint-plugin-storybook:
-        specifier: ^10.6.0
-        version: 10.6.0(eslint@10.14.0(jiti@2.7.0))(typescript@5.9.3)
       vue-tsc:
         specifier: ^3.3.4
         version: 3.3.4(typescript@5.9.3)
@@ -4245,11 +4242,6 @@ packages:
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
       eslint: '>=9.38.0'
-
-  eslint-plugin-storybook@10.6.0:
-    resolution: {integrity: sha512-HK3yD5Nslv97buJ5JfT1xFkTOoyJgGIENmBoZZI3F8t2UpBzb/dHpKyCh5bQ8AvJWnhoM/WAtDNqyd9nq6xgcg==}
-    peerDependencies:
-      eslint: '>=8'
 
   eslint-plugin-unicorn@73.0.0:
     resolution: {integrity: sha512-V0YatLe9nkGhXEXKe2Qljb1EY0sJHwDV0HUF1NKFwtsHh/fU7qGHDgv+6fchzZcgU2/7noHo2gdjnmo0P2uDPw==}
@@ -11428,15 +11420,6 @@ snapshots:
       refa: 0.12.1
       regexp-ast-analysis: 0.7.1
       scslre: 0.3.0
-
-  eslint-plugin-storybook@10.6.0(eslint@10.14.0(jiti@2.7.0))(typescript@5.9.3):
-    dependencies:
-      '@typescript-eslint/types': 8.69.0
-      '@typescript-eslint/utils': 8.69.0(eslint@10.14.0(jiti@2.7.0))(typescript@5.9.3)
-      eslint: 10.14.0(jiti@2.7.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   eslint-plugin-unicorn@73.0.0(eslint@10.14.0(jiti@2.7.0)):
     dependencies:
