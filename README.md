@@ -37,7 +37,7 @@ On boot the module restores an existing session (user and token) and then runs t
 
 ### Session lifetime
 
-The SPA keeps the session with **refresh tokens**: the client uses `useRefreshTokens` with `localStorage` cache and logs in with `audience` and `scope: openid profile email offline_access`. Before each API call the module asks Auth0 for the current access token, which is cached and renewed with the refresh token once it expires (2 hours for `https://api.merkaly.io`). When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token. Account linking (`linkWithConnection`) uses a separate client (account.merkaly.io) with an in-memory cache.
+The SPA keeps the session with **refresh tokens**: the client uses `useRefreshTokens` with `localStorage` cache and logs in with `audience` and `scope: openid profile email offline_access`. Before each API call the module asks Auth0 for the current access token, which is cached and renewed with the refresh token once it expires (2 hours for `https://api.merkaly.io`). When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token. Account linking (`linkWithConnection`) uses a separate Auth0 client, the account linking client (named `account.merkaly.io` in Auth0, no app behind it), with an in-memory cache.
 
 The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes, organizations, and the checklist for a new app) is documented in the auth.merkaly.io repo: [`docs/tenant-setup.md`](https://github.com/merkaly-io/auth.merkaly.io/blob/master/docs/tenant-setup.md).
 
