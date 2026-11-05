@@ -1,5 +1,5 @@
 import type { GenericError, User, RedirectConnectAccountOptions } from '@auth0/auth0-spa-js';
-import { createAuth0Client } from '@auth0/auth0-spa-js';
+import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp, useState } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
@@ -118,33 +118,37 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   });
 
   // ---------- Account Linking ----------
-  const callbackUrl = $config.merkaly.auth0.callbackUrl;
-  const redirectUri = URL.canParse(callbackUrl) ? callbackUrl : `${location.origin}${callbackUrl}`;
+  let linkingClient: Auth0Client | undefined; // created on first use, no checkSession on page load
 
-  const linkingClient = await createAuth0Client({
-    cacheLocation: 'memory',
-    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L',
-    domain: $config.merkaly.auth0.domain,
+  const getLinkingClient = () => linkingClient ??= new Auth0Client({
     authorizationParams: {
-      redirect_uri: redirectUri,
+      redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
+        ? $config.merkaly.auth0.callbackUrl
+        : location.origin.concat($config.merkaly.auth0.callbackUrl),
     },
+    cacheLocation: 'memory',
+    clientId: 'AwD3uBHhLhFBbJhwSWXYFh9cZYidNc6L', // account.merkaly.io, the api checks this audience
+    domain: $config.merkaly.auth0.domain,
   });
 
   // @ts-expect-error Creating a lnkWthCntn fn
   auth0.linkWithConnection = async (connection: string) => {
-    await linkingClient.loginWithPopup({ authorizationParams: { connection } });
-    const claims = await linkingClient.getIdTokenClaims();
+    const client = getLinkingClient(); // sync until the popup opens, avoids popup blockers
 
-    if (!claims?.sub) {
+    await client.loginWithPopup({ authorizationParams: { connection } });
+    const claims = await client.getIdTokenClaims();
+
+    if (!claims?.__raw) {
       throw new Error('Failed to get ID token for linking');
     }
-    // sub format: "provider|user_id" (e.g., "GitHub|16559276")
-    const [provider, ...userIdParts] = claims.sub.split('|');
-    const userId = userIdParts.join('|');
-    const body = { provider, userId };
+
     const { $api } = useNuxtApp();
 
-    return await $api('/identities', { body, global: true, method: 'POST' });
+    return await $api('/identities', { // the api verifies it and derives the identity
+      body: { idToken: claims.__raw },
+      global: true,
+      method: 'POST',
+    });
   };
 
   // ---------- Bootstrap ----------
