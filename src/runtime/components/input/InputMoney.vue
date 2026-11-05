@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Numberish } from 'bootstrap-vue-next/dist/src/types/CommonTypes';
-import { computed, useAttrs, useId } from 'vue';
+import { computed, useAttrs, useId } from '#imports';
 import { Money3Component } from 'v-money3';
 import { useMoneyFormat } from '../../composables/useMoneyFormat';
 import { isCurrencyCode } from '../../utils/formatMoney';

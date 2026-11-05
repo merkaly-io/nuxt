@@ -1,6 +1,5 @@
 import type { Ref } from 'vue';
-import { getCurrentInstance, onServerPrefetch, reactive, ref } from 'vue';
-import { useNuxtApp, useState } from '#imports';
+import { getCurrentInstance, onServerPrefetch, reactive, ref, useNuxtApp, useState } from '#imports';
 import type { ApiOptions } from '../plugins/api.global';
 
 export interface ComposableOptions<TData = unknown, TMeta = Record<string, unknown>> extends ApiOptions<TData, TMeta> {
