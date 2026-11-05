@@ -41,7 +41,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
   const ssr = import.meta.server || nuxtApp.payload.serverRendered === true;
   const key = `merkaly:api:${initialOptions.method}:${initialOptions.uri}:${JSON.stringify(initialOptions.query ?? {})}`;
 
-  const loading = ref(false);
+  const loading = ref(Boolean(initialOptions.immediate) && !(import.meta.client && nuxtApp.isHydrating)); // immediate: loading from the first render; hydrating keeps the server value
   const data = ssr ? useState<TData>(`${key}:data`, () => initialOptions.default?.() as TData) : ref<TData>(initialOptions.default?.() as TData);
   const meta = ssr ? useState<TMeta>(`${key}:meta`, () => ({} as TMeta)) : ref<TMeta>({} as TMeta);
   const prefetched = ssr ? useState<boolean>(`${key}:prefetched`, () => false) : ref(false);
@@ -63,6 +63,9 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
       loading,
       meta: meta as Ref<Record<string, unknown>>,
       params,
+    }).catch((reason) => {
+      loading.value = false; // failed before the request (token, tenant): never leave a spinner on
+      throw reason;
     });
   };
 
