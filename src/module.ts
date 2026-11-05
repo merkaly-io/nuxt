@@ -504,5 +504,9 @@ export default defineNuxtModule<MerkalyModuleOptions>({
     await configureExternalIntegrations(nuxt, logger);
 
     registerRuntimeFeatures(options, resolver);
+
+    if (hasPosthogConfig(options)) {
+      logger.info('Loaded PostHog (proxy /phog)'); // build log: key present, plugin and proxy registered
+    }
   },
 });
