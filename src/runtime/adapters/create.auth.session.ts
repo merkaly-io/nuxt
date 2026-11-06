@@ -18,5 +18,5 @@ export const createAuthSession = withAdapter<CreateAuthSessionArgs>(() => ({
   default: () => ({} as AuthSessionData),
   global: true,
   method: 'POST',
-  uri: '/session',
+  uri: '/auth/session',
 }));

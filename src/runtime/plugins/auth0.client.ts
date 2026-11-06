@@ -144,7 +144,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
     const { $api } = useNuxtApp();
 
-    return await $api('/identities', { // the api verifies it and derives the identity
+    return await $api('/auth/identities', { // the api verifies it and derives the identity
       body: { idToken: claims.__raw },
       global: true,
       method: 'POST',
