@@ -141,8 +141,8 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 </script>
 
 <template>
-  <BCard no-body>
-    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative">
+  <BCard class="card-flush" no-body>
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative py-5 gap-2 gap-md-5">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
           <DropdownIcon icon="caret-down" toggle-class="p-2">
@@ -217,99 +217,100 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         style="bottom: -6px; z-index: 10" />
     </BCardHeader>
 
-    <BTableSimple
-      :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
-      class="mb-0 overflow-auto"
-      hover
-      responsive="lg"
-      small
-      table-class="align-middle table-row-dashed h-100">
-      <BThead class="sticky-top z-index-1 align-middle">
-        <BTr class="text-start text-body-secondary fw-bold text-uppercase">
-          <BTh v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;" />
+    <BCardBody class="pt-0">
+      <BTableSimple
+        :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
+        class="mb-0 overflow-auto"
+        responsive="lg"
+        table-class="align-middle table-row-dashed fs-6 gy-5 h-100">
+        <BThead class="sticky-top z-index-1 align-middle">
+          <BTr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+            <BTh v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;" />
 
-          <BTh v-if="!props.hideSelect" class="w-40px px-0">
-            <BFormCheckbox
-              :disabled="$datagrid.loading"
-              :indeterminate="selectionState.checkboxAllAttrs.indeterminate"
-              :model-value="selectionState.allChecked"
-              class="form-check-sm form-check-custom cell-checkbox"
-              @update:model-value="toggleCheckAll()" />
-          </BTh>
-
-          <template v-for="[key, column] in visibleColumns" :key="key">
-            <BTh :class="[column.class, column.thClass, 'text-nowrap']">
-              <slot :name="`head[${key}]`" v-bind="{ column,  key }">
-                <span v-text="column.title ?? sentenceCase(key)" />
-              </slot>
-            </BTh>
-          </template>
-
-          <BTh v-if="hasActionsSlot" class="text-end px-3" />
-        </BTr>
-      </BThead>
-
-      <BTbody v-if="!visibleItems.length">
-        <BTd :colspan="tableColspan">
-          <slot name="empty">
-            <div class="text-center text-muted" v-text="props.emptyText ?? t('empty')" />
-          </slot>
-        </BTd>
-      </BTbody>
-
-      <BTbody v-else class="fw-semibold text-nowrap">
-        <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
-          <BTr v-bind="getRowAttrs(item, idx)">
-            <BTd v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;">
-              <BButton
-                class="w-25px h-100 rounded-0 p-0 border-end border-dashed"
-                size="sm"
-                variant="none"
-                @click="toggleDetails(item)">
-                <FormatIcon :name="item._showDetails ? 'chevron-down' : 'chevron-right'" class="p-0" size="sm"
-                            variant="primary" />
-              </BButton>
-            </BTd>
-
-            <BTd v-if="!props.hideSelect" class="w-40px px-0">
+            <BTh v-if="!props.hideSelect" class="w-40px px-0">
               <BFormCheckbox
-                v-model="item._checked"
                 :disabled="$datagrid.loading"
-                class="form-check-sm form-check-custom cell-checkbox" />
-            </BTd>
+                :indeterminate="selectionState.checkboxAllAttrs.indeterminate"
+                :model-value="selectionState.allChecked"
+                class="form-check-sm form-check-custom cell-checkbox"
+                @update:model-value="toggleCheckAll()" />
+            </BTh>
 
             <template v-for="[key, column] in visibleColumns" :key="key">
-              <BTd :class="[column.class, column.tdClass]">
-                <slot :name="`row[${key}]`" v-bind="{ column, idx, item, key }">
-                  <span v-text="column.getter?.(item) ?? getItemValue(item, key)" />
+              <BTh :class="[column.class, column.thClass, 'text-nowrap']">
+                <slot :name="`head[${key}]`" v-bind="{ column,  key }">
+                  <span v-text="column.title ?? sentenceCase(key)" />
                 </slot>
-              </BTd>
+              </BTh>
             </template>
 
-            <BTd v-if="hasActionsSlot" class="text-end px-3">
-              <DropdownIcon :text="t('actions')" icon="caret-down" toggle-class="py-1 px-3" variant="light-dark">
-                <slot :index="idx" :item="item" name="actions" />
-              </DropdownIcon>
-            </BTd>
+            <BTh v-if="hasActionsSlot" class="text-end px-3" />
           </BTr>
+        </BThead>
 
-          <BTr v-if="hasDetailsSlot && item._showDetails">
-            <BTd :colspan="tableColspan" class="p-0">
-              <slot
-                :index="idx"
-                :item="item"
-                :toggle-details="() => toggleDetails(item)"
-                name="details" />
-            </BTd>
-          </BTr>
-        </template>
-      </BTbody>
+        <BTbody v-if="!visibleItems.length">
+          <BTd :colspan="tableColspan">
+            <slot name="empty">
+              <div class="text-center text-muted" v-text="props.emptyText ?? t('empty')" />
+            </slot>
+          </BTd>
+        </BTbody>
 
-      <BTfoot>
-        <slot name="tfoot" />
-      </BTfoot>
+        <BTbody v-else class="fw-semibold text-gray-600 text-nowrap">
+          <template v-for="(item, idx) in visibleItems" :key="getRowKey(item, idx)">
+            <BTr v-bind="getRowAttrs(item, idx)">
+              <BTd v-if="hasDetailsSlot" class="w-25px" style="padding: unset !important;">
+                <BButton
+                  class="w-25px h-100 rounded-0 p-0 border-end border-dashed"
+                  size="sm"
+                  variant="none"
+                  @click="toggleDetails(item)">
+                  <FormatIcon
+  :name="item._showDetails ? 'chevron-down' : 'chevron-right'" class="p-0" size="sm"
+                              variant="primary" />
+                </BButton>
+              </BTd>
 
-    </BTableSimple>
+              <BTd v-if="!props.hideSelect" class="w-40px px-0">
+                <BFormCheckbox
+                  v-model="item._checked"
+                  :disabled="$datagrid.loading"
+                  class="form-check-sm form-check-custom cell-checkbox" />
+              </BTd>
+
+              <template v-for="[key, column] in visibleColumns" :key="key">
+                <BTd :class="[column.class, column.tdClass]">
+                  <slot :name="`row[${key}]`" v-bind="{ column, idx, item, key }">
+                    <span v-text="column.getter?.(item) ?? getItemValue(item, key)" />
+                  </slot>
+                </BTd>
+              </template>
+
+              <BTd v-if="hasActionsSlot" class="text-end px-3">
+                <DropdownIcon :text="t('actions')" icon="caret-down" toggle-class="py-1 px-3" variant="light-dark">
+                  <slot :index="idx" :item="item" name="actions" />
+                </DropdownIcon>
+              </BTd>
+            </BTr>
+
+            <BTr v-if="hasDetailsSlot && item._showDetails">
+              <BTd :colspan="tableColspan" class="p-0">
+                <slot
+                  :index="idx"
+                  :item="item"
+                  :toggle-details="() => toggleDetails(item)"
+                  name="details" />
+              </BTd>
+            </BTr>
+          </template>
+        </BTbody>
+
+        <BTfoot>
+          <slot name="tfoot" />
+        </BTfoot>
+
+      </BTableSimple>
+    </BCardBody>
 
     <BCardFooter v-if="!props.hideFooter">
       <slot name="footer" />
@@ -355,31 +356,6 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
   }
 }
 
-table {
-
-  thead {
-    font-size: .8rem;
-    background: var(--bs-body-bg);
-
-    &:before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: rgb(var(--bs-primary-rgb), .05);
-    }
-
-    tr th:is(:first-child, :last-child) {
-      padding: 0 .75rem !important;
-    }
-  }
-
-  tbody {
-    tr td:is(:first-child, :last-child) {
-      padding: 0 .75rem !important;
-    }
-  }
-}
 </style>
 
 <i18n lang="json">
