@@ -113,6 +113,39 @@ The path is `/phog` because ad blockers drop requests to paths such as
 `/posthog`, `/analytics`, `/tracking` or `/telemetry`; a first-party, neutral
 path keeps events flowing.
 
+## Notifications and modals
+
+`useNotify()` is the standard for feedback and confirmations in every app:
+
+| Need | Use |
+|---|---|
+| Short feedback | `$notify.toast({ title, variant })` |
+| Confirm an action (text and two buttons) | `$notify.confirm({ title, message, confirmText, cancelText, variant, onConfirm })` |
+| Modal with its own content (form, list) | a component with `<BModal>`, opened with `useModal().create({ component: markRaw(component), ...props }).show()` |
+
+```ts
+const $notify = useNotify();
+
+$notify.confirm({
+  cancelText: $t('actions.back'),
+  confirmText: $t('order.cancel.submit'),
+  message: $t('order.cancel.confirm'),
+  onConfirm: () => cancel({ id }).then(() => !error.value), // false keeps it open (the error is shown by the app)
+  title: $t('order.cancel.modalTitle', { number }),
+  variant: 'danger',
+});
+```
+
+- `onConfirm` returning a promise keeps the modal open with both buttons disabled until it settles; it
+  closes afterwards unless the promise resolves `false`. Adapters' `execute` resolves on api errors too,
+  so check `error` before returning.
+- Each call creates its own modal and destroys it when hidden.
+- No inline "click again to confirm" and no `<BModal v-model>` in a page: open modals through `create`.
+- A component opened by `create` is mounted outside the page tree: pass data as props and answer
+  through emits (`onSaved`), never `inject`. Do not use `modelValue` for data: the orchestrator shows the modal through it
+  (use a named model such as `v-model:page`). Destroy it on `onHidden` when created from a click.
+- Props already set in the app `bootstrap.config.ts` are defaults: do not repeat them.
+
 ## Money formatting
 
 Money in Merkaly is stored as **integer cents**. `MKFormatMoney`, `MKInputMoney`,
