@@ -11,7 +11,7 @@ export interface NotifyOptions {
 export interface NotifyConfirmOptions extends NotifyOptions {
   cancelText?: string;
   confirmText?: string;
-  onConfirm?: () => unknown; // a promise keeps the modal open and busy; resolving false keeps it open after
+  onConfirm?: () => Promise<unknown> | unknown; // a promise keeps the modal open and busy; resolving false keeps it open after
 }
 
 export interface NotifyAlertOptions extends NotifyOptions {
