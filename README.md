@@ -121,7 +121,7 @@ path keeps events flowing.
 |---|---|
 | Short feedback | `$notify.toast({ title, variant })` |
 | Confirm an action (text and two buttons) | `$notify.confirm({ title, message, confirmText, cancelText, variant, onConfirm })` |
-| Modal with its own content (form, list) | a component with `<BModal>`, opened with `useModal().create({ component, ...props }).show()` |
+| Modal with its own content (form, list) | a component with `<BModal>`, opened with `useModal().create({ component: markRaw(component), ...props }).show()` |
 
 ```ts
 const $notify = useNotify();
@@ -142,7 +142,8 @@ $notify.confirm({
 - Each call creates its own modal and destroys it when hidden.
 - No inline "click again to confirm" and no `<BModal v-model>` in a page: open modals through `create`.
 - A component opened by `create` is mounted outside the page tree: pass data as props and answer
-  through emits (`onSaved`), never `inject`.
+  through emits (`onSaved`), never `inject`. Do not use `modelValue` for data: the orchestrator shows the modal through it
+  (use a named model such as `v-model:page`). Destroy it on `onHidden` when created from a click.
 - Props already set in the app `bootstrap.config.ts` are defaults: do not repeat them.
 
 ## Money formatting
