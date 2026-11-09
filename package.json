@@ -48,7 +48,7 @@
     "@nuxtjs/plausible": "^4.0.0",
     "@nuxtjs/robots": "^7.0.2",
     "@nuxtjs/sitemap": "^9.1.0",
-    "@sentry/nuxt": "^11.10.0",
+    "@sentry/nuxt": "^11.11.0",
     "@types/node": "latest",
     "@types/vue-select": "^3.16.8",
     "@vueuse/components": "^15.0.0",
