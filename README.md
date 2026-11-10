@@ -47,7 +47,7 @@ The callback page renders `MKAuth`, which reads its query string:
 | `?organization=<org_id>[&redirect=/path]` | Logs in straight into that organization (a silent login when the Auth0 session exists) and lands on `redirect`, e.g. `https://admin.merkaly.io/auth?organization=org_123&redirect=/onboarding` right after creating a store in www. |
 | `?redirect=/path` | Plain login, lands on `redirect` (the auth middleware sends protected pages here). |
 
-To open the Auth0 signup screen instead of the login one, use `useAuth().signup(target)`: it calls `loginWithRedirect` with `screen_hint: 'signup'` and `appState: { target }`, so after the callback the app lands on `target` (default `/`).
+To open the Auth0 signup screen instead of the login one, use `useAuth().signup({ redirectTo })`: it calls `loginWithRedirect` with `screen_hint: 'signup'` and `appState: { target: redirectTo }`, so after the callback the app lands on `redirectTo` (default `/`).
 
 ### Session lifetime
 

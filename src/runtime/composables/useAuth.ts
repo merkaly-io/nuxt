@@ -32,9 +32,9 @@ export const useAuth = () => {
 
   const logout = () => nuxtApp.$auth0.logout();
 
-  // Opens the Auth0 signup screen; after the callback the app lands on `target`
-  const signup = (target = '/') => nuxtApp.$auth0.loginWithRedirect({
-    appState: { target },
+  // Opens the Auth0 signup screen; after the callback the app lands on `redirectTo`
+  const signup = ({ redirectTo = '/' }: { redirectTo?: string } = {}) => nuxtApp.$auth0.loginWithRedirect({
+    appState: { target: redirectTo },
     authorizationParams: { screen_hint: 'signup' },
   });
 
