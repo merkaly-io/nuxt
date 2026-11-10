@@ -5,7 +5,7 @@ import { callOnce } from '#imports';
 const { $auth0 } = useNuxtApp();
 
 const emit = defineEmits<{
-  (e: 'success'): void;
+  (e: 'success', appState?: { target?: string }): void;
   (e: 'error', reason: string): void;
 }>();
 
@@ -25,6 +25,11 @@ function handleInvite() {
   return $auth0.loginWithRedirect({ authorizationParams: { organization, invitation } });
 }
 
+// Login directo en una organización (ej. la tienda recién creada en www)
+function handleOrganization() {
+  return $auth0.loginWithRedirect({ appState: { target: redirect || '/' }, authorizationParams: { organization } });
+}
+
 // Maneja errores OAuth devueltos por Auth0
 // Muestra el mensaje como error 400 en Nuxt
 function handleError() {
@@ -40,7 +45,7 @@ function handleError() {
 
 function handleCode() {
   return void $auth0.handleRedirectCallback()
-    .then(() => emit('success'));
+    .then(result => emit('success', result?.appState)); // appState: where the login started (e.g. { target })
 }
 
 callOnce(async () => {
@@ -53,7 +58,10 @@ callOnce(async () => {
   // 3️⃣ Si es un invite inicial
   if (invitation && organization) return handleInvite();
 
-  // 4️⃣ Login normal
+  // 4️⃣ Login en una organización concreta
+  if (organization) return handleOrganization();
+
+  // 5️⃣ Login normal
   return $auth0.loginWithRedirect({ appState: { target: redirect || '/' } });
 });
 </script>

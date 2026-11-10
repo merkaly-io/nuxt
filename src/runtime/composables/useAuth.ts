@@ -32,6 +32,12 @@ export const useAuth = () => {
 
   const logout = () => nuxtApp.$auth0.logout();
 
+  // Opens the Auth0 signup screen; after the callback the app lands on `target`
+  const signup = (target = '/') => nuxtApp.$auth0.loginWithRedirect({
+    appState: { target },
+    authorizationParams: { screen_hint: 'signup' },
+  });
+
   // Re-runs the auth bootstrap (token + tenant/auth hooks) registered by the auth0 plugin
   // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
@@ -63,6 +69,7 @@ export const useAuth = () => {
     isLoading,
     logout,
     retry,
+    signup,
     token,
     user,
   };

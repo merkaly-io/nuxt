@@ -35,6 +35,20 @@ On boot the module restores an existing session (user and token) and then runs t
 | store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
 | www | optional | not used | No hooks; anonymous or signed-in. |
 
+### Login entry points (`MKAuth`)
+
+The callback page renders `MKAuth`, which reads its query string:
+
+| Query | Behavior |
+|---|---|
+| `?code=...` (Auth0 callback) | Completes the login, navigates to the `appState.target` set when it started (or `/`) and emits `success` with that `appState`. |
+| `?error=...&error_description=...` | Emits `error` and shows a 400 error page. |
+| `?invitation=<ticket>&organization=<org_id>` | Accepts an organization invitation (Auth0 Organizations). |
+| `?organization=<org_id>[&redirect=/path]` | Logs in straight into that organization (a silent login when the Auth0 session exists) and lands on `redirect`, e.g. `https://admin.merkaly.io/auth?organization=org_123&redirect=/onboarding` right after creating a store in www. |
+| `?redirect=/path` | Plain login, lands on `redirect` (the auth middleware sends protected pages here). |
+
+To open the Auth0 signup screen instead of the login one, use `useAuth().signup(target)`: it calls `loginWithRedirect` with `screen_hint: 'signup'` and `appState: { target }`, so after the callback the app lands on `target` (default `/`).
+
 ### Session lifetime
 
 The SPA keeps the session with **refresh tokens**: the client uses `useRefreshTokens` with `localStorage` cache and logs in with `audience` and `scope: openid profile email offline_access`. Before each API call the module asks Auth0 for the current access token, which is cached and renewed with the refresh token once it expires (2 hours for `https://api.merkaly.io`). When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token. Account linking (`linkWithConnection(connection)`) uses a separate Auth0 client, the `auth.merkaly.io` SPA client in Auth0, with an in-memory cache, created only on the first call (no extra `checkSession` on page load). It opens a login popup for that connection and sends the popup's raw ID token to `POST /auth/identities` as `{ idToken }`; the api verifies the token (signature, issuer, audience = the account linking client, expiry) and links the identity from its `sub` into the logged-in user. Requires an api with that contract (older clients that sent `{ provider, userId }` get `400`).

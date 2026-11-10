@@ -91,11 +91,15 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   // ---------- Callback ----------
   auth0.handleRedirectCallback = () => self0.handleRedirectCallback()
-    .then(async ({ appState }: RedirectConnectAccountOptions) => {
+    .then(async (result: RedirectConnectAccountOptions) => {
+      const { appState } = result;
+
       await resolveIdentity();
       await startSession();
 
       void navigateTo(appState?.target || '/');
+
+      return result; // MKAuth emits its appState on success
     }, (reason: GenericError) => fail({ message: reason.error_description || reason.message, stage: 'callback' }));
 
   // ---------- Login ----------
