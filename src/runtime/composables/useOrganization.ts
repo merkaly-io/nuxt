@@ -1,13 +1,18 @@
-import { computed, useNuxtApp } from '#imports';
-import { runBootstrapStage, useBootstrapState } from '../internal/bootstrap';
+import { computed, useNuxtApp, useState } from '#imports';
+import { useBootstrapStage } from '../internal/state';
 
-export const useOrganization = <T = unknown>() => { // shared state loaded by defineBootstrap
-  const nuxtApp = useNuxtApp();
-  const { data, error, status } = useBootstrapState<T>('organization');
+export const useOrganization = () => { // id (tenant) plus the data loaded by defineBootstrap
+  const id = useState<string>('merkaly:organization:id', () => '');
+  const fromServer = useState<boolean>('merkaly:organization:server', () => false); // resolved during SSR: the page renders before auth
+  const stage = useBootstrapStage(useNuxtApp(), 'organization');
 
-  const isReady = computed(() => status.value === 'success');
+  const hasId = computed(() => Boolean(id.value));
 
-  const refresh = () => runBootstrapStage(nuxtApp, 'organization', { force: true }); // e.g. after saving the settings
+  const setId = (value: string, options: { server?: boolean } = {}) => {
+    id.value = value;
 
-  return { data, error, isReady, refresh, status };
+    if (options.server) fromServer.value = true;
+  };
+
+  return { ...stage, fromServer, hasId, id, setId };
 };

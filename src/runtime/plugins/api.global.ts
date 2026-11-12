@@ -1,6 +1,6 @@
 import { defineNuxtPlugin, useNuxtApp, useRequestURL, useRuntimeConfig } from '#app';
 import type { Ref } from '#imports';
-import { useAuth, useTenant } from '#imports';
+import { useAuth, useOrganization } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
@@ -86,7 +86,7 @@ export default defineNuxtPlugin(({ provide }) => {
     const { token } = useAuth();
 
     if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
-    const { tenant } = useTenant();
+    const { id: tenant } = useOrganization();
     const { public: { merkaly } } = useRuntimeConfig();
 
     const requiresTenant = options.requiresTenant ?? merkaly.auth0.requiresTenant;
@@ -96,7 +96,7 @@ export default defineNuxtPlugin(({ provide }) => {
         `[api] Tenant context is required but not set for: ${url}\n` +
         `This surface has requiresTenant: true. Possible causes:\n` +
         `  1. The request fired before the auth boot sequence completed (race condition).\n` +
-        `  2. setTenant() was never called in this surface's auth plugin.\n` +
+        `  2. useOrganization().setId() was never called in this surface's auth plugin.\n` +
         `  3. The adapter should use { global: true } to bypass tenant enforcement.`,
       );
     }

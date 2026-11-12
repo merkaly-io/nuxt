@@ -1,6 +1,7 @@
 import type { User } from '@auth0/auth0-spa-js';
 import { computed } from 'vue';
 import { useNuxtApp, useState } from '#imports';
+import { useBootstrapStage } from '../internal/state';
 
 export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'me';
 
@@ -27,6 +28,8 @@ export const useAuth = () => {
   const error = useState<AuthError | undefined>('auth:error', () => undefined);
 
   const isAuthenticated = computed(() => Boolean(user.value?.sub));
+
+  const me = useBootstrapStage(nuxtApp, 'me'); // the app's /auth/me, loaded after the organization when signed in
 
   const clear = () => (error.value = undefined);
 
@@ -68,6 +71,7 @@ export const useAuth = () => {
     isAuthenticated,
     isLoading,
     logout,
+    me,
     retry,
     signup,
     token,

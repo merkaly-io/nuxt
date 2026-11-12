@@ -1,7 +1,5 @@
 import { useNuxtApp } from '#imports';
-import type { BootstrapLoaders } from '../internal/bootstrap';
-import { registerBootstrapLoaders } from '../internal/bootstrap';
+import type { BootstrapLoaders } from '../internal/state';
+import { registerBootstrapLoaders } from '../internal/state';
 
-export const defineBootstrap = <TOrganization = unknown, TMe = unknown>(loaders: BootstrapLoaders<TOrganization, TMe>) => { // call it from an app plugin
-  registerBootstrapLoaders(useNuxtApp(), loaders as BootstrapLoaders);
-};
+export const defineBootstrap = (loaders: BootstrapLoaders) => registerBootstrapLoaders(useNuxtApp(), loaders); // call it from an app plugin

@@ -41,7 +41,7 @@ The app mounts (and `MKApp` renders its default slot) only after the last stage,
 | store | optional | required | `merkaly:tenant` resolves the store from the host (public); then organization (`/company`, public, also during SSR); me only for a signed-in buyer. Protected pages (account, checkout) ask for login. |
 | www | optional | not used | No hooks and no loaders; anonymous or signed-in. |
 
-### Ordered bootstrap (`defineBootstrap`, `useOrganization`, `useMe`)
+### Ordered bootstrap (`defineBootstrap`, `useOrganization`, `useAuth().me`)
 
 Each app declares its loaders once, from a plugin, with its own adapters (the module has no app endpoints):
 
@@ -69,14 +69,20 @@ export default defineNuxtPlugin(() => {
 
 A loader returns an adapter (`withAdapter()` result, preferably with `immediate: false`, the bootstrap runs it), a promise or a plain value. An adapter with an api error, or a rejected promise, fails the stage. Every stage is optional: an app without loaders skips it.
 
-The loaded data is shared state for the whole app:
+Two composables hold the state, shared by the whole app:
 
-```ts
-const { data: organization, isReady, refresh, status, error } = useOrganization<SettingsOrganizationProfileResponse>();
-const { data: me } = useMe<AccountAuthProfile>(); // undefined for visitors
-```
+- `useOrganization()`: everything about the organization (tenant). It exists without a login and also loads on the server.
+- `useAuth()`: everything about the user (`user`, `token`, `isAuthenticated`, `fail`, `retry`, `logout`, `signup`) plus `me`, the loaded profile.
 
-| Key | Description |
+| `useOrganization()` | Description |
+|---|---|
+| `id` | Organization id (Auth0 org), sent as the `identity` header; `''` until set |
+| `setId(id, { server? })` | Sets the id; `server: true` when resolved during SSR |
+| `hasId` | `Boolean(id)` |
+| `fromServer` | The id was resolved during SSR: the page renders before auth |
+| `data`, `status`, `error`, `isReady`, `refresh()` | The loaded organization, see below |
+
+| `useAuth().me` and the stage keys of `useOrganization()` | Description |
 |---|---|
 | `data` | Loaded value; `undefined` until it loads (and always for `me` with visitors) |
 | `status` | `idle`, `pending`, `success` or `error` |
@@ -84,16 +90,50 @@ const { data: me } = useMe<AccountAuthProfile>(); // undefined for visitors
 | `isReady` | `status === 'success'` |
 | `refresh()` | Loads it again (e.g. after saving the settings); a failure here only sets `error`, it does not block the app |
 
+```ts
+const { data: organization, id } = useOrganization();
+const { me } = useAuth();
+
+const name = computed(() => me.data.value?.name); // typed by MerkalyMe
+```
+
+#### Typing (`MerkalyOrganization`, `MerkalyMe`)
+
+`data` is typed with two interfaces exported by the package, empty by default. Each app extends them once with its own contracts (module augmentation, no generics at call sites), e.g. in `app/types/merkaly.d.ts`:
+
+```ts
+import type { AccountAuthProfile } from '@merkaly/api/account/auth';
+import type { SettingsOrganizationProfileResponse } from '@merkaly/api/settings/organization';
+
+declare module '@merkaly/nuxt' {
+  interface MerkalyMe extends AccountAuthProfile {}
+  interface MerkalyOrganization extends SettingsOrganizationProfileResponse {}
+}
+```
+
+The file must be a module (keep at least one `import` or an `export {}`), otherwise it replaces the package types instead of extending them. The loaders passed to `defineBootstrap` are checked against the same interfaces.
+
 In SSR apps (store) the organization stage also runs on the server, after the server plugins (`tenant.server.ts`), so it reaches the HTML; the client reuses it from the payload and does not request it again. `me` never runs on the server (there is no session there), so avoid rendering `me` data in SSR markup to keep hydration stable.
 
-#### Migration per app
+#### Migration per app (breaking: `useTenant` and its keys are gone)
 
-Nothing breaks: apps without `defineBootstrap` boot as before (session hooks only). To get the ordered boot:
+`useTenant()` is removed; its keys live in `useOrganization()`: `tenant` → `id`, `setTenant(id, options)` → `setId(id, options)`, `fromServer` → `fromServer`, `isReady` (id set) → `hasId` (`isReady` now means the organization data loaded). The `merkaly:tenant` hook is unchanged: it still runs first and is where the id gets set.
 
-- **admin**: add the plugin above. In `plugins/money.ts` stop loading the organization on `tenant` and read it: `watch(useOrganization().data, (data) => data && setMoneyDefaults({ ... }), { immediate: true })`. `useAccountProfile` reads `useMe().data` (and `useMe().refresh()` after saving) instead of creating its own `readAccountProfile()`. Settings pages can use `useOrganization().refresh()` after saving.
-- **store**: add the universal plugin above. `layouts/default.vue` and the order page read `useOrganization().data` instead of `readAppCompany()`. Keep `tenant.server.ts` and the `merkaly:tenant` hook as they are.
-- **dashboard**: nothing required; add `defineBootstrap({ me })` if it needs `/auth/me` before the pages.
-- **www**: nothing.
+- **admin**
+  - `app/plugins/auth.ts:4`: `const { setTenant } = useTenant()` → `const { setId } = useOrganization()`; line 25: `setTenant(data.orgId)` → `setId(data.orgId)`.
+  - `app/plugins/money.ts:8-18`: drop `useTenant()`, the `readSettingsOrganization()` call and the `watch(tenant, ...)`; use `watch(useOrganization().data, (data) => data && setMoneyDefaults({ currency: data.localization?.currency, locale: data.localization?.language }), { immediate: true })`.
+  - New `app/plugins/bootstrap.ts` (above) and `app/types/merkaly.d.ts` (above).
+  - `app/composables/useAccountProfile.ts:7`: `readAccountProfile()` → `const { data: profile, refresh } = useAuth().me`.
+  - `app/pages/settings/(overview)/.composables/useSettingsOrganization.ts:5` (optional): read `useOrganization()` (`data`, `status === 'pending'`, `refresh`) instead of a second `readSettingsOrganization()`.
+- **store**
+  - `app/plugins/tenant.server.ts:4`: `const { setTenant } = useTenant()` → `const { setId } = useOrganization()`; lines 7 and 15: `setTenant(..., { server: true })` → `setId(..., { server: true })`.
+  - `app/plugins/auth.ts:4`: `const { fromServer, setTenant } = useTenant()` → `const { fromServer, setId } = useOrganization()`; lines 9 and 13: `setTenant(...)` → `setId(...)`.
+  - `app/pages/checkout/.composables/usePaymentStream.ts:11`: `const { tenant } = useTenant()` → `const { id: tenant } = useOrganization()` (line 43 keeps `tenant.value`).
+  - New universal `app/plugins/bootstrap.ts` (above) and `app/types/merkaly.d.ts` with `MerkalyOrganization extends SettingsOrganizationStoreProfile`.
+  - `app/layouts/default.vue:5` and `app/pages/account/orders/[order]/index.vue:85`: `readAppCompany()` → `const { data: company } = useOrganization()`.
+  - `app/plugins/README.md:11` mentions `fromServer`: now from `useOrganization()`.
+- **dashboard**: no `useTenant` or `useMe` usages, nothing required. Add `defineBootstrap({ me })` and `MerkalyMe` if it needs `/auth/me` before the pages.
+- **www**: no usages, nothing required.
 
 ### Login entry points (`MKAuth`)
 
