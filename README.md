@@ -78,7 +78,7 @@ const { data: me } = useMe<AccountAuthProfile>(); // undefined for visitors
 
 | Key | Description |
 |---|---|
-| `data` | Loaded value (`undefined` until it loads, and `me` for visitors) |
+| `data` | Loaded value; `undefined` until it loads (and always for `me` with visitors) |
 | `status` | `idle`, `pending`, `success` or `error` |
 | `error` | `{ message, status? }` of the last failure |
 | `isReady` | `status === 'success'` |
