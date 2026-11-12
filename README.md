@@ -26,14 +26,74 @@ Install the module to your Nuxt application:
 
 Every surface can sign in; `auth0.requiresAuth` only decides whether pages require a login (globally, or per page with `definePageMeta({ requiresAuth: true })`). `auth0.requiresTenant` decides whether API calls require a tenant (`global: true` adapters bypass it).
 
-On boot the module restores an existing session (user and token) and then runs the app hooks in order, `merkaly:tenant` then `merkaly:auth`, with that user (or none). `MKApp` shows its `loading` slot until both finish; if a hook throws, it shows the `error` slot instead. The auth callback page renders right away so it can complete the login.
+On boot the module restores an existing session (user and token) and then runs the bootstrap stages in a fixed order, each one only after the previous one finished:
+
+1. **session**: the app hooks `merkaly:tenant` then `merkaly:auth`, with that user (or none).
+2. **organization**: the app's organization loader (see `defineBootstrap`), always, signed in or not.
+3. **me**: the app's `/auth/me` loader, only when the visitor is signed in.
+
+The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `me`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed. The auth callback page renders right away so it can complete the login, and runs the stages after it.
 
 | Surface | Login | Tenant | Boot |
 |---|---|---|---|
-| admin | required | required | `merkaly:tenant` creates the session and sets the tenant; without a session the auth middleware redirects to login. |
-| dashboard | required | not used | `merkaly:auth` loads the session; without a session it redirects to login. |
-| store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
-| www | optional | not used | No hooks; anonymous or signed-in. |
+| admin | required | required | `merkaly:tenant` creates the session and sets the tenant; then organization (`/settings/organization`) and me (`/auth/me`). Without a session the auth middleware redirects to login. |
+| dashboard | required | not used | `merkaly:auth` loads the session; then me if it declares a loader. Without a session it redirects to login. |
+| store | optional | required | `merkaly:tenant` resolves the store from the host (public); then organization (`/company`, public, also during SSR); me only for a signed-in buyer. Protected pages (account, checkout) ask for login. |
+| www | optional | not used | No hooks and no loaders; anonymous or signed-in. |
+
+### Ordered bootstrap (`defineBootstrap`, `useOrganization`, `useMe`)
+
+Each app declares its loaders once, from a plugin, with its own adapters (the module has no app endpoints):
+
+```ts
+// admin: app/plugins/bootstrap.ts
+import { readAccountProfile } from '~/adapters/account/read.account.profile';
+import { readSettingsOrganization } from '~/adapters/settings/organization/read.settings.organization';
+
+export default defineNuxtPlugin(() => {
+  defineBootstrap({
+    me: () => readAccountProfile(() => ({ immediate: false })),
+    organization: () => readSettingsOrganization(() => ({ immediate: false })),
+  });
+});
+```
+
+```ts
+// store: app/plugins/bootstrap.ts (universal, not .client: SSR loads the organization too)
+import { readAppCompany } from '~/adapters/app/read.company';
+
+export default defineNuxtPlugin(() => {
+  defineBootstrap({ organization: () => readAppCompany(() => ({ immediate: false })) });
+});
+```
+
+A loader returns an adapter (`withAdapter()` result, preferably with `immediate: false`, the bootstrap runs it), a promise or a plain value. An adapter with an api error, or a rejected promise, fails the stage. Every stage is optional: an app without loaders skips it.
+
+The loaded data is shared state for the whole app:
+
+```ts
+const { data: organization, isReady, refresh, status, error } = useOrganization<SettingsOrganizationProfileResponse>();
+const { data: me } = useMe<AccountAuthProfile>(); // undefined for visitors
+```
+
+| Key | Description |
+|---|---|
+| `data` | Loaded value (`undefined` until it loads, and `me` for visitors) |
+| `status` | `idle`, `pending`, `success` or `error` |
+| `error` | `{ message, status? }` of the last failure |
+| `isReady` | `status === 'success'` |
+| `refresh()` | Loads it again (e.g. after saving the settings); a failure here only sets `error`, it does not block the app |
+
+In SSR apps (store) the organization stage also runs on the server, after the server plugins (`tenant.server.ts`), so it reaches the HTML; the client reuses it from the payload and does not request it again. `me` never runs on the server (there is no session there), so avoid rendering `me` data in SSR markup to keep hydration stable.
+
+#### Migration per app
+
+Nothing breaks: apps without `defineBootstrap` boot as before (session hooks only). To get the ordered boot:
+
+- **admin**: add the plugin above. In `plugins/money.ts` stop loading the organization on `tenant` and read it: `watch(useOrganization().data, (data) => data && setMoneyDefaults({ ... }), { immediate: true })`. `useAccountProfile` reads `useMe().data` (and `useMe().refresh()` after saving) instead of creating its own `readAccountProfile()`. Settings pages can use `useOrganization().refresh()` after saving.
+- **store**: add the universal plugin above. `layouts/default.vue` and the order page read `useOrganization().data` instead of `readAppCompany()`. Keep `tenant.server.ts` and the `merkaly:tenant` hook as they are.
+- **dashboard**: nothing required; add `defineBootstrap({ me })` if it needs `/auth/me` before the pages.
+- **www**: nothing.
 
 ### Login entry points (`MKAuth`)
 

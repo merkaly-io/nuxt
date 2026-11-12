@@ -27,6 +27,7 @@ import type { Strategies } from '@nuxtjs/i18n';
 // Re-export types for consumers
 export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
 export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runtime/plugins/api.global';
+export type { BootstrapError, BootstrapLoader, BootstrapLoaders, BootstrapStatus } from './runtime/internal/bootstrap';
 
 type ModuleDependencies = Record<string, Record<string, unknown>>;
 type Resolver = ReturnType<typeof createResolver>;
@@ -408,6 +409,7 @@ function registerRuntimeFeatures(options: MerkalyModuleOptions, resolver: Resolv
   // Register Plugins
   addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
+  addPlugin({ src: resolver.resolve('./runtime/plugins/bootstrap.server') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
 
   if (hasPosthogConfig(options)) {

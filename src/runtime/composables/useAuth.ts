@@ -2,7 +2,7 @@ import type { User } from '@auth0/auth0-spa-js';
 import { computed } from 'vue';
 import { useNuxtApp, useState } from '#imports';
 
-export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant';
+export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'me';
 
 export interface AuthError {
   message: string;
@@ -38,7 +38,7 @@ export const useAuth = () => {
     authorizationParams: { screen_hint: 'signup' },
   });
 
-  // Re-runs the auth bootstrap (token + tenant/auth hooks) registered by the auth0 plugin
+  // Re-runs the auth bootstrap (token, tenant/auth hooks, then the stages still pending) registered by the auth0 plugin
   // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
     isLoading.value = true;

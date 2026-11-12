@@ -4,11 +4,13 @@ import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp, useState } from '#impor
 import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
+import { runBootstrap } from '../internal/bootstrap';
 
 // Auth0 errors meaning "there is no session", not "something broke"
 const NO_SESSION_ERRORS = ['consent_required', 'interaction_required', 'invalid_grant', 'login_required', 'missing_refresh_token'];
 
-export default defineNuxtPlugin(async ({ callHook, hook }) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
+  const { callHook, hook } = nuxtApp;
   const { public: $config } = useRuntimeConfig();
   const callbackPath = URL.canParse($config.merkaly.auth0.callbackUrl)
     ? new URL($config.merkaly.auth0.callbackUrl).pathname
@@ -49,7 +51,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   const resolveIdentity = () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()]);
 
-  const initTenantContext = async () => {
+  const initTenantContext = async () => { // session (tenant + auth hooks), then organization and me
     try {
       await callHook('merkaly:tenant', user.value);
       await callHook('merkaly:auth', user.value);
@@ -60,6 +62,8 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         await fail({ message: (reason as Error)?.message || String(reason), stage: 'tenant' });
       }
     }
+
+    await runBootstrap(nuxtApp); // stops on an earlier failure
   };
 
   // A known user without a token is a real failure; a missing Auth0 session is not

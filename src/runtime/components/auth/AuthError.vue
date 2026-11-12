@@ -11,11 +11,21 @@ const emit = defineEmits<(e: 'logout' | 'retry') => void>();
 
 const isDenied = computed(() => [401, 403].includes(props.error.status as number));
 
-const title = computed(() => isDenied.value ? 'Access denied' : 'We could not start your session');
+const isOrganization = computed(() => props.error.stage === 'organization'); // public apps fail here without a session
 
-const description = computed(() => isDenied.value
-  ? 'You signed in successfully, but this account is not allowed to access this application.'
-  : 'You signed in successfully, but something failed while preparing your session.');
+const title = computed(() => {
+  if (isDenied.value) return 'Access denied';
+
+  return isOrganization.value ? 'We could not load this organization' : 'We could not start your session';
+});
+
+const description = computed(() => {
+  if (isDenied.value) return 'You signed in successfully, but this account is not allowed to access this application.';
+
+  return isOrganization.value
+    ? 'Something failed while loading the organization of this application.'
+    : 'You signed in successfully, but something failed while preparing your session.';
+});
 
 const details = computed(() => [props.error.stage, props.error.status, props.error.url]
   .filter(Boolean)
