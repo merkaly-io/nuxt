@@ -4,6 +4,7 @@ import { useAuth, useOrganization } from '#imports';
 import type { FetchOptions, FetchResponse } from 'ofetch';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
+const CLIENT_HEADER = 'x-merkaly-client'; // the app's Auth0 client id, checked by the api against the token azp
 
 type OnBeforeSendArgs = { query: FetchOptions['query'], body: FetchOptions['body'], headers: FetchOptions['headers'] }
 type OnResponseArgs = { response: FetchResponse<unknown>, request: RequestInfo }
@@ -111,6 +112,7 @@ export default defineNuxtPlugin(({ provide }) => {
         identity: tenant.value,
         [GLOBAL_API_HEADER]: options.global ? 'true' : '',
         ...(requestHost ? { 'x-merkaly-host': requestHost } : {}), // tenant host, as the proxy sends it
+        ...(merkaly.auth0.client ? { [CLIENT_HEADER]: merkaly.auth0.client } : {}),
         ...options?.headers,
       },
 

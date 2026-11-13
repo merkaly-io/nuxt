@@ -169,6 +169,10 @@ To open the Auth0 signup screen instead of the login one, use `useAuth().signup(
 
 The SPA keeps the session with **refresh tokens**: the client uses `useRefreshTokens` with `localStorage` cache and logs in with `audience` and `scope: openid profile email offline_access`. Before each API call the module asks Auth0 for the current access token, which is cached and renewed with the refresh token once it expires (2 hours for `https://api.merkaly.io`). When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token. Account linking (`linkWithConnection(connection)`) uses a separate Auth0 client, the `auth.merkaly.io` SPA client in Auth0, with an in-memory cache, created only on the first call (no extra `checkSession` on page load). It opens a login popup for that connection and sends the popup's raw ID token to `POST /auth/identities` as `{ idToken }`; the api verifies the token (signature, issuer, audience = the account linking client, expiry) and links the identity from its `sub` into the logged-in user. Requires an api with that contract (older clients that sent `{ provider, userId }` get `400`).
 
+### Calling app header
+
+Every API request carries the app's Auth0 client id (`merkaly.auth0.client`) in the `x-merkaly-client` header: the `$api` plugin adds it to server-side calls and the `/api` proxy sets it on every forwarded request (overwriting whatever the browser sent). The api checks it against its list of Auth0 applications and, on authenticated requests, against the token `azp` (api doc: [`docs/conventions/surface-clients.md`](https://github.com/merkaly-io/api.merkaly.io/blob/master/docs/conventions/surface-clients.md)). An app without `merkaly.auth0.client` sends no header.
+
 The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes, organizations, and the checklist for a new app) is documented in the auth.merkaly.io repo: [`docs/tenant-setup.md`](https://github.com/merkaly-io/auth.merkaly.io/blob/master/docs/tenant-setup.md).
 
 ## SEO: robots and sitemap

@@ -4,6 +4,7 @@ import { useRuntimeConfig } from '#imports';
 
 const GLOBAL_API_HEADER = 'x-merkaly-global';
 const TENANT_HOST_HEADER = 'x-merkaly-host';
+const CLIENT_HEADER = 'x-merkaly-client';
 const API_PREFIX_PATTERN = /^\/api\/?/;
 const API_ROUTE_PATTERN = /^\/api(?:\/|$)/;
 const EDGE_SLASH_PATTERN = /^\/|\/$/g;
@@ -54,6 +55,9 @@ export default defineEventHandler((event) => {
   // tenant host travels in a custom header the edge leaves untouched
   event.node.req.headers['x-forwarded-host'] = url.host;
   event.node.req.headers[TENANT_HOST_HEADER] = url.host;
+
+  if ($config.merkaly.auth0.client) event.node.req.headers[CLIENT_HEADER] = $config.merkaly.auth0.client; // the app's Auth0 client id, set here so the browser value never counts
+  else Reflect.deleteProperty(event.node.req.headers, CLIENT_HEADER);
 
   // Cloudflare rejects requests to a proxied origin that already carry its
   // own headers (cf-connecting-ip -> Error 1000), so drop the inbound edge
