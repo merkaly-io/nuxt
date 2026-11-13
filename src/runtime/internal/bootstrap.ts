@@ -4,12 +4,12 @@ import type { BootstrapStage } from './state';
 import { inApp, runBootstrapStage, useBootstrapState } from './state';
 
 export const runBootstrap = async (nuxtApp: NuxtApp) => { // after the session hooks: organization, then user
-  const { error, fail, isAuthenticated, token } = inApp(nuxtApp, useAuth);
+  const { error, fail, isAuthenticated, token } = await inApp(nuxtApp, useAuth);
 
   if (error.value || nuxtApp.payload.error) return; // an earlier stage already failed
 
-  const failStage = (stage: BootstrapStage) => {
-    const reason = inApp(nuxtApp, () => useBootstrapState(stage)).error.value;
+  const failStage = async (stage: BootstrapStage) => {
+    const reason = (await inApp(nuxtApp, () => useBootstrapState(stage))).error.value;
 
     return fail({ message: reason?.message || `${stage} failed`, stage, status: reason?.status });
   };
