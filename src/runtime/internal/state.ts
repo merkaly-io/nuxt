@@ -3,11 +3,11 @@ import type { Ref } from '#imports';
 import { computed, useState } from '#imports';
 import { until } from '@vueuse/core';
 
-export interface MerkalyMe {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
-
 export interface MerkalyOrganization {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
 
-export type BootstrapStage = 'organization' | 'me';
+export interface MerkalyUser {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
+
+export type BootstrapStage = 'organization' | 'user';
 
 export type BootstrapStatus = 'idle' | 'pending' | 'success' | 'error';
 
@@ -26,13 +26,13 @@ interface AdapterLike<T> { // what withAdapter() returns
 export type BootstrapLoader<T = unknown> = () => T | Promise<T> | AdapterLike<T>;
 
 export interface BootstrapLoaders {
-  me?: BootstrapLoader<MerkalyMe>;
   organization?: BootstrapLoader<MerkalyOrganization>;
+  user?: BootstrapLoader<MerkalyUser>;
 }
 
 interface StageData {
-  me: MerkalyMe;
   organization: MerkalyOrganization;
+  user: MerkalyUser;
 }
 
 export const inApp = <T>(nuxtApp: NuxtApp, fn: () => T) => nuxtApp.runWithContext(fn) as T; // sync composables only

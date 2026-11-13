@@ -27,7 +27,7 @@ import type { Strategies } from '@nuxtjs/i18n';
 // Re-export types for consumers
 export type { AdapterOptions, AdapterArgs } from './runtime/utils/withAdapter';
 export type { HooksOptions, ApiOptions, RefOptions, ParamsOptions } from './runtime/plugins/api.global';
-export type { BootstrapError, BootstrapLoader, BootstrapLoaders, BootstrapStatus, MerkalyMe, MerkalyOrganization } from './runtime/internal/state';
+export type { BootstrapError, BootstrapLoader, BootstrapLoaders, BootstrapStatus, MerkalyOrganization, MerkalyUser } from './runtime/internal/state';
 
 type ModuleDependencies = Record<string, Record<string, unknown>>;
 type Resolver = ReturnType<typeof createResolver>;

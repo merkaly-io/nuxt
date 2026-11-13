@@ -3,7 +3,7 @@ import { useAuth } from '../composables/useAuth';
 import type { BootstrapStage } from './state';
 import { inApp, runBootstrapStage, useBootstrapState } from './state';
 
-export const runBootstrap = async (nuxtApp: NuxtApp) => { // after the session hooks: organization, then me
+export const runBootstrap = async (nuxtApp: NuxtApp) => { // after the session hooks: organization, then user
   const { error, fail, isAuthenticated, token } = inApp(nuxtApp, useAuth);
 
   if (error.value || nuxtApp.payload.error) return; // an earlier stage already failed
@@ -16,7 +16,7 @@ export const runBootstrap = async (nuxtApp: NuxtApp) => { // after the session h
 
   if (!await runBootstrapStage(nuxtApp, 'organization')) return failStage('organization');
 
-  if (!isAuthenticated.value || !token.value) return; // public visitor: no me
+  if (!isAuthenticated.value || !token.value) return; // public visitor: no user
 
-  if (!await runBootstrapStage(nuxtApp, 'me')) return failStage('me');
+  if (!await runBootstrapStage(nuxtApp, 'user')) return failStage('user');
 };

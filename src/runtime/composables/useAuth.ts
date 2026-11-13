@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useNuxtApp, useState } from '#imports';
 import { useBootstrapStage } from '../internal/state';
 
-export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'me';
+export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'user';
 
 export interface AuthError {
   message: string;
@@ -22,14 +22,14 @@ export interface AuthErrorContext {
 export const useAuth = () => {
   const nuxtApp = useNuxtApp();
 
-  const user = useState<User | undefined>('auth:user', () => undefined);
+  const claims = useState<User | undefined>('auth:claims', () => undefined); // Auth0 ID token user (sub, email, name, picture)
   const token = useState<string | null>('auth:token', () => null);
   const isLoading = useState('auth:loading', () => true);
   const error = useState<AuthError | undefined>('auth:error', () => undefined);
 
-  const isAuthenticated = computed(() => Boolean(user.value?.sub));
+  const isAuthenticated = computed(() => Boolean(claims.value?.sub));
 
-  const me = useBootstrapStage(nuxtApp, 'me'); // the app's /auth/me, loaded after the organization when signed in
+  const user = useBootstrapStage(nuxtApp, 'user'); // the app's /auth/me, loaded after the organization when signed in
 
   const clear = () => (error.value = undefined);
 
@@ -65,13 +65,13 @@ export const useAuth = () => {
   };
 
   return {
+    claims,
     clear,
     error,
     fail,
     isAuthenticated,
     isLoading,
     logout,
-    me,
     retry,
     signup,
     token,

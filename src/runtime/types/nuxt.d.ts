@@ -15,10 +15,10 @@ declare module '#app' {
   }
 
   interface RuntimeNuxtHooks {
-    'merkaly:auth': (user?: User) => HookResult;
+    'merkaly:auth': (claims?: User) => HookResult;
     'merkaly:auth:error': (context: AuthErrorContext) => HookResult;
     'merkaly:auth:retry': () => HookResult;
-    'merkaly:tenant': (user?: User) => HookResult;
+    'merkaly:tenant': (claims?: User) => HookResult;
   }
 }
 
