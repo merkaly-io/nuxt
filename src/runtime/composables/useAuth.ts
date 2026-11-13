@@ -1,8 +1,9 @@
 import type { User } from '@auth0/auth0-spa-js';
 import { computed } from 'vue';
 import { useNuxtApp, useState } from '#imports';
+import { useBootstrapStage } from '../internal/state';
 
-export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant';
+export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'user';
 
 export interface AuthError {
   message: string;
@@ -21,12 +22,14 @@ export interface AuthErrorContext {
 export const useAuth = () => {
   const nuxtApp = useNuxtApp();
 
-  const user = useState<User | undefined>('auth:user', () => undefined);
+  const claims = useState<User | undefined>('auth:claims', () => undefined); // Auth0 ID token user (sub, email, name, picture)
   const token = useState<string | null>('auth:token', () => null);
   const isLoading = useState('auth:loading', () => true);
   const error = useState<AuthError | undefined>('auth:error', () => undefined);
 
-  const isAuthenticated = computed(() => Boolean(user.value?.sub));
+  const isAuthenticated = computed(() => Boolean(claims.value?.sub));
+
+  const user = useBootstrapStage(nuxtApp, 'user'); // the app's /auth/me, loaded after the organization when signed in
 
   const clear = () => (error.value = undefined);
 
@@ -38,7 +41,7 @@ export const useAuth = () => {
     authorizationParams: { screen_hint: 'signup' },
   });
 
-  // Re-runs the auth bootstrap (token + tenant/auth hooks) registered by the auth0 plugin
+  // Re-runs the auth bootstrap (token, tenant/auth hooks, then the stages still pending) registered by the auth0 plugin
   // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
     isLoading.value = true;
@@ -62,6 +65,7 @@ export const useAuth = () => {
   };
 
   return {
+    claims,
     clear,
     error,
     fail,

@@ -18,10 +18,10 @@ export default defineNuxtPlugin(() => {
     ui_host: 'https://us.posthog.com',
   });
 
-  const { user } = useAuth();
+  const { claims } = useAuth();
 
-  watchImmediate(() => user.value?.sub, (sub, previous) => {
-    if (sub) return posthog.identify(sub, { email: user.value?.email, name: user.value?.name }); // Auth0 id after login
+  watchImmediate(() => claims.value?.sub, (sub, previous) => {
+    if (sub) return posthog.identify(sub, { email: claims.value?.email, name: claims.value?.name }); // Auth0 id after login
 
     if (previous) posthog.reset(); // logout: back to an anonymous visitor
   });

@@ -4,11 +4,13 @@ import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp, useState } from '#impor
 import { navigateTo } from '#app';
 import { defu } from 'defu';
 import { useAuth } from '../composables/useAuth';
+import { runBootstrap } from '../internal/bootstrap';
 
 // Auth0 errors meaning "there is no session", not "something broke"
 const NO_SESSION_ERRORS = ['consent_required', 'interaction_required', 'invalid_grant', 'login_required', 'missing_refresh_token'];
 
-export default defineNuxtPlugin(async ({ callHook, hook }) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
+  const { callHook, hook } = nuxtApp;
   const { public: $config } = useRuntimeConfig();
   const callbackPath = URL.canParse($config.merkaly.auth0.callbackUrl)
     ? new URL($config.merkaly.auth0.callbackUrl).pathname
@@ -21,7 +23,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     useRefreshTokens: true,
   });
 
-  const { error, isLoading, user, token, fail } = useAuth();
+  const { claims, error, isLoading, token, fail } = useAuth();
   // Internal: true while the bootstrap session (tenant + auth hooks) is running
   const isStarting = useState('auth:starting', () => false);
 
@@ -31,7 +33,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
   let tokenError: GenericError | undefined;
 
   auth0.getUser = () => self0.getUser()
-    .then((result: User) => (user.value = result))
+    .then((result: User) => (claims.value = result))
     .catch((reason: Error) => console.error('[Auth0] getUser failed', reason));
 
   auth0.getTokenSilently = (options = {}) =>
@@ -49,10 +51,10 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
 
   const resolveIdentity = () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()]);
 
-  const initTenantContext = async () => {
+  const initTenantContext = async () => { // session (tenant + auth hooks), then organization and user
     try {
-      await callHook('merkaly:tenant', user.value);
-      await callHook('merkaly:auth', user.value);
+      await callHook('merkaly:tenant', claims.value);
+      await callHook('merkaly:auth', claims.value);
     } catch (reason) {
       // A throwing handler must not leave the app stuck: surface it through the error slot,
       // unless the app already reported its own failure via `fail(...)`
@@ -60,19 +62,21 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
         await fail({ message: (reason as Error)?.message || String(reason), stage: 'tenant' });
       }
     }
+
+    await runBootstrap(nuxtApp); // stops on an earlier failure
   };
 
   // A known user without a token is a real failure; a missing Auth0 session is not
   // (anonymous visitors and the auth middleware already handle that case)
   const startSession = async () => {
-    if (user.value && !token.value && tokenError && !NO_SESSION_ERRORS.includes(tokenError.error)) {
+    if (claims.value && !token.value && tokenError && !NO_SESSION_ERRORS.includes(tokenError.error)) {
       return fail({ message: tokenError.error_description || tokenError.message, stage: 'token' });
     }
 
     // A cached user whose session is gone (e.g. missing refresh token) is logged out: drop the
     // stale cache so protected pages send to login instead of calling the API without a token
-    if (user.value && !token.value && tokenError) {
-      user.value = undefined;
+    if (claims.value && !token.value && tokenError) {
+      claims.value = undefined;
       await self0.logout({ openUrl: false });
 
       if ($config.merkaly.auth0.requiresAuth) { // protected surface: back to login, never a tokenless session call
@@ -80,7 +84,7 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
       }
     }
 
-    if (!user.value && $config.merkaly.auth0.requiresAuth) { // anonymous on a protected surface: to login, never a tokenless session call (401 shown as "Access denied")
+    if (!claims.value && $config.merkaly.auth0.requiresAuth) { // anonymous on a protected surface: to login, never a tokenless session call (401 shown as "Access denied")
       return auth0.loginWithRedirect({ appState: { target: location.pathname + location.search } });
     }
 
@@ -140,16 +144,16 @@ export default defineNuxtPlugin(async ({ callHook, hook }) => {
     const client = getLinkingClient(); // sync until the popup opens, avoids popup blockers
 
     await client.loginWithPopup({ authorizationParams: { connection } });
-    const claims = await client.getIdTokenClaims();
+    const idClaims = await client.getIdTokenClaims();
 
-    if (!claims?.__raw) {
+    if (!idClaims?.__raw) {
       throw new Error('Failed to get ID token for linking');
     }
 
     const { $api } = useNuxtApp();
 
     return await $api('/auth/identities', { // the api verifies it and derives the identity
-      body: { idToken: claims.__raw },
+      body: { idToken: idClaims.__raw },
       global: true,
       method: 'POST',
     });

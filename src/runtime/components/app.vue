@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useRoute } from '#app';
 import { computed } from 'vue';
-import { useAuth, useTenant, watchOnce, addRouteMiddleware, useNuxtApp, useRuntimeConfig } from '#imports';
+import { useAuth, useOrganization, watchOnce, addRouteMiddleware, useNuxtApp, useRuntimeConfig } from '#imports';
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
 import AuthError from './auth/AuthError.vue';
@@ -10,7 +10,7 @@ import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivu
 
 const $route = useRoute();
 const { clear, error, isLoading, logout, retry } = useAuth();
-const { fromServer } = useTenant();
+const { fromServer } = useOrganization();
 const { hook } = useNuxtApp();
 const { public: { merkaly } } = useRuntimeConfig();
 

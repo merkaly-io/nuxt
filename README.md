@@ -26,14 +26,130 @@ Install the module to your Nuxt application:
 
 Every surface can sign in; `auth0.requiresAuth` only decides whether pages require a login (globally, or per page with `definePageMeta({ requiresAuth: true })`). `auth0.requiresTenant` decides whether API calls require a tenant (`global: true` adapters bypass it).
 
-On boot the module restores an existing session (user and token) and then runs the app hooks in order, `merkaly:tenant` then `merkaly:auth`, with that user (or none). `MKApp` shows its `loading` slot until both finish; if a hook throws, it shows the `error` slot instead. The auth callback page renders right away so it can complete the login.
+On boot the module restores an existing session (Auth0 claims and token) and then runs the bootstrap stages in a fixed order, each one only after the previous one finished:
+
+1. **session**: the app hooks `merkaly:tenant` then `merkaly:auth`, with those claims (or none).
+2. **organization**: the app's organization loader (see `defineBootstrap`), always, signed in or not.
+3. **user**: the app's `/auth/me` loader, only when the visitor is signed in.
+
+The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `user`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed. The auth callback page renders right away so it can complete the login, and runs the stages after it.
 
 | Surface | Login | Tenant | Boot |
 |---|---|---|---|
-| admin | required | required | `merkaly:tenant` creates the session and sets the tenant; without a session the auth middleware redirects to login. |
-| dashboard | required | not used | `merkaly:auth` loads the session; without a session it redirects to login. |
-| store | optional | required | `merkaly:tenant` resolves the store from the host (public); a signed-in buyer is restored too; protected pages (account, checkout) ask for login. |
-| www | optional | not used | No hooks; anonymous or signed-in. |
+| admin | required | required | `merkaly:tenant` creates the session and sets the tenant; then organization (`/settings/organization`) and user (`/auth/me`). Without a session the auth middleware redirects to login. |
+| dashboard | required | not used | `merkaly:auth` loads the session; then user if it declares a loader. Without a session it redirects to login. |
+| store | optional | required | `merkaly:tenant` resolves the store from the host (public); then organization (`/company`, public, also during SSR); user only for a signed-in buyer. Protected pages (account, checkout) ask for login. |
+| www | optional | not used | No hooks and no loaders; anonymous or signed-in. |
+
+### Ordered bootstrap (`defineBootstrap`, `useOrganization`, `useAuth().user`)
+
+Each app declares its loaders once, from a plugin, with its own adapters (the module has no app endpoints):
+
+```ts
+// admin: app/plugins/bootstrap.ts
+import { readAccountProfile } from '~/adapters/account/read.account.profile';
+import { readSettingsOrganization } from '~/adapters/settings/organization/read.settings.organization';
+
+export default defineNuxtPlugin(() => {
+  defineBootstrap({
+    organization: () => readSettingsOrganization(() => ({ immediate: false })),
+    user: () => readAccountProfile(() => ({ immediate: false })),
+  });
+});
+```
+
+```ts
+// store: app/plugins/bootstrap.ts (universal, not .client: SSR loads the organization too)
+import { readAppCompany } from '~/adapters/app/read.company';
+
+export default defineNuxtPlugin(() => {
+  defineBootstrap({ organization: () => readAppCompany(() => ({ immediate: false })) });
+});
+```
+
+A loader returns an adapter (`withAdapter()` result, preferably with `immediate: false`, the bootstrap runs it), a promise or a plain value. An adapter with an api error, or a rejected promise, fails the stage. Every stage is optional: an app without loaders skips it.
+
+Two composables hold the state, shared by the whole app:
+
+- `useOrganization()`: everything about the organization (tenant). It exists without a login and also loads on the server.
+- `useAuth()`: everything about the user: `user`, the loaded profile (`/auth/me`), and `claims`, the Auth0 ID token user (`sub`, `email`, `name`, `picture`, custom claims), plus `token`, `isAuthenticated` (from `claims.sub`), `fail`, `retry`, `logout`, `signup`.
+
+Use `claims` for what the token already carries (id, email, roles) and `user.data` for the profile the api stores (own avatar, locale, saved name).
+
+| `useOrganization()` | Description |
+|---|---|
+| `id` | Organization id (Auth0 org), sent as the `identity` header; `''` until set |
+| `setId(id, { server? })` | Sets the id; `server: true` when resolved during SSR |
+| `hasId` | `Boolean(id)` |
+| `fromServer` | The id was resolved during SSR: the page renders before auth |
+| `data`, `status`, `error`, `isReady`, `refresh()` | The loaded organization, see below |
+
+| `useAuth().user` and the stage keys of `useOrganization()` | Description |
+|---|---|
+| `data` | Loaded value; `undefined` until it loads (and always for `user` with visitors) |
+| `status` | `idle`, `pending`, `success` or `error` |
+| `error` | `{ message, status? }` of the last failure |
+| `isReady` | `status === 'success'` |
+| `refresh()` | Loads it again (e.g. after saving the settings); a failure here only sets `error`, it does not block the app |
+
+```ts
+const { data: organization, id } = useOrganization();
+const { claims, user } = useAuth();
+
+const name = computed(() => user.data.value?.name || claims.value?.name); // typed by MerkalyUser
+```
+
+#### Typing (`MerkalyOrganization`, `MerkalyUser`)
+
+`data` is typed with two interfaces exported by the package, empty by default. Each app extends them once with its own contracts (module augmentation, no generics at call sites), e.g. in `app/types/merkaly.d.ts`:
+
+```ts
+import type { AccountAuthProfile } from '@merkaly/api/account/auth';
+import type { SettingsOrganizationProfileResponse } from '@merkaly/api/settings/organization';
+
+declare module '@merkaly/nuxt' {
+  interface MerkalyOrganization extends SettingsOrganizationProfileResponse {}
+  interface MerkalyUser extends AccountAuthProfile {}
+}
+```
+
+The file must be a module (keep at least one `import` or an `export {}`), otherwise it replaces the package types instead of extending them. The loaders passed to `defineBootstrap` are checked against the same interfaces.
+
+In SSR apps (store) the organization stage also runs on the server, after the server plugins (`tenant.server.ts`), so it reaches the HTML; the client reuses it from the payload and does not request it again. `user` never runs on the server (there is no session there), so avoid rendering `user` data in SSR markup to keep hydration stable.
+
+#### Migration per app (breaking: `useTenant` is gone and `useAuth().user` changed)
+
+- `useTenant()` is removed; its keys live in `useOrganization()`: `tenant` → `id`, `setTenant(id, options)` → `setId(id, options)`, `fromServer` → `fromServer`, `isReady` (id set) → `hasId` (`isReady` now means the organization data loaded). The `merkaly:tenant` hook is unchanged: it still runs first and is where the id gets set.
+- `useAuth().user` (the Auth0 user) is now `useAuth().claims`, same object. `useAuth().user` is the loaded profile (`data`, `status`, `error`, `isReady`, `refresh`). Every current app read of `user` is a token field (name, email, picture, sub, roles claim), so the rename is `user` → `claims`, in templates too (`user.name` → `claims.name`, `v-if="user"` → `v-if="claims"`). `isAuthenticated` is unchanged.
+- The `merkaly:tenant` and `merkaly:auth` hooks still receive the Auth0 claims.
+
+- **admin**
+  - `app/plugins/auth.ts:4`: `const { setTenant } = useTenant()` → `const { setId } = useOrganization()`; line 25: `setTenant(data.orgId)` → `setId(data.orgId)`.
+  - `app/plugins/money.ts:8-18`: drop `useTenant()`, the `readSettingsOrganization()` call and the `watch(tenant, ...)`; use `watch(useOrganization().data, (data) => data && setMoneyDefaults({ currency: data.localization?.currency, locale: data.localization?.language }), { immediate: true })`.
+  - New `app/plugins/bootstrap.ts` and `app/types/merkaly.d.ts` (above).
+  - `app/composables/useAccountProfile.ts:5`: `const { user } = useAuth()` → `const { claims, user } = useAuth()`; line 7: `readAccountProfile()` → `const { data: profile, refresh } = user`; line 9: `user.value?.picture` → `claims.value?.picture`.
+  - `app/components/ui/select/SelectLocale.vue:9`: `{ user }` → `{ claims }`; line 32: `user.value?.name` → `claims.value?.name`.
+  - `app/components/ui/nav/NavUser.vue:2`: `{ user }` → `{ claims }`; template lines 22, 24, 25, 29, 30, 33, 50, 54, 61: `user` / `user.name` / `user.email` → `claims` / `claims.name` / `claims.email`.
+  - `app/pages/settings/(overview)/.components/SettingsMembersSection.vue:16`: `{ user }` → `{ claims }`; line 28: `user.value?.[AUTH_CLAIM]` → `claims.value?.[AUTH_CLAIM]`; line 36: `user.value?.sub` → `claims.value?.sub`.
+  - `app/pages/profile/(overview)/.components/ProfileOverviewSection.vue:7`: `{ user }` → `{ claims }`; lines 16, 22: `user.value?.name` → `claims.value?.name`; template lines 83 and 109: `user?.name`, `user?.email` → `claims?.name`, `claims?.email`.
+  - `app/pages/profile/(overview)/.components/ProfileSignInMethodSection.vue:9`: `{ user }` → `{ claims }`; template line 74: `user?.email` → `claims?.email`.
+  - `app/pages/settings/(overview)/.composables/useSettingsOrganization.ts:5` (optional): read `useOrganization()` (`data`, `status === 'pending'`, `refresh`) instead of a second `readSettingsOrganization()`.
+- **store**
+  - `app/plugins/tenant.server.ts:4`: `const { setTenant } = useTenant()` → `const { setId } = useOrganization()`; lines 7 and 15: `setTenant(..., { server: true })` → `setId(..., { server: true })`.
+  - `app/plugins/auth.ts:4`: `const { fromServer, setTenant } = useTenant()` → `const { fromServer, setId } = useOrganization()`; lines 9 and 13: `setTenant(...)` → `setId(...)`.
+  - `app/pages/checkout/.composables/usePaymentStream.ts:11`: `const { tenant } = useTenant()` → `const { id: tenant } = useOrganization()` (line 43 keeps `tenant.value`).
+  - `app/components/nav/NavUser.vue:8`: `user` → `claims` in the destructuring; template line 55: `user?.name` → `claims?.name`.
+  - `app/pages/checkout/index.vue:22`: `{ user }` → `{ claims }`; line 76: `watch(user, ...)` → `watch(claims, ...)`.
+  - `app/pages/account/.components/AccountUser.vue:2`: `{ user }` → `{ claims }`; line 4 and template lines 9, 10, 21, 23, 24: `user` → `claims`.
+  - New universal `app/plugins/bootstrap.ts` (above) and `app/types/merkaly.d.ts` with `MerkalyOrganization extends SettingsOrganizationStoreProfile`.
+  - `app/layouts/default.vue:5` and `app/pages/account/orders/[order]/index.vue:85`: `readAppCompany()` → `const { data: company } = useOrganization()`.
+  - `app/plugins/README.md:11` mentions `fromServer`: now from `useOrganization()`.
+- **dashboard**
+  - `app/components/ui/nav/NavUser.vue:2`: `{ user }` → `{ claims }`; line 7 and template lines 12, 21, 28, 33, 35: `user` → `claims`.
+  - No `useTenant` usages. Add `defineBootstrap({ user })` and `MerkalyUser` only if it needs `/auth/me` before the pages.
+- **www**
+  - `app/components/modals/ModalBookDemo.vue:11`: `{ isAuthenticated, user }` → `{ isAuthenticated, claims }`; lines 14 and 15: `user.value?.name`, `user.value?.email` → `claims.value?.name`, `claims.value?.email`.
+  - No `useTenant` usages, no loaders needed.
 
 ### Login entry points (`MKAuth`)
 
@@ -103,7 +219,7 @@ overrides it at runtime.
 **Client plugin.** Initializes `posthog-js` **only in production builds**
 (`nuxt dev` never sends events) with `api_host: '/phog'` and
 `ui_host: 'https://us.posthog.com'`. It identifies the Auth0 user from
-`useAuth()` (`identify(sub, { email, name })`) and calls `posthog.reset()` on
+`useAuth().claims` (`identify(sub, { email, name })`) and calls `posthog.reset()` on
 logout. The app can keep using `import posthog from 'posthog-js'` for
 `capture()`: the module dedupes `posthog-js` so the app and the plugin share
 the initialized instance (keep `posthog-js` as an app dependency).
