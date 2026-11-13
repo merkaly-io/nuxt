@@ -66,7 +66,7 @@ const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): P
   if (!isAdapter<T>(result)) return result;
 
   if (result.loading.value) await until(result.loading).toBe(false); // immediate adapter, already running
-  else await result.execute();
+  else await nuxtApp.runWithContext(() => result.execute()); // server: the context is lost after an await
 
   if (result.error.value) throw result.error.value; // adapters resolve on api errors
 
