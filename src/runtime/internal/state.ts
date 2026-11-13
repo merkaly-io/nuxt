@@ -35,7 +35,7 @@ interface StageData {
   user: MerkalyUser;
 }
 
-export const inApp = <T>(nuxtApp: NuxtApp, fn: () => T) => nuxtApp.runWithContext(fn) as T; // sync composables only
+export const inApp = async <T>(nuxtApp: NuxtApp, fn: () => T): Promise<T> => await nuxtApp.runWithContext(fn); // server returns a Promise (callAsync), client the value
 
 const registry = new WeakMap<NuxtApp, BootstrapLoaders>(); // per app instance, safe across SSR requests
 
@@ -75,12 +75,12 @@ const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): P
   return result.data.value;
 };
 
-export const runBootstrapStage = (nuxtApp: NuxtApp, stage: BootstrapStage, { force = false } = {}) => { // force: reload a resolved stage
+export const runBootstrapStage = async (nuxtApp: NuxtApp, stage: BootstrapStage, { force = false } = {}) => { // force: reload a resolved stage
   const loader = registry.get(nuxtApp)?.[stage] as BootstrapLoader<StageData[typeof stage]> | undefined;
-  const { data, error, status } = inApp(nuxtApp, () => useBootstrapState(stage));
+  const { data, error, status } = await inApp(nuxtApp, () => useBootstrapState(stage));
 
-  if (!loader) return Promise.resolve(true);
-  if (status.value === 'success' && !force) return Promise.resolve(true); // SSR payload or an earlier run
+  if (!loader) return true;
+  if (status.value === 'success' && !force) return true; // SSR payload or an earlier run
 
   status.value = 'pending';
   error.value = undefined;
