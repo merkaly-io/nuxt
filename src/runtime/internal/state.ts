@@ -16,11 +16,11 @@ export interface BootstrapError {
   status?: number;
 }
 
-interface AdapterLike<T> { // what withAdapter() returns
-  data: Ref<T>;
-  error: Ref<unknown>;
+interface AdapterLike<T> { // what withAdapter() returns; readonly so `Ref<T | undefined>` adapters fit
+  readonly data: { readonly value: T | null | undefined };
+  readonly error: { readonly value: unknown };
   execute: () => Promise<void>;
-  loading: Ref<boolean>;
+  readonly loading: Ref<boolean>;
 }
 
 export type BootstrapLoader<T = unknown> = () => T | Promise<T> | AdapterLike<T>;
@@ -69,6 +69,8 @@ const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): P
   else await result.execute();
 
   if (result.error.value) throw result.error.value; // adapters resolve on api errors
+
+  if (result.data.value == null) throw new Error('Empty response'); // loud: a stage never resolves to nothing
 
   return result.data.value;
 };

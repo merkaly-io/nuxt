@@ -67,7 +67,7 @@ export default defineNuxtPlugin(() => {
 });
 ```
 
-A loader returns an adapter (`withAdapter()` result, preferably with `immediate: false`, the bootstrap runs it), a promise or a plain value. An adapter with an api error, or a rejected promise, fails the stage. Every stage is optional: an app without loaders skips it.
+A loader returns an adapter (`withAdapter()` result, preferably with `immediate: false`, the bootstrap runs it), a promise or a plain value. An adapter with an api error, an empty `data`, or a rejected promise, fails the stage. The adapter `data` may be typed `T | undefined` (the usual `default: () => undefined`). Every stage is optional: an app without loaders skips it.
 
 Two composables hold the state, shared by the whole app:
 
