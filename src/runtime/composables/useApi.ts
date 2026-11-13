@@ -22,7 +22,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
 ): UseApiReturn<TData, TMeta, TParams> {
   const { $api } = useNuxtApp();
 
-  const controller = new AbortController();
+  let controller = new AbortController(); // one per execute: an aborted signal stays aborted
 
   const params = reactive({}) as TParams;
 
@@ -54,6 +54,9 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
 
     const currentOptions = getOptions(params);
 
+    controller = new AbortController();
+    loading.value = true; // from the call, not after the token await: callers can trust it right away
+
     await $api(currentOptions.uri, {
       ...currentOptions,
       controller,
@@ -63,10 +66,7 @@ function useApi<TData = unknown, TMeta = Record<string, unknown>, TParams extend
       loading,
       meta: meta as Ref<Record<string, unknown>>,
       params,
-    }).catch((reason) => {
-      loading.value = false; // failed before the request (token, tenant): never leave a spinner on
-      throw reason;
-    });
+    }).finally(() => loading.value = false); // any exit (token, tenant, abort, response): never leave a spinner on
   };
 
   if (initialOptions.immediate) {
