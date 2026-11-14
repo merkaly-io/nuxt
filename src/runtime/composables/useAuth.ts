@@ -26,6 +26,7 @@ export const useAuth = () => {
   const token = useState<string | null>('auth:token', () => null);
   const isLoading = useState('auth:loading', () => true);
   const error = useState<AuthError | undefined>('auth:error', () => undefined);
+  const isExpired = useState('auth:expired', () => false); // the session ended while the app was open, MKApp shows MKAuthExpired
 
   const isAuthenticated = computed(() => Boolean(claims.value?.sub));
 
@@ -34,6 +35,15 @@ export const useAuth = () => {
   const clear = () => (error.value = undefined);
 
   const logout = () => nuxtApp.$auth0.logout();
+
+  // Drops the dead token and asks for a new login (never a logout), one modal however many calls fail
+  const expire = () => {
+    token.value = null;
+    isExpired.value = true;
+  };
+
+  // Logs in again and comes back to the current page
+  const relogin = () => nuxtApp.$auth0.loginWithRedirect({ appState: { target: location.pathname + location.search } });
 
   // Opens the Auth0 signup screen; after the callback the app lands on `redirectTo`
   const signup = ({ redirectTo = '/' }: { redirectTo?: string } = {}) => nuxtApp.$auth0.loginWithRedirect({
@@ -68,10 +78,13 @@ export const useAuth = () => {
     claims,
     clear,
     error,
+    expire,
     fail,
     isAuthenticated,
+    isExpired,
     isLoading,
     logout,
+    relogin,
     retry,
     signup,
     token,
