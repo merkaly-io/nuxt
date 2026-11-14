@@ -10,7 +10,7 @@ type MerkalyAuth0Client = Auth0Client & {
 declare module '#app' {
   interface NuxtApp {
     $auth0: MerkalyAuth0Client;
-    $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T>;
+    $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T | undefined>; // undefined when the request fails
     $gmap: never;
   }
 
@@ -25,7 +25,7 @@ declare module '#app' {
 declare module 'vue' {
   interface ComponentCustomProperties {
     $auth0: MerkalyAuth0Client;
-    $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T>;
+    $api: <T = unknown>(url: string, options?: ApiOptions) => Promise<T | undefined>; // undefined when the request fails
     $gmap: never;
   }
 }

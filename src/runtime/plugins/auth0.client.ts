@@ -151,12 +151,19 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     }
 
     const { $api } = useNuxtApp();
+    let failure: { message?: unknown } | undefined;
 
-    return await $api('/auth/identities', { // the api verifies it and derives the identity
+    const linked = await $api('/auth/identities', { // the api verifies it and derives the identity
       body: { idToken: idClaims.__raw },
       global: true,
       method: 'POST',
+      onError: (reason: Error) => void (failure = reason ?? {}), // api error body
+      onFatal: (reason: Error) => void (failure = reason ?? {}), // network or aborted
     });
+
+    if (failure) throw new Error(String(failure.message || 'Failed to link the account')); // callers handle it in .catch
+
+    return linked;
   };
 
   // ---------- Bootstrap ----------

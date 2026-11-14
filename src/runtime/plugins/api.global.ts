@@ -83,7 +83,7 @@ export default defineNuxtPlugin(({ provide }) => {
 
   const nuxtApp = useNuxtApp();
 
-  provide('api', async (url: string, options: ApiOptions = {}) => {
+  provide('api', async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
     const { token } = useAuth();
 
     if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
@@ -101,6 +101,8 @@ export default defineNuxtPlugin(({ provide }) => {
         `  3. The adapter should use { global: true } to bypass tenant enforcement.`,
       );
     }
+
+    let result: T | undefined;
 
     await $fetch(url, {
       baseURL: import.meta.server ? serverBaseURL(merkaly.api, options.global) : '/api',
@@ -151,6 +153,7 @@ export default defineNuxtPlugin(({ provide }) => {
         // ignorar errores
         if (status >= 400) return;
 
+        result = data as T;
         await options?.onSuccess?.({ data, meta, headers, params: options.params as object });
         if (options.data) options.data.value = data;
         if (options.meta) options.meta.value = meta;
@@ -176,6 +179,8 @@ export default defineNuxtPlugin(({ provide }) => {
       retry: false,
 
       signal: options.controller?.signal,
-    }).catch(reason => reason);
+    }).catch(() => undefined); // failures already went to onError/onFatal and `error`
+
+    return result;
   });
 });
