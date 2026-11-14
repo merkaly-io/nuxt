@@ -74,7 +74,7 @@ function serverBaseURL(api: { url: string, prefix?: string }, global?: boolean) 
 }
 
 export default defineNuxtPlugin(({ provide }) => {
-  const requestHost = import.meta.server ? useRequestURL().host : undefined; // per request on the server
+  const requestHost = import.meta.server ? useRequestURL({ xForwardedHost: true }).host : undefined; // public host behind Railway/Cloudflare, per request
 
   // Same as the proxy: local mkcert certificates of *.test APIs are not trusted by Node
   if (import.meta.server && import.meta.dev && new URL(useRuntimeConfig().public.merkaly.api.url).hostname.endsWith('.test')) {
