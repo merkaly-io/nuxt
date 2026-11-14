@@ -1,4 +1,5 @@
-import { reactive } from 'vue';
+import { computed, isRef, reactive, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 
 export interface ColumnDefinition<C = unknown> {
   class?: string;
@@ -53,9 +54,13 @@ interface OptionArgs<D> {
   total?: number;
 }
 
-export function useDatagrid<D = unknown>(params: OptionArgs<D>): DataGrid<D> {
+export function useDatagrid<D = unknown>(options: MaybeRefOrGetter<OptionArgs<D>>): DataGrid<D> {
+  const params = toValue(options); // initial values for items/page/etc.
+  const isDynamic = typeof options === 'function' || isRef(options);
+  const columns = isDynamic ? computed(() => toValue(options).columns) : params.columns; // getter: columns follow i18n/refs
+
   const state = reactive({
-    columns: params.columns,
+    columns,
     error: params.error ?? null,
     fn: {
       addItem(item: D, options: DataGridAddItemOptions = {}) {
