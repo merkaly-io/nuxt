@@ -23,7 +23,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     useRefreshTokens: true,
   });
 
-  const { claims, error, isLoading, token, fail } = useAuth();
+  const { claims, error, expire, isLoading, token, fail } = useAuth();
   // Internal: true while the bootstrap session (tenant + auth hooks) is running
   const isStarting = useState('auth:starting', () => false);
 
@@ -45,6 +45,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       })
       .catch((err: GenericError) => {
         tokenError = err;
+
+        if (token.value && NO_SESSION_ERRORS.includes(err.error)) return expire(); // had a session: it was revoked or rotated
 
         console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err);
       });

@@ -82,9 +82,12 @@ export default defineNuxtPlugin(({ provide }) => {
   }
 
   const nuxtApp = useNuxtApp();
+  const renewed = new WeakSet<ApiOptions>(); // repeated calls, a second 401 is not renewed again
 
-  provide('api', async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
-    const { token } = useAuth();
+  const api = async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
+    const { claims, expire, isExpired, isLoading, token } = useAuth();
+    const canRenew = import.meta.client && Boolean(claims.value) && !isExpired.value && !renewed.has(options); // anonymous visitors never renew
+    let unauthorized = false; // 401 held back to renew the token and repeat the call
 
     if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
     const { id: tenant } = useOrganization();
@@ -148,6 +151,9 @@ export default defineNuxtPlugin(({ provide }) => {
         const { status, _data, headers } = response;
         const { data, meta } = (_data || {});
 
+        unauthorized = status === 401 && canRenew; // held back: no hooks yet, the call is repeated below
+        if (unauthorized) return;
+
         await options?.onResponse?.({ response, request });
 
         // ignorar errores
@@ -164,7 +170,11 @@ export default defineNuxtPlugin(({ provide }) => {
       },
 
       onResponseError: async ({ response, request }) => {
-        const { _data } = response;
+        const { _data, status } = response;
+
+        if (unauthorized) return;
+
+        if (status === 401 && renewed.has(options) && !isLoading.value) expire(); // still 401 with a fresh token; boot failures go to the error slot
 
         await options.onError?.(_data, { response, request });
         if (options.error) options.error.value = _data;
@@ -181,6 +191,14 @@ export default defineNuxtPlugin(({ provide }) => {
       signal: options.controller?.signal,
     }).catch(() => undefined); // failures already went to onError/onFatal and `error`
 
-    return result;
-  });
+    if (!unauthorized) return result;
+
+    const retry = { ...options };
+
+    renewed.add(retry);
+
+    return nuxtApp.$auth0.getTokenSilently({ cacheMode: 'off' }).then(() => api<T>(url, retry)); // data of the repeated call; a dead session opens MKAuthExpired
+  };
+
+  provide('api', api);
 });

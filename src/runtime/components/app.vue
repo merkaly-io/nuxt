@@ -5,6 +5,7 @@ import { useAuth, useOrganization, watchOnce, addRouteMiddleware, useNuxtApp, us
 import AuthMiddleware from '../middleware/auth';
 import { useNavigation } from '../composables/useNavigation';
 import AuthError from './auth/AuthError.vue';
+import AuthExpired from './auth/AuthExpired.vue';
 import { useColorMode } from '@vueuse/core';
 import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivue';
 
@@ -52,6 +53,8 @@ hook('page:finish', () => regenerate());
       <slot v-else>
         <NuxtPage />
       </slot>
+
+      <AuthExpired />
     </BApp>
   </main>
 </template>

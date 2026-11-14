@@ -169,6 +169,17 @@ To open the Auth0 signup screen instead of the login one, use `useAuth().signup(
 
 The SPA keeps the session with **refresh tokens**: the client uses `useRefreshTokens` with `localStorage` cache and logs in with `audience` and `scope: openid profile email offline_access`. Before each API call the module asks Auth0 for the current access token, which is cached and renewed with the refresh token once it expires (2 hours for `https://api.merkaly.io`). When the refresh token is gone or expired, protected surfaces (`requiresAuth: true`) go back to login instead of calling the API without a token. Account linking (`linkWithConnection(connection)`) uses a separate Auth0 client, the `auth.merkaly.io` SPA client in Auth0, with an in-memory cache, created only on the first call (no extra `checkSession` on page load). It opens a login popup for that connection and sends the popup's raw ID token to `POST /auth/identities` as `{ idToken }`; the api verifies the token (signature, issuer, audience = the account linking client, expiry) and links the identity from its `sub` into the logged-in user. Requires an api with that contract (older clients that sent `{ provider, userId }` get `400`).
 
+### Expired session (`MKAuthExpired`)
+
+When the session ends while the app is open (refresh token revoked, rotated or expired), the module does not log the user out and does not call the API with a dead token:
+
+- `getTokenSilently` failing with a "no session" error (`login_required`, `invalid_grant`, `missing_refresh_token`, `consent_required`, `interaction_required`) after the user had a token calls `useAuth().expire()`: it clears `token` and sets `isExpired`.
+- An API `401` for a signed-in user renews the token once (`getTokenSilently({ cacheMode: 'off' })`) and repeats the request; the hooks of the first attempt do not run. If the repeated request gets `401` again (after boot), it calls `expire()` too. Boot failures still go to the `error` slot.
+- `MKApp` mounts `MKAuthExpired` once: a modal that cannot be dismissed, with a single button that calls `useAuth().relogin()` (`loginWithRedirect` with `appState.target` = current path and query), so the user lands back on the same page. Texts in `en`, `es` and `pt` (local i18n block).
+- One state (`auth:expired`), so many failing calls show a single modal. Anonymous visitors (store, www) never had a token, so they never see it.
+
+Apps need nothing beyond rendering `MKApp`.
+
 ### Calling app header
 
 Every API request carries the app's Auth0 client id (`merkaly.auth0.client`) in the `x-merkaly-client` header: the `$api` plugin adds it to server-side calls and the `/api` proxy sets it on every forwarded request (overwriting whatever the browser sent). The api checks it against its list of Auth0 applications and, on authenticated requests, against the token `azp` (api doc: [`docs/conventions/surface-clients.md`](https://github.com/merkaly-io/api.merkaly.io/blob/master/docs/conventions/surface-clients.md)). An app without `merkaly.auth0.client` sends no header.
