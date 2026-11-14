@@ -45,7 +45,7 @@ export default defineEventHandler((event) => {
   const { public: $config } = useRuntimeConfig();
 
   const targetOrigin = new URL($config.merkaly.api.url);
-  const url = getRequestURL(event);
+  const url = getRequestURL(event, { xForwardedHost: true }); // public host behind Railway/Cloudflare, same as the SSR plugin
   const prefix = isGlobalRequest(event.node.req.headers[GLOBAL_API_HEADER])
     ? ''
     : $config.merkaly.api.prefix;
