@@ -354,3 +354,28 @@ setMoneyDefaults({
 - `MKInputMoney`: `v-model` in cents; props `currency`, `locale`. `prefix`, `decimal`,
   `thousands` and `placeholder` default to the resolved currency/locale and can still
   be passed explicitly.
+
+## Datagrid (`useDatagrid`, `MKTableDatagrid`)
+
+`useDatagrid(options)` builds the reactive state that `MKTableDatagrid` renders.
+`options` is a `MaybeRefOrGetter`: a plain object, a ref or a getter returning it.
+
+With a getter (or ref) the `columns` are recomputed reactively, so titles from i18n
+follow a locale change. The rest of the options (`items`, `limit`, `total`, `search`,
+`row`, ...) are read once as initial values; the state (`items`, `page`, `loading`,
+...) is never reset by a recompute.
+
+```ts
+const { t: $t } = useI18n();
+
+const $datagrid = useDatagrid<OrderEntity>(() => ({
+  columns: {
+    number: { title: $t('order.number') }, // follows the locale
+    total: { title: $t('order.total'), class: 'text-end' },
+  },
+  limit: 20, // initial value only
+}));
+```
+
+A plain object still works and keeps the previous behavior (static columns). Without
+`title` the header falls back to the column key in sentence case.
