@@ -1,5 +1,5 @@
 import { push } from 'notivue';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { type BvTriggerableEvent, useModal } from 'bootstrap-vue-next';
 
 export interface NotifyOptions {
@@ -55,14 +55,15 @@ export function useNotify(): NotifyApi {
   }
 
   function confirm(options: NotifyConfirmOptions): void {
-    const busy = ref(false);
+    const setBusy = (busy: boolean) => (props.value = { ...props.value, busy, noCloseOnEsc: busy }); // disables both buttons
 
-    const instance = $modal.create(computed(() => ({
+    // Writable ref, never a computed: create() keeps this same ref and show() writes modelValue into it
+    const props = ref({
       body: options.message,
-      busy: busy.value, // disables both buttons
+      busy: false,
       cancelTitle: options.cancelText || 'Cancel',
       cancelVariant: 'secondary' as const,
-      noCloseOnEsc: busy.value,
+      noCloseOnEsc: false,
       okTitle: options.confirmText || 'OK',
       okVariant: options.variant || 'primary',
       onHidden: () => void instance.destroy(), // one modal per call: never pile up hidden ones
@@ -72,14 +73,16 @@ export function useNotify(): NotifyApi {
         if (!(result instanceof Promise)) return; // sync: closes right away
 
         event.preventDefault();
-        busy.value = true;
+        setBusy(true);
 
         result
           .then(value => value !== false && instance.hide('ok'))
-          .finally(() => void (busy.value = false));
+          .finally(() => setBusy(false));
       },
       title: options.title || 'Confirm',
-    })));
+    });
+
+    const instance = $modal.create(props);
 
     instance.show();
   }
