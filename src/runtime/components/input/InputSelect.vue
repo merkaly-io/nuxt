@@ -8,8 +8,8 @@ import VSelect from 'vue-select';
 import FormatIcon from '../format/FormatIcon.vue';
 
 const emit = defineEmits({
-  'request:selected': (_v: string) => true,
-  'search': (_v: string) => true,
+  'request:selected': (value: string) => Boolean(value),
+  search: (value: string) => typeof value === 'string',
 });
 
 const props = defineProps({

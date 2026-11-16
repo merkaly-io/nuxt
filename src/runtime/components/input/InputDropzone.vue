@@ -20,8 +20,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  reject: (_rejections: InputDropzoneRejection[]) => true,
-  select: (_files: File[]) => true,
+  reject: (rejections: InputDropzoneRejection[]) => Array.isArray(rejections),
+  select: (files: File[]) => Array.isArray(files),
 });
 
 const { t } = useI18n({ useScope: 'local' });
