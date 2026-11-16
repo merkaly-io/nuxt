@@ -4,10 +4,10 @@ import { callOnce } from '#imports';
 
 const { $auth0 } = useNuxtApp();
 
-const emit = defineEmits<{
-  (e: 'success', appState?: { target?: string }): void;
-  (e: 'error', reason: string): void;
-}>();
+const emit = defineEmits({
+  success: (_appState?: { target?: string }) => true,
+  error: (_reason: string) => true,
+});
 
 // Parseamos los query params directamente desde la URL
 // (este componente asume ejecución en el cliente)

@@ -9,7 +9,7 @@ const props = defineProps({
 
 const search = defineModel({ type: String, default: () => String() });
 
-const emit = defineEmits<{ change: [] }>();
+const emit = defineEmits(['change']);
 
 // Debounce search-as-you-type so consumers fetch once the user pauses, not per keystroke.
 const emitChange = useDebounceFn(() => emit('change'), props.debounce);
