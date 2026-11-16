@@ -10,10 +10,10 @@ import type { DataGrid } from '../../composables/useDatagrid';
 
 type FetchReason = 'paginate' | 'refresh' | 'search' | 'sort' | 'filter';
 
-const emit = defineEmits<{
-  (e: 'fetch', reason: FetchReason): void
-  (e: 'toggle:item', item: G, expanded: boolean): void
-}>();
+const emit = defineEmits({
+  fetch: (reason: FetchReason) => Boolean(reason),
+  'toggle:item': (item: G, expanded: boolean) => Boolean(item) && typeof expanded === 'boolean',
+});
 
 const slots = useSlots();
 

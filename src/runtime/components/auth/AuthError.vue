@@ -7,7 +7,10 @@ const props = defineProps({
   error: { type: Object as PropType<AuthError>, required: true },
 });
 
-const emit = defineEmits<(e: 'logout' | 'retry') => void>();
+const emit = defineEmits({
+  logout: null,
+  retry: null,
+});
 
 const isDenied = computed(() => [401, 403].includes(props.error.status as number));
 

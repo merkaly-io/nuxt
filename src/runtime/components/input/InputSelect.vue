@@ -7,9 +7,10 @@ import type { OptionConsumer, VueSelectProps } from 'vue-select';
 import VSelect from 'vue-select';
 import FormatIcon from '../format/FormatIcon.vue';
 
-const emit = defineEmits<{
-  (e: 'request:selected' | 'search', v: string): unknown;
-}>();
+const emit = defineEmits({
+  'request:selected': (value: string) => Boolean(value),
+  search: (value: string) => typeof value === 'string',
+});
 
 const props = defineProps({
   debounce: { type: Number, default: () => 250 },
