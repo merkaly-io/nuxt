@@ -123,4 +123,5 @@ Custom components must **not** use `v-text` directly.
 - ✔ Use variables to avoid repetition  
 - ✔ `v-for` inside `<template>` + `:key`  
 - ✔ Use `v-text`  
-- ✔ Custom components → wrap text in `<span v-text="">`
+- ✔ Custom components → wrap text in `<span v-text="">`  
+- ✔ `defineProps`/`defineEmits` with runtime declaration (`{ type, required, default }`, `['save']` or `{ select: (_value: T) => true }`), never `defineProps<T>()`, `defineEmits<T>()` or `withDefaults`
