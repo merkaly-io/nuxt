@@ -124,4 +124,4 @@ Custom components must **not** use `v-text` directly.
 - ✔ `v-for` inside `<template>` + `:key`  
 - ✔ Use `v-text`  
 - ✔ Custom components → wrap text in `<span v-text="">`  
-- ✔ `defineProps`/`defineEmits` with runtime declaration (`{ type, required, default }`, `['save']` or `{ select: (_value: T) => true }`), never `defineProps<T>()`, `defineEmits<T>()` or `withDefaults`
+- ✔ `defineProps` with runtime declaration (`{ type, required, default }`) and `defineEmits` in object form: `close: null` without payload, a typed validator with a simple presence check with payload (`saved: (status: PaymentAccountStatus) => Boolean(status)`; `typeof`/`Array.isArray`/`!== undefined` when a falsy value is valid). Never `defineProps<T>()`, `defineEmits<T>()`, `withDefaults`, the array form `['save']` or `(_value: T) => true`
