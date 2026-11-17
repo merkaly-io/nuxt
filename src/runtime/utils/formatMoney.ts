@@ -97,8 +97,7 @@ export function formatMoneyParts(value: number, options: FormatMoneyOptions = {}
  * This helper is pure (no app defaults). Inside components prefer
  * `useMoneyFormat().format()`, which applies the app-level currency/locale.
  *
- * For non-currency numbers (counts, units, percentages) use `formatNumber` /
- * `MKFormatNumber` instead, those do NOT divide and would show the raw cents.
+ * Do not use it for non-currency numbers (counts, units, percentages): it divides by `base`.
  */
 export function formatMoney(value: number, options: FormatMoneyOptions = {}) {
   const parts = formatMoneyParts(value, options);

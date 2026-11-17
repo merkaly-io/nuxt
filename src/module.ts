@@ -222,11 +222,11 @@ function configureI18n(nuxt: Nuxt, options: MerkalyModuleOptions) {
     const template = addTemplate({
       filename,
       getContents: () => contents,
-      write: true,
+      write: true, // rewrites it after `nuxi prepare`/build clear .nuxt
     });
 
     mkdirSync(dirname(template.dst), { recursive: true });
-    writeFileSync(template.dst, contents);
+    writeFileSync(template.dst, contents); // @nuxtjs/i18n needs it on disk during setup
 
     return template.dst;
   };

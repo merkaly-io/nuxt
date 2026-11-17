@@ -102,9 +102,6 @@ importers:
       filesize:
         specifier: ^11.0.17
         version: 11.0.17
-      gsap:
-        specifier: ^3.15.0
-        version: 3.15.0
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
@@ -4652,9 +4649,6 @@ packages:
 
   graceful-fs@4.2.12:
     resolution: {integrity: sha512-iuyGF2E4oafQfPsRrG2wtY2ILupMhvtdrhzrxB+0VcjsPpSPttpfYdjnGFGsTi5MaJFjI1jOKHPQ6UTbTj9TAw==}
-
-  gsap@3.15.0:
-    resolution: {integrity: sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A==}
 
   gzip-size@7.0.0:
     resolution: {integrity: sha512-O1Ld7Dr+nqPnmGpdhzLmMTQ4vAsD+rHwMm1NLUmoUFFymBOMKxCCrtDxqdBRYXdeEPEi3SyoR4TizJLQrnKBNA==}
@@ -11872,8 +11866,6 @@ snapshots:
       unicorn-magic: 0.4.1
 
   graceful-fs@4.2.12: {}
-
-  gsap@3.15.0: {}
 
   gzip-size@7.0.0:
     dependencies:
