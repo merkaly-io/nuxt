@@ -83,6 +83,15 @@ export default defineNuxtPlugin(({ provide }) => {
 
   const nuxtApp = useNuxtApp();
   const renewed = new WeakSet<ApiOptions>(); // repeated calls, a second 401 is not renewed again
+  let renewing: Promise<unknown> | undefined; // forced refresh in flight, shared by concurrent 401s
+
+  const renewToken = () => {
+    renewing ??= nuxtApp.$auth0.getTokenSilently({ cacheMode: 'off' }).finally(() => {
+      renewing = undefined; // settled either way: the next 401 starts a new refresh
+    });
+
+    return renewing;
+  };
 
   const api = async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
     const { claims, expire, isExpired, isLoading, token } = useAuth();
@@ -197,7 +206,7 @@ export default defineNuxtPlugin(({ provide }) => {
 
     renewed.add(retry);
 
-    return nuxtApp.$auth0.getTokenSilently({ cacheMode: 'off' }).then(() => api<T>(url, retry)); // data of the repeated call; a dead session opens MKAuthExpired
+    return renewToken().then(() => api<T>(url, retry)); // data of the repeated call; a dead session opens MKAuthExpired
   };
 
   provide('api', api);
