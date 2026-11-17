@@ -179,19 +179,6 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 
             <BDropdownForm>
               <slot name="filters" />
-
-
-              <BDropdownDivider />
-
-              <div class="d-flex justify-content-between align-items-center">
-                <BButton size="sm">
-                  <FormatIcon name="ban" text="Cancel" />
-                </BButton>
-
-                <BButton size="sm" variant="light-success">
-                  <FormatIcon name="thumbs-up" text="Apply" />
-                </BButton>
-              </div>
             </BDropdownForm>
           </BDropdown>
         </template>
