@@ -9,6 +9,7 @@ import InputSearch from '../input/InputSearch.vue';
 import type { DataGrid } from '../../composables/useDatagrid';
 
 type FetchReason = 'paginate' | 'refresh' | 'search' | 'sort' | 'filter';
+type DatagridRow = G & { _checked?: boolean; _showDetails?: boolean }; // row ui state lives on the item
 
 const emit = defineEmits({
   fetch: (reason: FetchReason) => Boolean(reason),
@@ -26,6 +27,7 @@ const props = defineProps({
 });
 
 const $datagrid = defineModel<DataGrid<G>>({ type: Object, required: true });
+const rows = computed(() => $datagrid.value.items as DatagridRow[]);
 
 const { t } = useI18n({ useScope: 'local' });
 
@@ -73,18 +75,18 @@ const paginationText = computed(() => {
 
 const visibleItems = computed(() => {
   if (canFetch) {
-    return $datagrid.value.items;
+    return rows.value;
   }
 
   const start = Math.max(0, paginationText.value.values.current - 1);
 
-  return $datagrid.value.items.slice(start, paginationText.value.values.final);
+  return rows.value.slice(start, paginationText.value.values.final);
 });
 
 const selectionState = computed(() => {
   const selectedItems: G[] = [];
 
-  for (const item of $datagrid.value.items) {
+  for (const item of rows.value) {
     if (item._checked) {
       selectedItems.push(item);
     }
@@ -107,8 +109,8 @@ const selectionState = computed(() => {
 });
 
 function toggleCheckAll() {
-  const allChecked = $datagrid.value.items.every((it) => it._checked);
-  $datagrid.value.items.forEach(it => it._checked = !allChecked);
+  const allChecked = rows.value.every((it) => it._checked);
+  rows.value.forEach(it => it._checked = !allChecked);
 }
 
 function getItemValue(item: G, key: string): unknown {
