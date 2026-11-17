@@ -16,7 +16,7 @@ const props = defineProps({
   debounce: { type: Number, default: () => 250 },
   disabled: { type: Boolean, default: () => false },
   fieldDisabled: { type: Function as PropType<(item: T) => boolean>, default: undefined },
-  fieldSort: { type: Function as PropType<(item: T) => string>, default: (it: Record<string, unknown>) => it.fieldText },
+  fieldSort: { type: Function as PropType<(item: T) => string>, default: undefined }, // falls back to fieldText
   fieldText: { type: Function as PropType<(item: T) => string>, default: ((it: Record<string, unknown>) => it.name) },
   fieldValue: { type: Function as PropType<(item: T) => unknown>, default: ((it: Record<string, unknown>) => it._id) },
   filterable: { type: Boolean, default: () => true },
@@ -53,11 +53,11 @@ function filterItems(options: T[], search: string) {
 }
 
 const sortedOptions = computed<T[]>(() => {
-  const options = props.options;
+  const sortKey = props.fieldSort ?? props.fieldText;
 
-  return options.sort((prev, next) => {
-    const textPrev = props.fieldSort(prev)?.toLowerCase?.();
-    const textNext = props.fieldSort(next)?.toLowerCase?.();
+  return [...props.options].sort((prev, next) => { // a copy: never reorder the parent's array
+    const textPrev = sortKey(prev)?.toLowerCase?.();
+    const textNext = sortKey(next)?.toLowerCase?.();
 
     if (textPrev > textNext) {
       return 1;
