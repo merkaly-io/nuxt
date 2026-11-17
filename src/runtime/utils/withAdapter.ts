@@ -26,8 +26,7 @@ export const withAdapter = <T extends AdapterOptions>(
     const config = args?.(executionParams) || {};
     const { params: initialParams = {}, ...hooks } = config;
 
-    // Merge initial params with execution params (execution params take priority)
-    const mergedParams = defu(executionParams, { ...initialParams }) as T['params'];
+    const mergedParams = { ...initialParams, ...executionParams } as T['params']; // shallow: an execute key replaces the initial one whole (arrays and objects too), an explicit undefined clears it
 
     // Call adapter callback with merged params
     const adapterResult = callback(mergedParams);
