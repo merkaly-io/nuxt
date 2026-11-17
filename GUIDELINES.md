@@ -137,7 +137,7 @@ Rules:
 
 Applies to admin, store, dashboard and www. `@merkaly/nuxt` keeps its public names (`MK` + `<type>/<Type><Thing>`).
 
-- **Folders in singular:** `components/ui/<type>/` (generic primitives), `components/<domain>/` (business pieces, same namespace as `@merkaly/api`: `order/sale/`, `finance/payment/`), `components/layout/` (the app shell; private parts in `layout/.components/`), `pages/<route>/.components/` (private to one page).
+- **Folders in singular:** `components/ui/<type>/` (generic primitives), `components/<domain>/` (business pieces, same namespace as `@merkaly/api`: `order/sale/`, `finance/payment/`), `components/base/` (the app shell, prefix `Base`; no `.components/` anywhere inside `components/**`, that folder is only for pages: shell pieces go to their type folder, e.g. `ui/dropdown/DropdownTheme.vue`), `pages/<route>/.components/` (private to one page).
 - **A file starts with its folder's last segment**, so Nuxt doesn't repeat it and the template name equals the file: `order/sale/SaleStatusBadge.vue` → `<OrderSaleStatusBadge>`, `ui/button/ButtonSubmit.vue` → `<UiButtonSubmit>`.
 - **Thing + type suffix** from a closed list: `Card`, `Item` (row in a list), `List`/`Grid`, `Modal`, `Form`, `Fields`, `Section`, `Badge`, `Button`, `Select`, `Dropdown`, `Step`. No `Box`/`Line` synonyms.
 - **Singular for one entity, plural only for collections** (`MemberRoleModal`, `MembersCard`); no verbs as suffix (`WithdrawalModal`).
@@ -164,4 +164,4 @@ Applies to admin, store, dashboard and www. `@merkaly/nuxt` keeps its public nam
 - ✔ Custom components → wrap text in `<span v-text="">`  
 - ✔ `defineProps` with runtime declaration (`{ type, required, default }`) and `defineEmits` in object form: `close: null` without payload, a typed validator with a simple presence check with payload (`saved: (status: PaymentAccountStatus) => Boolean(status)`; `typeof`/`Array.isArray`/`!== undefined` when a falsy value is valid). Never `defineProps<T>()`, `defineEmits<T>()`, `withDefaults`, the array form `['save']` or `(_value: T) => true`
 - ✔ State: composable → shared composable/`useState` → `provide`/`inject` for a page flow → Pinia only for complex multi-route domains (justified); api data through adapters; no module-level state in SSR apps
-- ✔ Naming: singular folders (`ui/<type>`, `<domain>`, `layout`), file starts with its folder segment, thing + closed type suffix, shared pieces in `components/`, acronyms in PascalCase
+- ✔ Naming: singular folders (`ui/<type>`, `<domain>`, `base`), no `.components` inside `components/`, file starts with its folder segment, thing + closed type suffix, shared pieces in `components/`, acronyms in PascalCase
