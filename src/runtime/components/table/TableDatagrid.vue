@@ -174,7 +174,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
               <FormatIcon name="bars-filter" />
             </template>
 
-            <BDropdownHeader text="Filters:" />
+            <BDropdownHeader :text="t('filters')" />
             <BDropdownDivider />
 
             <BDropdownForm>
@@ -322,7 +322,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
           </BCol>
 
           <BCol class="text-muted" cols="auto">
-            <span v-if="$datagrid.loading">Loading...</span>
+            <span v-if="$datagrid.loading" v-text="t('loading')" />
             <FormatText v-else :template="paginationText.template" :values="paginationText.values" />
           </BCol>
         </BRow>
@@ -350,11 +350,15 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
   "en": {
     "empty": "No items found",
     "actions": "Actions",
+    "filters": "Filters:",
+    "loading": "Loading...",
     "pagination": "Showing :current: to :final: of :total: items"
   },
   "pt": {
     "empty": "Nenhum item encontrado",
     "actions": "Ações",
+    "filters": "Filtros:",
+    "loading": "Carregando...",
     "pagination": "Mostrando :current: a :final: de :total: itens"
   }
 }

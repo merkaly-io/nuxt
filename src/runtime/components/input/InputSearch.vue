@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 import FormatIcon from '../format/FormatIcon.vue';
 
 const props = defineProps({
   debounce: { type: Number, default: () => 300 },
 });
+
+const { t } = useI18n({ useScope: 'local' });
 
 const search = defineModel({ type: String, default: () => String() });
 
@@ -21,8 +24,22 @@ watch(search, () => emitChange());
 
 <template>
   <div class="d-flex align-items-center position-relative">
-    <BFormInput v-model="search" class="form-control-solid border" placeholder="Search..." />
+    <BFormInput v-model="search" class="form-control-solid border" :placeholder="t('placeholder')" />
 
     <FormatIcon class="position-absolute me-3 end-0" mode="regular" name="search" size="4" variant="primary" />
   </div>
 </template>
+
+<i18n lang="json">
+{
+  "en": {
+    "placeholder": "Search..."
+  },
+  "es": {
+    "placeholder": "Buscar..."
+  },
+  "pt": {
+    "placeholder": "Buscar..."
+  }
+}
+</i18n>

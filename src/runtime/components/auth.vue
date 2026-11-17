@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { useNuxtApp, showError } from '#app';
 import { callOnce } from '#imports';
+import { useI18n } from 'vue-i18n';
 
 const { $auth0 } = useNuxtApp();
+const { t } = useI18n({ useScope: 'local' });
 
 const emit = defineEmits({
   success: (appState?: { target?: string }) => appState === undefined || typeof appState === 'object',
@@ -69,6 +71,20 @@ callOnce(async () => {
 <template>
   <div class="d-flex gap-3 justify-content-center align-items-center h-100">
     <BSpinner variant="primary" />
-    <span v-text="'Loading...'" />
+    <span v-text="t('loading')" />
   </div>
 </template>
+
+<i18n lang="json">
+{
+  "en": {
+    "loading": "Loading..."
+  },
+  "es": {
+    "loading": "Cargando..."
+  },
+  "pt": {
+    "loading": "Carregando..."
+  }
+}
+</i18n>
