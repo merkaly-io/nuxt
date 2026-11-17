@@ -20,7 +20,8 @@ const contentParts = computed(() => {
   let match: RegExpExecArray | null;
 
   while((match = regex.exec(props.template)) !== null) {
-    const [fullMatch, key] = match;
+    const [fullMatch] = match;
+    const key = match[1] as string; // the regex always captures group 1
     const index = match.index;
 
     // Agrega texto antes del token
@@ -32,7 +33,7 @@ const contentParts = computed(() => {
     if (slots[key]) {
       parts.push({ slotName: key });
     } else {
-      const value = props.values?.[key];
+      const value = (props.values as Record<string, unknown>)?.[key];
       parts.push(value != null ? String(value) : props.fallback ?? fullMatch);
     }
 
