@@ -133,7 +133,22 @@ Rules:
 
 ---
 
-## 7. **Quick Summary**
+## 7. **Naming (apps)**
+
+Applies to admin, store, dashboard and www. `@merkaly/nuxt` keeps its public names (`MK` + `<type>/<Type><Thing>`).
+
+- **Folders in singular:** `components/ui/<type>/` (generic primitives), `components/<domain>/` (business pieces, same namespace as `@merkaly/api`: `order/sale/`, `finance/payment/`), `components/layout/` (the app shell; private parts in `layout/.components/`), `pages/<route>/.components/` (private to one page).
+- **A file starts with its folder's last segment**, so Nuxt doesn't repeat it and the template name equals the file: `order/sale/SaleStatusBadge.vue` → `<OrderSaleStatusBadge>`, `ui/button/ButtonSubmit.vue` → `<UiButtonSubmit>`.
+- **Thing + type suffix** from a closed list: `Card`, `Item` (row in a list), `List`/`Grid`, `Modal`, `Form`, `Fields`, `Section`, `Badge`, `Button`, `Select`, `Dropdown`, `Step`. No `Box`/`Line` synonyms.
+- **Singular for one entity, plural only for collections** (`MemberRoleModal`, `MembersCard`); no verbs as suffix (`WithdrawalModal`).
+- **Used by more than one page → `components/<domain>/`**; never import from another page's `.components`.
+- **Acronyms in PascalCase** (`SectionFaq`).
+- **Composables** `use<Domain><Thing>`; **utils** `<domain>.<thing>.ts` lowercase with dots, exporting only what is used outside; non-component files never in `.components`.
+- `components/` by auto-import; page `.components`/`.composables` with explicit imports.
+
+---
+
+## 8. **Quick Summary**
 
 - ❌ No `data-*`, `aria-*`, `name`, `id`  
 - ✔ Inline tags if <120 chars  
@@ -149,3 +164,4 @@ Rules:
 - ✔ Custom components → wrap text in `<span v-text="">`  
 - ✔ `defineProps` with runtime declaration (`{ type, required, default }`) and `defineEmits` in object form: `close: null` without payload, a typed validator with a simple presence check with payload (`saved: (status: PaymentAccountStatus) => Boolean(status)`; `typeof`/`Array.isArray`/`!== undefined` when a falsy value is valid). Never `defineProps<T>()`, `defineEmits<T>()`, `withDefaults`, the array form `['save']` or `(_value: T) => true`
 - ✔ State: composable → shared composable/`useState` → `provide`/`inject` for a page flow → Pinia only for complex multi-route domains (justified); api data through adapters; no module-level state in SSR apps
+- ✔ Naming: singular folders (`ui/<type>`, `<domain>`, `layout`), file starts with its folder segment, thing + closed type suffix, shared pieces in `components/`, acronyms in PascalCase
