@@ -30,4 +30,12 @@ declare module 'vue' {
   }
 }
 
+declare module 'bootstrap-vue-next' {
+  interface BaseButtonVariant { // Metronic button variants
+    'active-light-primary': unknown;
+    'light-dark': unknown;
+    'none': unknown;
+  }
+}
+
 export {};
