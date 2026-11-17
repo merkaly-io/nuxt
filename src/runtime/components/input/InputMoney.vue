@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import type { Numberish } from 'bootstrap-vue-next/dist/src/types/CommonTypes';
 import { computed, useAttrs, useId } from '#imports';
 import { Money3Component } from 'v-money3';
 import { useMoneyFormat } from '../../composables/useMoneyFormat';
 import { isCurrencyCode } from '../../utils/formatMoney';
 
+type Numberish = string | number; // bootstrap-vue-next no longer exports it
+
 const money = defineModel<Numberish>({
   default: () => 0,
-  get: v => v / 100,
-  set: v => Math.trunc(v * 100),
+  get: v => Number(v) / 100, // same coercion as the bare operator
+  set: v => Math.trunc(Number(v) * 100),
   type: [String, Number],
 });
 
