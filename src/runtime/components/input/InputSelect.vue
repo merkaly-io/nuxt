@@ -92,7 +92,7 @@ const bindAttrs = computed<Partial<VueSelectProps>>(() => ({
   disabled: props.disabled,
   filter: filterItems as OptionConsumer<never>,
   filterable: props.filterable,
-  getOptionLabel: props.fieldText,
+  getOptionLabel: props.fieldText as OptionConsumer<string>,
   loading: props.loading,
   multiple: props.multiple,
   options: mergedOptions.value as VueSelectProps['options'],
