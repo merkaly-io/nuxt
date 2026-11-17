@@ -110,7 +110,30 @@ Custom components must **not** use `v-text` directly.
 
 ---
 
-## 6. **Quick Summary**
+## 6. **State: composables first, Pinia only when it pays off**
+
+Pick the simplest option that covers the need. No app uses Pinia today (admin dropped it); none needs it yet.
+
+| Need | Use |
+|---|---|
+| Reusable reactive logic: forms, modals, filters, pagination, SDK wrappers, transformations | **Composable** (`useX()`), a new instance per call |
+| One instance shared by many components on the client (e.g. the store cart, search state) | **Shared composable**: `createSharedComposable` (VueUse). On the server it is not shared, which is what we want |
+| Simple shared state that must survive SSR → client | **`useState`** |
+| A single-page flow split into components (e.g. checkout steps) | A composable created in the page and passed with **`provide`/`inject`** |
+| A complex domain shared across several routes, with coordinated actions and invariants | **Pinia**, justified in the PR |
+| Data that lives in the api (products, orders, payments, settings) | **Adapters** (`withAdapter` from `@merkaly/nuxt`): not `useFetch`/`useAsyncData` directly, and never copied into a store |
+
+Rules:
+- **Never module-level `ref`/`reactive` in SSR apps** (store, www): on the server it is shared across requests and tenants. Use `useState`, a shared composable (client) or keep it inside the composable.
+- **The backend is the source of truth**: the frontend keeps only client state (cart in `localStorage`, a checkout in progress, temporary selections, local preferences).
+- **Auth and the organization come from Auth0** (`useAuth`, `useOrganization`): no store copies them. Changing organization is a new login with a full reload; the store tenant comes from the host.
+- **No tokens or private data persisted** in `localStorage`/cookies by our code (the Auth0 SDK handles its own).
+- **No Pinia "for the future"**: introduce it only when composables became hard to keep consistent (e.g. a backend-synced cart with coupons, a checkout across several routes), and say why in the PR. A store is one coherent domain, never a bag of variables; no circular stores.
+- Do not migrate existing code just to follow this.
+
+---
+
+## 7. **Quick Summary**
 
 - ❌ No `data-*`, `aria-*`, `name`, `id`  
 - ✔ Inline tags if <120 chars  
@@ -125,3 +148,4 @@ Custom components must **not** use `v-text` directly.
 - ✔ Use `v-text`  
 - ✔ Custom components → wrap text in `<span v-text="">`  
 - ✔ `defineProps` with runtime declaration (`{ type, required, default }`) and `defineEmits` in object form: `close: null` without payload, a typed validator with a simple presence check with payload (`saved: (status: PaymentAccountStatus) => Boolean(status)`; `typeof`/`Array.isArray`/`!== undefined` when a falsy value is valid). Never `defineProps<T>()`, `defineEmits<T>()`, `withDefaults`, the array form `['save']` or `(_value: T) => true`
+- ✔ State: composable → shared composable/`useState` → `provide`/`inject` for a page flow → Pinia only for complex multi-route domains (justified); api data through adapters; no module-level state in SSR apps
