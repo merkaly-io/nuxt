@@ -355,6 +355,17 @@ setMoneyDefaults({
   `thousands` and `placeholder` default to the resolved currency/locale and can still
   be passed explicitly.
 
+## Time left (`useTimeLeft`, `formatTimeLeft`)
+
+Countdowns to a date (for example the payment window of a supplier order) use the two largest units,
+leaving out a zero second one: `5d 23h`, `4h 2min`, `1d`, `2min 10s`, `45s`; `0s` once passed. Units are
+the same in every locale, so the app only translates the sentence around them.
+
+```ts
+const { seconds, text } = useTimeLeft(() => order.payExpiryDate); // ticks every second; undefined without a date
+const label = formatTimeLeft(3 * 3600); // "3h", pure
+```
+
 ## Datagrid (`useDatagrid`, `MKTableDatagrid`)
 
 `useDatagrid(options)` builds the reactive state that `MKTableDatagrid` renders.
