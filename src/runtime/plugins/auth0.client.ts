@@ -3,8 +3,11 @@ import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js';
 import { defineNuxtPlugin, useRuntimeConfig, useNuxtApp, useState } from '#imports';
 import { navigateTo } from '#app';
 import { defu } from 'defu';
+import type { Ref } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { runBootstrap } from '../internal/bootstrap';
+
+type AppI18n = { localeProperties: Ref<{ code?: string; language?: string }> }; // @nuxtjs/i18n, optional per app
 
 // Auth0 errors meaning "there is no session", not "something broke"
 const NO_SESSION_ERRORS = ['consent_required', 'interaction_required', 'invalid_grant', 'login_required', 'missing_refresh_token'];
@@ -108,10 +111,17 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       return result; // MKAuth emits its appState on success
     }, (reason: GenericError) => fail({ message: reason.error_description || reason.message, stage: 'callback' }));
 
+  const resolveUiLocales = () => { // Universal Login in the app language ('pt-BR pt'), first one enabled in the tenant
+    const { code, language } = (nuxtApp.$i18n as AppI18n | undefined)?.localeProperties.value ?? {};
+
+    return [...new Set([language, code].filter(Boolean))].join(' ') || undefined; // no i18n: tenant default
+  };
+
   // ---------- Login ----------
   auth0.loginWithRedirect = (options = {}) => self0.loginWithRedirect(defu(options, {
     authorizationParams: {
       audience: $config.merkaly.auth0.audience,
+      ui_locales: resolveUiLocales(),
       redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
         ? $config.merkaly.auth0.callbackUrl
         : location.origin.concat($config.merkaly.auth0.callbackUrl),
