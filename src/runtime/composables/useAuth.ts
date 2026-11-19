@@ -1,6 +1,7 @@
 import type { User } from '@auth0/auth0-spa-js';
 import { computed } from 'vue';
 import { useNuxtApp, useState } from '#imports';
+import { useLoginTarget } from '../internal/loginTarget';
 import { useBootstrapStage } from '../internal/state';
 
 export type AuthErrorStage = 'callback' | 'token' | 'session' | 'tenant' | 'organization' | 'user';
@@ -54,7 +55,9 @@ export const useAuth = () => {
   // Re-runs the auth bootstrap (token, tenant/auth hooks, then the stages still pending) registered by the auth0 plugin
   // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
-    if (error.value?.stage === 'callback') return nuxtApp.$auth0.loginWithRedirect({ appState: { target: '/' } }); // the login state is gone: start a new one
+    if (error.value?.stage === 'callback') { // the login state is gone: start a new one, to where the failed one was going
+      return nuxtApp.$auth0.loginWithRedirect({ appState: { target: useLoginTarget().value || '/' } });
+    }
 
     isLoading.value = true;
     clear();
