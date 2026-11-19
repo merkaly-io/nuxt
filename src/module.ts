@@ -348,8 +348,10 @@ function configureSentry(nuxt: Nuxt, options: MerkalyModuleOptions) {
 }
 
 function configureBootstrapVueNext(nuxt: Nuxt, components: BvnComponentProps) {
+  const linkDefaults = { BLink: { routerComponentName: 'MKNuxtLink' } }; // NuxtLink without href, see plugins/link.global
+
   nuxt.options.bootstrapVueNext = defu(nuxt.options.bootstrapVueNext || {},
-    { plugin: { components } },
+    { plugin: { components: defu(components, linkDefaults) } }, // the app bootstrap.config wins
   );
 }
 
@@ -409,6 +411,7 @@ function registerRuntimeFeatures(options: MerkalyModuleOptions, resolver: Resolv
   // Register Plugins
   addPlugin({ src: resolver.resolve('./runtime/plugins/api.global') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/auth0.client') });
+  addPlugin({ src: resolver.resolve('./runtime/plugins/link.global') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/bootstrap.server') });
   addPlugin({ src: resolver.resolve('./runtime/plugins/sentry.global') });
 
