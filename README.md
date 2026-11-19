@@ -291,6 +291,12 @@ $notify.confirm({
   (use a named model such as `v-model:page`). Destroy it on `onHidden` when created from a click.
 - Props already set in the app `bootstrap.config.ts` are defaults: do not repeat them.
 
+## BootstrapVueNext defaults
+
+The app `bootstrap.config.ts` holds the component defaults; the module adds its own only where the app sets nothing:
+
+- `BLink.routerComponentName: 'MKNuxtLink'`: BLink (and `BButton`, `BNavItem`, `BDropdownItem` with `to`) passes both `to` and `href` to `NuxtLink`, which warns `[NUXT_E4010] to and href cannot be used together` on every render ([bootstrap-vue-next#3316](https://github.com/bootstrap-vue-next/bootstrap-vue-next/issues/3316)); in dev SSR each warning also logs `[nostics]: import.meta.hot.send() is not available`. `MKNuxtLink` (plugin `link.global`) renders `NuxtLink` without `href` when `to` is set, the same `href` NuxtLink already ignored. Drop it once bootstrap-vue-next fixes the issue.
+
 ## Money formatting
 
 Money in Merkaly is stored as **integer cents**. `MKFormatMoney`, `MKInputMoney`,
