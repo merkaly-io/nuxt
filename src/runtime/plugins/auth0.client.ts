@@ -49,7 +49,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       .catch((err: GenericError) => {
         tokenError = err;
 
-        if (token.value && NO_SESSION_ERRORS.includes(err.error)) return expire(); // had a session: it was revoked or rotated
+        if (NO_SESSION_ERRORS.includes(err.error)) return token.value ? expire() : undefined; // had a session: revoked or rotated; none: signed out, quietly
 
         console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err);
       });
