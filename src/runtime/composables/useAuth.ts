@@ -17,6 +17,7 @@ export interface AuthErrorContext {
   error: AuthError;
   logout: () => Promise<void>;
   retry: () => Promise<void>;
+  switchOrganization: () => Promise<void>;
 }
 
 export const useAuth = () => {
@@ -44,6 +45,9 @@ export const useAuth = () => {
 
   // Logs in again and comes back to the current page
   const relogin = () => nuxtApp.$auth0.loginWithRedirect({ appState: { target: location.pathname + location.search } });
+
+  // New login without an organization: Auth0 asks which one (post-login prompt), e.g. the current one no longer exists
+  const switchOrganization = () => nuxtApp.$auth0.loginWithRedirect({ appState: { target: '/' } });
 
   // Opens the Auth0 signup screen; after the callback the app lands on `redirectTo`
   const signup = ({ redirectTo = '/' }: { redirectTo?: string } = {}) => nuxtApp.$auth0.loginWithRedirect({
@@ -73,7 +77,7 @@ export const useAuth = () => {
 
     console.error(`[Auth] ${reason.stage} failed`, reason);
 
-    await nuxtApp.callHook('merkaly:auth:error', { clear, error: reason, logout, retry });
+    await nuxtApp.callHook('merkaly:auth:error', { clear, error: reason, logout, retry, switchOrganization });
   };
 
   return {
@@ -89,6 +93,7 @@ export const useAuth = () => {
     relogin,
     retry,
     signup,
+    switchOrganization,
     token,
     user,
   };
