@@ -3,6 +3,7 @@ name: PullRequest & Push master
 on:
   pull_request:
     branches: [ master ]
+    types: [ opened, synchronize, reopened, closed ] # closed only runs the cache cleanup
 
 permissions:
   contents: write
@@ -10,6 +11,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
 
     steps:
@@ -23,3 +25,11 @@ jobs:
       - uses: merkaly-io/actions/dependabot@master
         with:
           private-key: ${{ secrets.MERKALY_BOT_PRIVATE_KEY }}
+
+  cache:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: merkaly-io/actions/cache-cleanup@master # the PR merge ref caches are useless once closed
