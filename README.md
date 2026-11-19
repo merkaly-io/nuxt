@@ -290,6 +290,8 @@ $notify.confirm({
   through emits (`onSaved`), never `inject`. Do not use `modelValue` for data: the orchestrator shows the modal through it
   (use a named model such as `v-model:page`). Destroy it on `onHidden` when created from a click.
 - Props already set in the app `bootstrap.config.ts` are defaults: do not repeat them.
+- `MKApp` translates the BootstrapVueNext texts it knows to the app language (local i18n block in `en`, `es`, `pt`):
+  today `BButton.loadingText` ("Carregando..." instead of "Loading..."). A value in the app `bootstrap.config.ts` wins.
 
 ## Money formatting
 
