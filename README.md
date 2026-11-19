@@ -163,6 +163,8 @@ The callback page renders `MKAuth`, which reads its query string:
 | `?organization=<org_id>[&redirect=/path]` | Logs in straight into that organization (a silent login when the Auth0 session exists) and lands on `redirect`, e.g. `https://admin.merkaly.io/auth?organization=org_123&redirect=/onboarding` right after creating a store in www. |
 | `?redirect=/path` | Plain login, lands on `redirect` (the auth middleware sends protected pages here). |
 
+Every login (`loginWithRedirect`) sends `ui_locales` with the active i18n locale of the app, its `language` then its `code` (e.g. `pt-BR pt`), so Universal Login matches the app language. Auth0 uses the first one enabled in the tenant languages; apps without i18n send nothing and get the tenant default. A caller can still pass its own `authorizationParams.ui_locales`.
+
 To open the Auth0 signup screen instead of the login one, use `useAuth().signup({ redirectTo })`: it calls `loginWithRedirect` with `screen_hint: 'signup'` and `appState: { target: redirectTo }`, so after the callback the app lands on `redirectTo` (default `/`).
 
 ### Session lifetime
