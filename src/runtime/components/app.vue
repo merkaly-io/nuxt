@@ -7,7 +7,9 @@ import { useNavigation } from '../composables/useNavigation';
 import AuthError from './auth/AuthError.vue';
 import AuthExpired from './auth/AuthExpired.vue';
 import { useColorMode } from '@vueuse/core';
+import { defu } from 'defu';
 import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivue';
+import { useI18n } from 'vue-i18n';
 
 const $route = useRoute();
 const { clear, error, isLoading, logout, retry } = useAuth();
@@ -16,6 +18,12 @@ const { hook } = useNuxtApp();
 const { public: { merkaly } } = useRuntimeConfig();
 
 useColorMode({ attribute: 'data-bs-theme' });
+
+const { t } = useI18n({ useScope: 'local' });
+
+const defaults = computed(() => ({ BButton: { loadingText: t('loading') } })); // BootstrapVueNext texts in the app language
+
+const keepAppDefaults = (app: object, module: object) => defu(app, module); // the app bootstrap.config wins
 
 // Apps that need a login or a tenant wait for auth + tenant; public apps (www) and pages already
 // resolved on the server (store) render right away, so their content and SEO reach the HTML
@@ -43,7 +51,7 @@ hook('page:finish', () => regenerate());
       </Notification>
     </Notivue>
 
-    <BApp>
+    <BApp :defaults="defaults" :merge-defaults="keepAppDefaults">
       <slot v-if="blocking" name="loading" />
 
       <slot v-else-if="error" :clear="clear" :error="error" :logout="logout" :retry="retry" name="error">
@@ -58,6 +66,20 @@ hook('page:finish', () => regenerate());
     </BApp>
   </main>
 </template>
+
+<i18n lang="json">
+{
+  "en": {
+    "loading": "Loading..."
+  },
+  "es": {
+    "loading": "Cargando..."
+  },
+  "pt": {
+    "loading": "Carregando..."
+  }
+}
+</i18n>
 
 <style>
 :root {
