@@ -389,6 +389,17 @@ function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
     resolve: {
       dedupe: ['notivue', ...(hasPosthogConfig(options) ? ['posthog-js'] : [])], // app imports share the initialized posthog
     },
+    optimizeDeps: {
+      include: [ // deps found at runtime reload Vite and break lazy routes; globs expand against the package exports
+        '@merkaly/api/**',
+        '@vueuse/integrations/useChangeCase', // shipped with change-case, used by the apps
+        'bootstrap-vue-next/components/**',
+        'bootstrap-vue-next/composables/**',
+        'class-transformer',
+        'class-validator',
+        'reflect-metadata',
+      ],
+    },
   });
 }
 

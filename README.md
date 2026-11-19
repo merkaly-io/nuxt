@@ -188,6 +188,16 @@ Every API request carries the app's Auth0 client id (`merkaly.auth0.client`) in 
 
 The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes, organizations, and the checklist for a new app) is documented in the auth.merkaly.io repo: [`docs/tenant-setup.md`](https://github.com/merkaly-io/auth.merkaly.io/blob/master/docs/tenant-setup.md).
 
+## Dev pre-bundling (`vite.optimizeDeps.include`)
+
+The module pre-bundles the shared deps up front: every `@merkaly/api` entry,
+every `bootstrap-vue-next` component and composable (trailing globs expand
+against the package `exports`), `@vueuse/integrations/useChangeCase`,
+`class-transformer`, `class-validator` and `reflect-metadata`. A dep found at
+runtime makes Vite re-optimize and reload, which breaks the dynamic import of
+lazy routes (e.g. the first login). Apps don't list these; app includes are
+merged with the module's.
+
 ## SEO: robots and sitemap
 
 Every app gets `@nuxtjs/robots`. Apps are **private by default**: in production
