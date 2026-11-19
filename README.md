@@ -193,7 +193,8 @@ The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes,
 The module pre-bundles the shared deps up front: every `@merkaly/api` entry,
 every `bootstrap-vue-next` component and composable (trailing globs expand
 against the package `exports`), `@vueuse/integrations/useChangeCase`,
-`class-transformer`, `class-validator` and `reflect-metadata`. A dep found at
+`class-transformer`, `class-validator`, `posthog-js` (with or without a PostHog
+key, apps import it) and `reflect-metadata`. A dep found at
 runtime makes Vite re-optimize and reload, which breaks the dynamic import of
 lazy routes (e.g. the first login). Apps don't list these; app includes are
 merged with the module's.

@@ -397,6 +397,7 @@ function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
         'bootstrap-vue-next/composables/**',
         'class-transformer',
         'class-validator',
+        'posthog-js', // module dep; apps import it even without a key in dev (www)
         'reflect-metadata',
       ],
     },
