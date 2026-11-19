@@ -32,7 +32,7 @@ On boot the module restores an existing session (Auth0 claims and token) and the
 2. **organization**: the app's organization loader (see `defineBootstrap`), always, signed in or not.
 3. **user**: the app's `/auth/me` loader, only when the visitor is signed in.
 
-The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `user`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed. The auth callback page renders right away so it can complete the login, and runs the stages after it.
+The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `user`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed; when the callback itself failed (stage `callback`, e.g. `invalid state`) there is nothing to re-run, so it starts a new login that lands on `/`. The default error screen (`MKAuthError`) shows "Try again" (`retry`) and "Sign in with another account" (`logout`) in every stage, with texts in `en`, `es` and `pt` (local i18n block). The auth callback page renders right away so it can complete the login, and runs the stages after it.
 
 | Surface | Login | Tenant | Boot |
 |---|---|---|---|
@@ -162,6 +162,8 @@ The callback page renders `MKAuth`, which reads its query string:
 | `?invitation=<ticket>&organization=<org_id>` | Accepts an organization invitation (Auth0 Organizations). |
 | `?organization=<org_id>[&redirect=/path]` | Logs in straight into that organization (a silent login when the Auth0 session exists) and lands on `redirect`, e.g. `https://admin.merkaly.io/auth?organization=org_123&redirect=/onboarding` right after creating a store in www. |
 | `?redirect=/path` | Plain login, lands on `redirect` (the auth middleware sends protected pages here). |
+
+Every login (`loginWithRedirect`) sends `ui_locales` with the active i18n locale of the app, its `language` then its `code` (e.g. `pt-BR pt`), so Universal Login matches the app language. Auth0 uses the first one enabled in the tenant languages; apps without i18n send nothing and get the tenant default. A caller can still pass its own `authorizationParams.ui_locales`.
 
 To open the Auth0 signup screen instead of the login one, use `useAuth().signup({ redirectTo })`: it calls `loginWithRedirect` with `screen_hint: 'signup'` and `appState: { target: redirectTo }`, so after the callback the app lands on `redirectTo` (default `/`).
 

@@ -54,6 +54,8 @@ export const useAuth = () => {
   // Re-runs the auth bootstrap (token, tenant/auth hooks, then the stages still pending) registered by the auth0 plugin
   // Back to the loading state while it runs, so the app never renders without a tenant
   const retry = async () => {
+    if (error.value?.stage === 'callback') return nuxtApp.$auth0.loginWithRedirect({ appState: { target: '/' } }); // the login state is gone: start a new one
+
     isLoading.value = true;
     clear();
 
