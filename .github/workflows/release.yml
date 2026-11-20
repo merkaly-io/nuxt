@@ -28,6 +28,7 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     permissions:
+      actions: write # release deletes the tag ref caches
       contents: write
     steps:
       - uses: merkaly-io/actions/release@master
