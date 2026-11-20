@@ -12,7 +12,7 @@ import { Notivue, NotificationProgress, Notification, pastelTheme } from 'notivu
 import { useI18n } from 'vue-i18n';
 
 const $route = useRoute();
-const { clear, error, isLoading, logout, retry } = useAuth();
+const { clear, error, isLoading, logout, retry, switchOrganization } = useAuth();
 const { fromServer } = useOrganization();
 const { hook } = useNuxtApp();
 const { public: { merkaly } } = useRuntimeConfig();
@@ -54,8 +54,16 @@ hook('page:finish', () => regenerate());
     <BApp :defaults="defaults" :merge-defaults="keepAppDefaults">
       <slot v-if="blocking" name="loading" />
 
-      <slot v-else-if="error" :clear="clear" :error="error" :logout="logout" :retry="retry" name="error">
-        <AuthError :error="error" @logout="logout" @retry="retry" />
+      <slot
+          v-else-if="error"
+          :clear="clear"
+          :error="error"
+          :logout="logout"
+          :retry="retry"
+          :switch-organization="switchOrganization"
+          name="error"
+      >
+        <AuthError :error="error" @logout="logout" @retry="retry" @switch-organization="switchOrganization" />
       </slot>
 
       <slot v-else>
