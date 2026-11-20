@@ -32,7 +32,7 @@ On boot the module restores an existing session (Auth0 claims and token) and the
 2. **organization**: the app's organization loader (see `defineBootstrap`), always, signed in or not.
 3. **user**: the app's `/auth/me` loader, only when the visitor is signed in.
 
-The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `user`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed; when the callback itself failed (stage `callback`, e.g. `invalid state`) there is nothing to re-run, so it starts a new login that lands on `/`. The default error screen (`MKAuthError`) shows "Try again" (`retry`) and "Sign in with another account" (`logout`) in every stage, with texts in `en`, `es` and `pt` (local i18n block). When the organization stage answers 404 (e.g. a saved session of a deleted store) it shows its own text instead of the api message and, for a signed-in user, "Choose another organization" (`switchOrganization`: a new login without an organization, Auth0 asks which one) instead of "Try again". The `error` slot and the `merkaly:auth:error` hook also receive `switchOrganization`. The auth callback page renders right away so it can complete the login, and runs the stages after it.
+The app mounts (and `MKApp` renders its default slot) only after the last stage, so pages, layouts and their requests start with the session, the organization and the user already loaded. A failing stage records the failure with `useAuth().fail()` (stage `tenant`, `organization` or `user`; never a logout) and `MKApp` renders the `error` slot; `retry()` runs again only the stages that did not succeed; when the callback itself failed (stage `callback`, e.g. `invalid state`) there is nothing to re-run, so it starts a new login that lands where the failed one was going (the `appState.target` of the last login, kept in `sessionStorage`; `/` without one). The default error screen (`MKAuthError`) shows "Try again" (`retry`) and "Sign in with another account" (`logout`) in every stage, with texts in `en`, `es` and `pt` (local i18n block). When the organization stage answers 404 (e.g. a saved session of a deleted store) it shows its own text instead of the api message and, for a signed-in user, "Choose another organization" (`switchOrganization`: a new login without an organization, Auth0 asks which one) instead of "Try again". The `error` slot and the `merkaly:auth:error` hook also receive `switchOrganization`. The auth callback page renders right away so it can complete the login, and runs the stages after it.
 
 | Surface | Login | Tenant | Boot |
 |---|---|---|---|
@@ -190,10 +190,11 @@ The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes,
 
 ## Dev pre-bundling (`vite.optimizeDeps.include`)
 
-The module pre-bundles the shared deps up front: every `@merkaly/api` entry,
+The module pre-bundles the shared deps up front: `@brazilian-utils/brazilian-utils`, every `@merkaly/api` entry,
 every `bootstrap-vue-next` component and composable (trailing globs expand
 against the package `exports`), `@vueuse/integrations/useChangeCase`,
-`class-transformer`, `class-validator` and `reflect-metadata`. A dep found at
+`class-transformer`, `class-validator`, `posthog-js` (with or without a PostHog
+key, apps import it) and `reflect-metadata`. A dep found at
 runtime makes Vite re-optimize and reload, which breaks the dynamic import of
 lazy routes (e.g. the first login). Apps don't list these; app includes are
 merged with the module's.
@@ -365,9 +366,32 @@ setMoneyDefaults({
   `mode`, `hideDecimal`, `tag`. `currency` also accepts a plain symbol (`$`) for
   backward compatibility: the number keeps the resolved currency layout and the
   symbol replaces the currency sign.
-- `MKInputMoney`: `v-model` in cents; props `currency`, `locale`. `prefix`, `decimal`,
+- `MKInputMoney`: `v-model` in cents; props `currency`, `locale`, `size` (`sm`, `md`, `lg`, as `BFormInput`). `prefix`, `decimal`,
   `thousands` and `placeholder` default to the resolved currency/locale and can still
   be passed explicitly.
+
+## Brazilian document and contact inputs
+
+`MKInputCpf`, `MKInputPhone` and `MKInputCep` wrap `BFormInput` (its attrs, such as `size`,
+`disabled` or `placeholder`, pass through) and mask while typing with
+[`@brazilian-utils/brazilian-utils`](https://github.com/brazilian-utils/javascript). The
+`v-model` is always the **raw digits**; a formatted value given to it is read as digits too.
+
+| Component | Mask | Model | Valid when |
+| --- | --- | --- | --- |
+| `MKInputCpf` | `000.000.000-00` | 11 digits | `isValidCpf` (check digits) |
+| `MKInputPhone` | `(00) 00000-0000` or `(00) 0000-0000` | 10 or 11 digits, DDD included | `isValidMobilePhone` or `isValidLandlinePhone` |
+| `MKInputCep` | `00000-000` | 8 digits | `isValidCep` |
+
+Once the value is complete and invalid the input shows the invalid state; pass `state` to
+take over (e.g. from a form validator). Each one exposes `isValid` (template ref), and the
+apps can call the same `@brazilian-utils/brazilian-utils` functions to validate the payload.
+
+```vue
+<MKInputCpf v-model="form.cpf" />
+<MKInputPhone v-model="form.phone" size="sm" />
+<MKInputCep v-model="form.cep" :state="errors.cep ? false : null" />
+```
 
 ## Time left (`useTimeLeft`, `formatTimeLeft`)
 

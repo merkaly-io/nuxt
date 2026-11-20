@@ -391,12 +391,14 @@ function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
     },
     optimizeDeps: {
       include: [ // deps found at runtime reload Vite and break lazy routes; globs expand against the package exports
+        '@brazilian-utils/brazilian-utils', // MKInputCpf, MKInputPhone, MKInputCep; also imported by the apps
         '@merkaly/api/**',
         '@vueuse/integrations/useChangeCase', // shipped with change-case, used by the apps
         'bootstrap-vue-next/components/**',
         'bootstrap-vue-next/composables/**',
         'class-transformer',
         'class-validator',
+        'posthog-js', // module dep; apps import it even without a key in dev (www)
         'reflect-metadata',
       ],
     },

@@ -6,6 +6,7 @@ import { defu } from 'defu';
 import type { Ref } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { runBootstrap } from '../internal/bootstrap';
+import { useLoginTarget } from '../internal/loginTarget';
 
 type AppI18n = { localeProperties: Ref<{ code?: string; language?: string }> }; // @nuxtjs/i18n, optional per app
 
@@ -27,6 +28,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   });
 
   const { claims, error, expire, isLoading, token, fail } = useAuth();
+  const loginTarget = useLoginTarget();
   // Internal: true while the bootstrap session (tenant + auth hooks) is running
   const isStarting = useState('auth:starting', () => false);
 
@@ -49,7 +51,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       .catch((err: GenericError) => {
         tokenError = err;
 
-        if (token.value && NO_SESSION_ERRORS.includes(err.error)) return expire(); // had a session: it was revoked or rotated
+        if (NO_SESSION_ERRORS.includes(err.error)) return token.value ? expire() : undefined; // had a session: revoked or rotated; none: signed out, quietly
 
         console.warn('[Auth0] getTokenSilently failed – fallback, user logged in?', err);
       });
@@ -103,6 +105,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     .then(async (result: RedirectConnectAccountOptions) => {
       const { appState } = result;
 
+      loginTarget.value = null; // landed: a later retry starts from scratch
       await resolveIdentity();
       await startSession();
 
@@ -118,16 +121,20 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   };
 
   // ---------- Login ----------
-  auth0.loginWithRedirect = (options = {}) => self0.loginWithRedirect(defu(options, {
-    authorizationParams: {
-      audience: $config.merkaly.auth0.audience,
-      ui_locales: resolveUiLocales(),
-      redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
-        ? $config.merkaly.auth0.callbackUrl
-        : location.origin.concat($config.merkaly.auth0.callbackUrl),
-      scope: 'openid profile email offline_access', // necesario aquí para API
-    },
-  }));
+  auth0.loginWithRedirect = (options = {}) => {
+    loginTarget.value = (options.appState as { target?: string } | undefined)?.target ?? null; // kept for retrying a failed callback (e.g. invalid state)
+
+    return self0.loginWithRedirect(defu(options, {
+      authorizationParams: {
+        audience: $config.merkaly.auth0.audience,
+        ui_locales: resolveUiLocales(),
+        redirect_uri: URL.canParse($config.merkaly.auth0.callbackUrl)
+          ? $config.merkaly.auth0.callbackUrl
+          : location.origin.concat($config.merkaly.auth0.callbackUrl),
+        scope: 'openid profile email offline_access', // necesario aquí para API
+      },
+    }));
+  };
 
   auth0.logout = () => self0.logout({
     logoutParams: {
