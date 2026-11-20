@@ -190,7 +190,7 @@ The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes,
 
 ## Dev pre-bundling (`vite.optimizeDeps.include`)
 
-The module pre-bundles the shared deps up front: every `@merkaly/api` entry,
+The module pre-bundles the shared deps up front: `@brazilian-utils/brazilian-utils`, every `@merkaly/api` entry,
 every `bootstrap-vue-next` component and composable (trailing globs expand
 against the package `exports`), `@vueuse/integrations/useChangeCase`,
 `class-transformer`, `class-validator` and `reflect-metadata`. A dep found at
@@ -368,6 +368,29 @@ setMoneyDefaults({
 - `MKInputMoney`: `v-model` in cents; props `currency`, `locale`. `prefix`, `decimal`,
   `thousands` and `placeholder` default to the resolved currency/locale and can still
   be passed explicitly.
+
+## Brazilian document and contact inputs
+
+`MKInputCpf`, `MKInputPhone` and `MKInputCep` wrap `BFormInput` (its attrs, such as `size`,
+`disabled` or `placeholder`, pass through) and mask while typing with
+[`@brazilian-utils/brazilian-utils`](https://github.com/brazilian-utils/javascript). The
+`v-model` is always the **raw digits**; a formatted value given to it is read as digits too.
+
+| Component | Mask | Model | Valid when |
+| --- | --- | --- | --- |
+| `MKInputCpf` | `000.000.000-00` | 11 digits | `isValidCpf` (check digits) |
+| `MKInputPhone` | `(00) 00000-0000` or `(00) 0000-0000` | 10 or 11 digits, DDD included | `isValidMobilePhone` or `isValidLandlinePhone` |
+| `MKInputCep` | `00000-000` | 8 digits | `isValidCep` |
+
+Once the value is complete and invalid the input shows the invalid state; pass `state` to
+take over (e.g. from a form validator). Each one exposes `isValid` (template ref), and the
+apps can call the same `@brazilian-utils/brazilian-utils` functions to validate the payload.
+
+```vue
+<MKInputCpf v-model="form.cpf" />
+<MKInputPhone v-model="form.phone" size="sm" />
+<MKInputCep v-model="form.cep" :state="errors.cep ? false : null" />
+```
 
 ## Time left (`useTimeLeft`, `formatTimeLeft`)
 
