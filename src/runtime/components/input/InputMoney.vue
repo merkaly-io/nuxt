@@ -10,7 +10,7 @@ type Numberish = string | number; // bootstrap-vue-next no longer exports it
 const money = defineModel<Numberish>({
   default: () => 0,
   get: v => Number(v) / 100, // same coercion as the bare operator
-  set: v => Math.trunc(Number(v) * 100),
+  set: v => Math.round(Number(v) * 100), // 0.29 * 100 = 28.999…: trunc gave 28
   type: [String, Number],
 });
 
