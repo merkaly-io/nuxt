@@ -68,7 +68,7 @@
     "jiti": "^2.7.0",
     "notivue": "^2.4.5",
     "nuxt": "^4.6.4",
-    "posthog-js": "^1.447.1",
+    "posthog-js": "^1.450.0",
     "reflect-metadata": "^0.2.2",
     "sass": "^1.108.0",
     "typescript": "~5.9.3",
