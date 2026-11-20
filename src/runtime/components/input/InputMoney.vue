@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, useAttrs, useId } from '#imports';
+import type { PropType } from 'vue';
 import { Money3Component } from 'v-money3';
 import { useMoneyFormat } from '../../composables/useMoneyFormat';
 import { isCurrencyCode } from '../../utils/formatMoney';
@@ -31,6 +32,7 @@ const props = defineProps({
   placeholder: { type: String, default: undefined },
   precision: { type: Number, default: () => 2 },
   prefix: { type: String, default: undefined },
+  size: { type: String as PropType<'sm' | 'md' | 'lg'>, default: undefined }, // like BFormInput: form-control-sm/lg, never the native <input size>
   suffix: { type: String, default: () => ' ' },
   thousands: { type: String, default: undefined },
 });
@@ -61,6 +63,8 @@ const placeholder = computed(() => {
   return parts.prefix + parts.amount + parts.digits + parts.suffix;
 });
 
+const sizeClass = computed(() => (props.size && props.size !== 'md' ? `form-control-${props.size}` : undefined));
+
 const config = computed(() => ({
   decimal: props.decimal ?? separators.value.decimal,
   precision: props.precision,
@@ -77,6 +81,7 @@ const config = computed(() => ({
       :max="props.max"
       :min="props.min"
       :placeholder="placeholder"
+      :class="sizeClass"
       class="form-control"
       v-bind="config"
   />

@@ -365,7 +365,7 @@ setMoneyDefaults({
   `mode`, `hideDecimal`, `tag`. `currency` also accepts a plain symbol (`$`) for
   backward compatibility: the number keeps the resolved currency layout and the
   symbol replaces the currency sign.
-- `MKInputMoney`: `v-model` in cents; props `currency`, `locale`. `prefix`, `decimal`,
+- `MKInputMoney`: `v-model` in cents; props `currency`, `locale`, `size` (`sm`, `md`, `lg`, as `BFormInput`). `prefix`, `decimal`,
   `thousands` and `placeholder` default to the resolved currency/locale and can still
   be passed explicitly.
 
