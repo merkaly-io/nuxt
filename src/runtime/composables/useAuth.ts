@@ -66,11 +66,9 @@ export const useAuth = () => {
     isLoading.value = true;
     clear();
 
-    try {
-      await nuxtApp.callHook('merkaly:auth:retry');
-    } finally {
+    return Promise.resolve(nuxtApp.callHook('merkaly:auth:retry')).finally(() => { // callHook may return void
       isLoading.value = false;
-    }
+    });
   };
 
   // Records an auth bootstrap failure instead of logging the user out: MKApp renders
