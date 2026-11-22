@@ -7,6 +7,10 @@ export interface MerkalyOrganization {} // eslint-disable-line @typescript-eslin
 
 export interface MerkalyUser {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
 
+export interface MerkalyOrganizationMeta {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
+
+export interface MerkalyUserMeta {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- apps augment it
+
 export type BootstrapStage = 'organization' | 'user';
 
 export type BootstrapStatus = 'idle' | 'pending' | 'success' | 'error';
@@ -19,6 +23,7 @@ export interface BootstrapError {
 interface AdapterLike<T> { // what withAdapter() returns; readonly so `Ref<T | undefined>` adapters fit
   readonly data: { readonly value: T | null | undefined };
   readonly error: { readonly value: unknown };
+  readonly meta?: { readonly value: unknown }; // response meta, kept beside the data
   execute: () => Promise<void>;
   readonly loading: Ref<boolean>;
 }
@@ -35,6 +40,11 @@ interface StageData {
   user: MerkalyUser;
 }
 
+interface StageMeta {
+  organization: Partial<MerkalyOrganizationMeta>;
+  user: Partial<MerkalyUserMeta>;
+}
+
 export const inApp = async <T>(nuxtApp: NuxtApp, fn: () => T): Promise<T> => await nuxtApp.runWithContext(fn); // server returns a Promise (callAsync), client the value
 
 const registry = new WeakMap<NuxtApp, BootstrapLoaders>(); // per app instance, safe across SSR requests
@@ -46,6 +56,7 @@ export const registerBootstrapLoaders = (nuxtApp: NuxtApp, loaders: BootstrapLoa
 export const useBootstrapState = <S extends BootstrapStage>(stage: S) => ({
   data: useState<StageData[S] | undefined>(`merkaly:${stage}:data`, () => undefined),
   error: useState<BootstrapError | undefined>(`merkaly:${stage}:error`, () => undefined),
+  meta: useState<StageMeta[S]>(`merkaly:${stage}:meta`, () => ({})), // empty until loaded and for plain loaders
   status: useState<BootstrapStatus>(`merkaly:${stage}:status`, () => 'idle'),
 });
 
@@ -60,10 +71,10 @@ const toError = (reason: unknown): BootstrapError => {
   };
 };
 
-const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): Promise<T> => {
+const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): Promise<{ data: T, meta: object }> => {
   const result = await nuxtApp.runWithContext(loader);
 
-  if (!isAdapter<T>(result)) return result;
+  if (!isAdapter<T>(result)) return { data: result, meta: {} };
 
   if (result.loading.value) await until(result.loading).toBe(false); // immediate adapter, already running
   else await nuxtApp.runWithContext(() => result.execute()); // server: the context is lost after an await
@@ -72,12 +83,12 @@ const resolveLoader = async <T>(nuxtApp: NuxtApp, loader: BootstrapLoader<T>): P
 
   if (result.data.value == null) throw new Error('Empty response'); // loud: a stage never resolves to nothing
 
-  return result.data.value;
+  return { data: result.data.value, meta: (result.meta?.value as object | undefined) ?? {} };
 };
 
 export const runBootstrapStage = async (nuxtApp: NuxtApp, stage: BootstrapStage, { force = false } = {}) => { // force: reload a resolved stage
   const loader = registry.get(nuxtApp)?.[stage] as BootstrapLoader<StageData[typeof stage]> | undefined;
-  const { data, error, status } = await inApp(nuxtApp, () => useBootstrapState(stage));
+  const { data, error, meta, status } = await inApp(nuxtApp, () => useBootstrapState(stage));
 
   if (!loader) return true;
   if (status.value === 'success' && !force) return true; // SSR payload or an earlier run
@@ -87,7 +98,8 @@ export const runBootstrapStage = async (nuxtApp: NuxtApp, stage: BootstrapStage,
 
   return resolveLoader(nuxtApp, loader)
     .then((value) => {
-      data.value = value;
+      data.value = value.data;
+      meta.value = value.meta;
       status.value = 'success';
 
       return true;
@@ -101,11 +113,11 @@ export const runBootstrapStage = async (nuxtApp: NuxtApp, stage: BootstrapStage,
 };
 
 export const useBootstrapStage = <S extends BootstrapStage>(nuxtApp: NuxtApp, stage: S) => { // public shape of a stage
-  const { data, error, status } = useBootstrapState(stage);
+  const { data, error, meta, status } = useBootstrapState(stage);
 
   const isReady = computed(() => status.value === 'success');
 
   const refresh = () => runBootstrapStage(nuxtApp, stage, { force: true }); // a failure only sets error
 
-  return { data, error, isReady, refresh, status };
+  return { data, error, isReady, meta, refresh, status };
 };

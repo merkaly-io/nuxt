@@ -93,6 +93,7 @@ export const useAuth = () => {
     isExpired,
     isLoading,
     logout,
+    meta: user.meta, // the /me response meta, e.g. meta.value.memberships
     relogin,
     retry,
     signup,
