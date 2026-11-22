@@ -87,6 +87,7 @@ Use `claims` for what the token already carries (id, email, roles) and `user.dat
 | `useAuth().user` and the stage keys of `useOrganization()` | Description |
 |---|---|
 | `data` | Loaded value; `undefined` until it loads (and always for `user` with visitors) |
+| `meta` | The response `meta` of the stage adapter (`{}` until it loads, and for loaders that are not adapters); also `useAuth().meta` for the user |
 | `status` | `idle`, `pending`, `success` or `error` |
 | `error` | `{ message, status? }` of the last failure |
 | `isReady` | `status === 'success'` |
@@ -97,11 +98,12 @@ const { data: organization, id } = useOrganization();
 const { claims, user } = useAuth();
 
 const name = computed(() => user.data.value?.name || claims.value?.name); // typed by MerkalyUser
+const { meta } = useAuth(); // /me meta, typed by MerkalyUserMeta (e.g. meta.value.memberships)
 ```
 
-#### Typing (`MerkalyOrganization`, `MerkalyUser`)
+#### Typing (`MerkalyOrganization`, `MerkalyUser`, `MerkalyOrganizationMeta`, `MerkalyUserMeta`)
 
-`data` is typed with two interfaces exported by the package, empty by default. Each app extends them once with its own contracts (module augmentation, no generics at call sites), e.g. in `app/types/merkaly.d.ts`:
+`data` and `meta` are typed with interfaces exported by the package, empty by default. Each app extends them once with its own contracts (module augmentation, no generics at call sites), e.g. in `app/types/merkaly.d.ts`:
 
 ```ts
 import type { AccountAuthProfile } from '@merkaly/api/account/auth';
@@ -110,6 +112,7 @@ import type { SettingsOrganizationProfileResponse } from '@merkaly/api/settings/
 declare module '@merkaly/nuxt' {
   interface MerkalyOrganization extends SettingsOrganizationProfileResponse {}
   interface MerkalyUser extends AccountAuthProfile {}
+  interface MerkalyUserMeta extends AccountAuthProfileMeta {} // useAuth().meta
 }
 ```
 
