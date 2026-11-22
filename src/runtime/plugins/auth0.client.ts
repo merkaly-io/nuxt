@@ -58,20 +58,13 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
   const resolveIdentity = () => Promise.allSettled([auth0.getUser(), auth0.getTokenSilently()]);
 
-  const initTenantContext = async () => { // session (tenant + auth hooks), then organization and user
-    try {
-      await callHook('merkaly:tenant', claims.value);
-      await callHook('merkaly:auth', claims.value);
-    } catch (reason) {
-      // A throwing handler must not leave the app stuck: surface it through the error slot,
-      // unless the app already reported its own failure via `fail(...)`
-      if (!error.value) {
-        await fail({ message: (reason as Error)?.message || String(reason), stage: 'tenant' });
-      }
-    }
-
-    await runBootstrap(nuxtApp); // stops on an earlier failure
-  };
+  const initTenantContext = () => Promise.resolve() // session (tenant + auth hooks), then organization and user
+    .then(() => callHook('merkaly:tenant', claims.value))
+    .then(() => callHook('merkaly:auth', claims.value))
+    .catch((reason) => { // a throwing handler must not leave the app stuck: the error slot, unless the app already called fail(...)
+      if (!error.value) return fail({ message: (reason as Error)?.message || String(reason), stage: 'tenant' });
+    })
+    .then(() => runBootstrap(nuxtApp)); // stops on an earlier failure
 
   // A known user without a token is a real failure; a missing Auth0 session is not
   // (anonymous visitors and the auth middleware already handle that case)
@@ -201,15 +194,10 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   // but the app stays in the loading state until the tenant context exists
   isStarting.value = true;
 
-  hook('app:created', async () => {
-    try {
-      await startSession();
-    } finally {
-      // Always leave the loading state: failures are rendered by the error slot
-      isStarting.value = false;
-      isLoading.value = false;
-    }
-  });
+  hook('app:created', () => Promise.resolve().then(startSession).finally(() => { // always leave the loading state: failures are rendered by the error slot
+    isStarting.value = false;
+    isLoading.value = false;
+  }));
 
   return { provide: { auth0 } };
 });
