@@ -1,4 +1,5 @@
-import { computed, isRef, reactive, toValue } from 'vue';
+import { computed, isRef, reactive, toRef, toValue } from 'vue';
+import { type Pagination, usePagination } from './usePagination';
 import type { MaybeRefOrGetter } from 'vue';
 
 export interface ColumnDefinition<C = unknown> {
@@ -38,6 +39,7 @@ export interface DataGrid<C = unknown> {
   limit: number;
   loading: boolean;
   page: number;
+  pagination: Pagination; // page, limit and total live here; the fields above are aliases
   row?: (item: C, index: number) => DataGridRowDefinition;
   search: string;
   total: number;
@@ -58,6 +60,10 @@ export function useDatagrid<D = unknown>(options: MaybeRefOrGetter<OptionArgs<D>
   const params = toValue(options); // initial values for items/page/etc.
   const isDynamic = typeof options === 'function' || isRef(options);
   const columns = isDynamic ? computed(() => toValue(options).columns) : params.columns; // getter: columns follow i18n/refs
+
+  const pagination = usePagination({ limit: params.limit ?? 10 });
+
+  if (params.total !== undefined) pagination.total = params.total;
 
   const state = reactive({
     columns,
@@ -89,12 +95,13 @@ export function useDatagrid<D = unknown>(options: MaybeRefOrGetter<OptionArgs<D>
       },
     },
     items: params.items ?? [],
-    limit: params.limit ?? 10,
+    limit: toRef(pagination, 'limit'),
     loading: params.loading ?? false,
-    page: 1,
+    page: toRef(pagination, 'page'),
+    pagination,
     row: params.row,
     search: params.search ?? '',
-    total: params.total ?? 0,
+    total: toRef(pagination, 'total'),
   });
 
   return state as DataGrid<D>;

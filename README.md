@@ -413,6 +413,36 @@ const { seconds, text } = useTimeLeft(() => order.payExpiryDate); // ticks every
 const label = formatTimeLeft(3 * 3600); // "3h", pure
 ```
 
+## Pagination (`usePagination`)
+
+`usePagination({ limit, page })` wraps VueUse `useOffsetPagination` (page, page size, clamping, `prev`/`next`,
+`isFirstPage`/`isLastPage`) and adds what the api lists need:
+
+- `setTotal(meta)`: reads `meta.pagination.totalItems`. Until the first total arrives the page is not clamped, so a
+  `?page=3` from the url survives the first request.
+- `query`: the `{ limit, page }` object for the `pagination` param.
+- `onChange(callback)`: one call per change of page and/or limit (a limit change that clamps the page is still one call).
+- `resetPage()`: for filter changes. Goes back to page 1, or, when already there, runs the `onChange` callbacks:
+  always exactly one fetch.
+
+```ts
+const $pagination = usePagination({ limit: 10 });
+
+const { execute } = searchFinanceMovements(() => ({
+  onSuccess: ({ meta }) => $pagination.setTotal(meta),
+  params: { filters: { bucket: bucket.value }, pagination: $pagination.query },
+}));
+
+$pagination.onChange(execute);
+watch(bucket, () => $pagination.resetPage()); // one request, on page 1
+```
+
+```vue
+<BPagination v-model="$pagination.page" :per-page="$pagination.limit" :total-rows="$pagination.total" />
+```
+
+`useDatagrid` uses it internally: `$datagrid.page`, `limit` and `total` are aliases of `$datagrid.pagination`.
+
 ## Datagrid (`useDatagrid`, `MKTableDatagrid`)
 
 `useDatagrid(options)` builds the reactive state that `MKTableDatagrid` renders.
