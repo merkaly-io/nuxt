@@ -37,23 +37,23 @@ export function usePagination(options: PaginationOptions = {}): Pagination { // 
   const offset = useOffsetPagination({ page: options.page ?? 1, pageSize: options.limit ?? 10, total: () => known.value ?? Number.POSITIVE_INFINITY }); // clamps the page once the total is known
 
   const callbacks: Array<() => unknown> = []; // registered with onChange
+  const runCallbacks = () => callbacks.forEach(callback => callback());
 
   const query = computed<PaginationQuery>(() => ({ limit: offset.currentPageSize.value, page: offset.currentPage.value })); // the `pagination` param of the api
+
+  watch(query, runCallbacks); // one watcher, created with the component: one call per change, page and limit together
 
   return reactive({
     isFirstPage: offset.isFirstPage,
     isLastPage: offset.isLastPage,
     limit: offset.currentPageSize,
     next: offset.next,
-    onChange: (callback: () => unknown) => {
-      callbacks.push(callback);
-      watch(query, () => callback()); // one call per change, page and limit together
-    },
+    onChange: (callback: () => unknown) => void callbacks.push(callback),
     page: offset.currentPage,
     pages: computed(() => known.value === null ? 1 : offset.pageCount.value), // 1 until the total is known
     prev: offset.prev,
     query,
-    resetPage: () => offset.currentPage.value === 1 ? callbacks.forEach(callback => callback()) : void (offset.currentPage.value = 1), // filter changes: one fetch, on page 1
+    resetPage: () => offset.currentPage.value === 1 ? runCallbacks() : void (offset.currentPage.value = 1), // filter changes: one fetch, on page 1
     setTotal: (meta?: PaginationMeta) => void (total.value = meta?.pagination?.totalItems ?? 0),
     total,
   }) as Pagination;
