@@ -148,7 +148,12 @@ export default defineNuxtPlugin(({ provide }) => {
       },
 
       onRequestError: async ({ error, response, request }) => {
-        await options.onFatal?.(error);
+        if (options.onFatal) await options.onFatal(error);
+        else if (options.onError && error?.name !== 'AbortError') { // no onFatal: the caller still learns about the failure (aborts are intended)
+          console.warn(`[merkaly:api] ${url} failed without a response (network or api down) and has no onFatal: handled by onError, critical errors should be handled with onFatal`, error);
+          await options.onError(error, { request, response: response ?? (Response.error() as FetchResponse<unknown>) }); // status 0: no response
+        }
+
         if (options.error) options.error.value = error;
 
         await options?.onComplete?.({ response, request });
