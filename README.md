@@ -413,7 +413,7 @@ const { seconds, text } = useTimeLeft(() => order.payExpiryDate); // ticks every
 const label = formatTimeLeft(3 * 3600); // "3h", pure
 ```
 
-## Pagination (`usePagination`, `fetchAllPages`)
+## Pagination (`usePagination`)
 
 `usePagination({ limit, page })` wraps VueUse `useOffsetPagination` (page, page size, clamping, `prev`/`next`,
 `isFirstPage`/`isLastPage`) and adds what the api lists need:
@@ -442,9 +442,6 @@ watch(bucket, () => $pagination.resetPage()); // one request, on page 1
 ```
 
 `useDatagrid` uses it internally: `$datagrid.page`, `limit` and `total` are aliases of `$datagrid.pagination`.
-
-`fetchAllPages(fetchPage, { limit })` walks every page (100 per request by default) until `nextPage` is null, for
-exports: `fetchPage` receives `{ limit, page }` and returns `{ items, nextPage }`.
 
 ## Datagrid (`useDatagrid`, `MKTableDatagrid`)
 
