@@ -25,10 +25,11 @@ const STATE_KEY = 'merkaly:money';
  */
 export const useMoneyFormat = () => {
   const state = useState<MoneyDefaults>(STATE_KEY, () => ({}));
-  const config = useRuntimeConfig().public.merkaly as { money?: MoneyDefaults } | undefined;
+  const { public: $config } = useRuntimeConfig();
+  const options = $config.merkaly as { money?: MoneyDefaults } | undefined;
 
-  const currency = computed(() => state.value.currency || config?.money?.currency || DEFAULT_MONEY_CURRENCY);
-  const locale = computed(() => state.value.locale || config?.money?.locale || DEFAULT_MONEY_LOCALE);
+  const currency = computed(() => state.value.currency || options?.money?.currency || DEFAULT_MONEY_CURRENCY);
+  const locale = computed(() => state.value.locale || options?.money?.locale || DEFAULT_MONEY_LOCALE);
 
   const setMoneyDefaults = (defaults: MoneyDefaults) => {
     state.value = { ...state.value, ...defaults };
