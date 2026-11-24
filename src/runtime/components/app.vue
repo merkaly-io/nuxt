@@ -15,7 +15,7 @@ const $route = useRoute();
 const { clear, error, isLoading, logout, retry, switchOrganization } = useAuth();
 const { fromServer } = useOrganization();
 const { hook } = useNuxtApp();
-const { public: { merkaly } } = useRuntimeConfig();
+const { public: $config } = useRuntimeConfig();
 
 useColorMode({ attribute: 'data-bs-theme' });
 
@@ -27,7 +27,7 @@ const keepAppDefaults = (app: object, module: object) => defu(app, module); // t
 
 // Apps that need a login or a tenant wait for auth + tenant; public apps (www) and pages already
 // resolved on the server (store) render right away, so their content and SEO reach the HTML
-const waitsForAuth = merkaly.auth0.requiresAuth || merkaly.auth0.requiresTenant;
+const waitsForAuth = $config.merkaly.auth0.requiresAuth || $config.merkaly.auth0.requiresTenant;
 const blocking = computed(() => waitsForAuth && isLoading.value && !fromServer.value);
 
 // Ejecutar middleware una sola vez cuando `isLoading` cambia

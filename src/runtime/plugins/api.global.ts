@@ -77,7 +77,9 @@ export default defineNuxtPlugin(({ provide }) => {
   const requestHost = import.meta.server ? useRequestURL({ xForwardedHost: true }).host : undefined; // public host behind Railway/Cloudflare, per request
 
   // Same as the proxy: local mkcert certificates of *.test APIs are not trusted by Node
-  if (import.meta.server && import.meta.dev && new URL(useRuntimeConfig().public.merkaly.api.url).hostname.endsWith('.test')) {
+  const { public: $config } = useRuntimeConfig();
+
+  if (import.meta.server && import.meta.dev && new URL($config.merkaly.api.url).hostname.endsWith('.test')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
 
@@ -100,9 +102,7 @@ export default defineNuxtPlugin(({ provide }) => {
 
     if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
     const { id: tenant } = useOrganization();
-    const { public: { merkaly } } = useRuntimeConfig();
-
-    const requiresTenant = options.requiresTenant ?? merkaly.auth0.requiresTenant;
+    const requiresTenant = options.requiresTenant ?? $config.merkaly.auth0.requiresTenant;
 
     if (!tenant.value && !options.global && requiresTenant) {
       throw new Error(
@@ -117,7 +117,7 @@ export default defineNuxtPlugin(({ provide }) => {
     let result: T | undefined;
 
     await $fetch(url, {
-      baseURL: import.meta.server ? serverBaseURL(merkaly.api, options.global) : '/api',
+      baseURL: import.meta.server ? serverBaseURL($config.merkaly.api, options.global) : '/api',
 
       body: options?.body,
 
@@ -126,7 +126,7 @@ export default defineNuxtPlugin(({ provide }) => {
         identity: tenant.value,
         [GLOBAL_API_HEADER]: options.global ? 'true' : '',
         ...(requestHost ? { 'x-merkaly-host': requestHost } : {}), // tenant host, as the proxy sends it
-        ...(merkaly.auth0.client ? { [CLIENT_HEADER]: merkaly.auth0.client } : {}),
+        ...($config.merkaly.auth0.client ? { [CLIENT_HEADER]: $config.merkaly.auth0.client } : {}),
         ...options?.headers,
       },
 
