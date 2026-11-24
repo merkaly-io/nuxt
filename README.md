@@ -191,6 +191,12 @@ Every API request carries the app's Auth0 client id (`merkaly.auth0.client`) in 
 
 The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes, organizations, and the checklist for a new app) is documented in the auth.merkaly.io repo: [`docs/tenant-setup.md`](https://github.com/merkaly-io/auth.merkaly.io/blob/master/docs/tenant-setup.md).
 
+## API errors (`onError`, `onFatal`)
+
+- `onError(reason, { response, request })`: the api answered with an error status (4xx, 5xx).
+- `onFatal(reason)`: no response at all (network down, api down, CORS). Declare it where a failure must be handled differently.
+- Without `onFatal`, a fatal error goes to `onError` with a `response` of status `0` (`Response.error()`), and a console warning asks to handle it with `onFatal`. Aborted requests never reach `onError`.
+
 ## Dev pre-bundling (`vite.optimizeDeps.include`)
 
 The module pre-bundles the shared deps up front: `@brazilian-utils/brazilian-utils`, every `@merkaly/api` entry,
