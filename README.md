@@ -197,6 +197,25 @@ The Auth0 side (tenant, API, app settings, refresh token rotation and lifetimes,
 - `onFatal(reason)`: no response at all (network down, api down, CORS). Declare it where a failure must be handled differently.
 - Without `onFatal`, a fatal error goes to `onError` with a `response` of status `0` (`Response.error()`), and a console warning asks to handle it with `onFatal`. Aborted requests never reach `onError`.
 
+## Streaming responses (`$api.stream`)
+
+`$api.stream(url, options)` opens a request whose body the caller reads itself (SSE, NDJSON, downloads). It sends what `$api` sends: the `/api` proxy base URL (the api URL on the server), the Auth0 token (`getTokenSilently` first), `identity`, `x-merkaly-global`, `x-merkaly-host`, `x-merkaly-client`, plus `accept: text/event-stream` unless `headers` overrides it.
+
+```ts
+const controller = new AbortController(); // controller.abort() closes the stream
+
+const response = await $api.stream(`/account/orders/${id}/charges/stream`, { controller });
+
+if (response?.ok && response.body) {
+  const events = response.body.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream()); // eventsource-parser, in the app
+}
+```
+
+- Options: `body`, `controller`, `global`, `headers`, `method`, `query`, `requiresTenant`, `onError`, `onFatal`. No refs and no data hooks: the body is the caller's.
+- Resolves the `Response` for any status, with the body unread; check `response.ok` / `response.status`. Resolves `undefined` when there is no response (network down, aborted).
+- A `401` for a signed-in user renews the token once and repeats the request, like `$api`; a second `401` calls `expire()` and comes back as the response.
+- `onError(reason, { response, request })` runs for 4xx/5xx with the json error body (when there is one); `onFatal` and its fallback work as above.
+
 ## Dev pre-bundling (`vite.optimizeDeps.include`)
 
 The module pre-bundles the shared deps up front: `@brazilian-utils/brazilian-utils`, every `@merkaly/api` entry,
