@@ -66,6 +66,12 @@ export type ApiOptions<TData = unknown, TMeta = Record<string, unknown>, TParams
   & RefOptions
   & { params?: TParams }
 
+export type ApiStreamOptions =
+  Pick<ParamsOptions, 'body' | 'controller' | 'global' | 'headers' | 'method' | 'query' | 'requiresTenant'>
+  & Pick<HooksOptions, 'onError' | 'onFatal'>
+
+export type ApiStreamResponse = FetchResponse<ReadableStream<Uint8Array>>
+
 // SSR calls skip the Nuxt proxy (an internal call would carry the server host) and reach the API directly
 function serverBaseURL(api: { url: string, prefix?: string }, global?: boolean) {
   const prefix = global ? '' : (api.prefix ?? '').replace(/^\/+|\/+$/g, '');
@@ -95,12 +101,7 @@ export default defineNuxtPlugin(({ provide }) => {
     return renewing;
   };
 
-  const api = async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
-    const { claims, expire, isExpired, isLoading, token } = useAuth();
-    const canRenew = import.meta.client && Boolean(claims.value) && !isExpired.value && !renewed.has(options); // anonymous visitors never renew
-    let unauthorized = false; // 401 held back to renew the token and repeat the call
-
-    if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
+  const requireTenant = (url: string, options: ParamsOptions) => { // the tenant header, or an error when this surface needs one
     const { id: tenant } = useOrganization();
     const requiresTenant = options.requiresTenant ?? $config.merkaly.auth0.requiresTenant;
 
@@ -114,6 +115,26 @@ export default defineNuxtPlugin(({ provide }) => {
       );
     }
 
+    return tenant.value;
+  };
+
+  const requestHeaders = (options: ParamsOptions & { tenant?: string, token?: string | null }) => ({
+    authorization: options.token ? `Bearer ${options.token}` : '',
+    identity: options.tenant,
+    [GLOBAL_API_HEADER]: options.global ? 'true' : '',
+    ...(requestHost ? { 'x-merkaly-host': requestHost } : {}), // tenant host, as the proxy sends it
+    ...($config.merkaly.auth0.client ? { [CLIENT_HEADER]: $config.merkaly.auth0.client } : {}),
+    ...options.headers as Record<string, string> | undefined, // plain objects, as every caller passes them
+  }) as Record<string, string>;
+
+  const api = async <T = unknown>(url: string, options: ApiOptions = {}): Promise<T | undefined> => { // resolves the response data, undefined on failure (reported through onError/onFatal and `error`)
+    const { claims, expire, isExpired, isLoading, token } = useAuth();
+    const canRenew = import.meta.client && Boolean(claims.value) && !isExpired.value && !renewed.has(options); // anonymous visitors never renew
+    let unauthorized = false; // 401 held back to renew the token and repeat the call
+
+    if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently(); // cached until it expires, then renewed with the refresh token
+    const tenant = requireTenant(url, options);
+
     let result: T | undefined;
 
     await $fetch(url, {
@@ -121,14 +142,7 @@ export default defineNuxtPlugin(({ provide }) => {
 
       body: options?.body,
 
-      headers: {
-        authorization: token.value ? `Bearer ${token.value}` : '',
-        identity: tenant.value,
-        [GLOBAL_API_HEADER]: options.global ? 'true' : '',
-        ...(requestHost ? { 'x-merkaly-host': requestHost } : {}), // tenant host, as the proxy sends it
-        ...($config.merkaly.auth0.client ? { [CLIENT_HEADER]: $config.merkaly.auth0.client } : {}),
-        ...options?.headers,
-      },
+      headers: requestHeaders({ ...options, tenant, token: token.value }),
 
       method: options?.method,
 
@@ -214,5 +228,54 @@ export default defineNuxtPlugin(({ provide }) => {
     return renewToken().then(() => api<T>(url, retry)); // data of the repeated call; a dead session opens MKAuthExpired
   };
 
-  provide('api', api);
+  const stream = async (url: string, options: ApiStreamOptions = {}): Promise<ApiStreamResponse | undefined> => { // the response for any status (body unread), undefined without one
+    const { claims, expire, isExpired, isLoading, token } = useAuth();
+    const canRenew = import.meta.client && Boolean(claims.value) && !isExpired.value && !renewed.has(options); // same renewal as `api`
+
+    if (import.meta.client && token.value) await nuxtApp.$auth0?.getTokenSilently();
+    const tenant = requireTenant(url, options);
+
+    const response = await $fetch.raw(url, {
+      baseURL: import.meta.server ? serverBaseURL($config.merkaly.api, options.global) : '/api',
+      body: options.body,
+      headers: requestHeaders({ ...options, headers: { accept: 'text/event-stream', ...options.headers }, tenant, token: token.value }),
+      ignoreResponseError: true, // every status comes back to the caller
+      method: options.method,
+      query: options.query,
+      responseType: 'stream', // body left unread
+      retry: false,
+      signal: options.controller?.signal,
+    }).then(response => response as ApiStreamResponse).catch(async (error: Error): Promise<undefined> => {
+      if (error?.name === 'AbortError' || options.controller?.signal.aborted) return; // aborts are intended
+
+      if (options.onFatal) await options.onFatal(error);
+      else if (options.onError) {
+        console.warn(`[merkaly:api] ${url} stream failed without a response (network or api down) and has no onFatal: handled by onError, critical errors should be handled with onFatal`, error);
+        await options.onError(error, { request: url, response: Response.error() as FetchResponse<unknown> }); // status 0: no response
+      }
+    });
+
+    if (!response) return;
+
+    if (response.status === 401 && canRenew) { // renew once and repeat, the first attempt reports nothing
+      const retry = { ...options };
+
+      renewed.add(retry);
+      void response.body?.cancel();
+
+      return renewToken().then(() => stream(url, retry));
+    }
+
+    if (response.status === 401 && renewed.has(options) && !isLoading.value) expire(); // still 401 with a fresh token
+
+    if (response.status >= 400) {
+      const reason = await response.clone().json().catch(() => undefined); // api error body, when it is json
+
+      await options.onError?.(reason, { request: url, response });
+    }
+
+    return response;
+  };
+
+  provide('api', Object.assign(api, { stream }));
 });
