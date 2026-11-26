@@ -23,15 +23,24 @@ function isPathOrAbsoluteUrl(value: unknown) {
   return isPresent(value) && (value.startsWith('/') || isAbsoluteHttpUrl(value));
 }
 
-function isOptionalPosthogKey(value: unknown) {
-  return value === undefined || value === '' || (isPresent(value) && value.startsWith(POSTHOG_KEY_PREFIX)); // empty disables PostHog
+function isMissing(value: unknown) {
+  return value === undefined || value === null || (typeof value === 'string' && MISSING_VALUES.includes(value.trim()));
 }
 
+function isOptionalString(value: unknown) {
+  return isMissing(value) || isPresent(value); // only an app that needs it requires it
+}
+
+function isOptionalPosthogKey(value: unknown) {
+  return isMissing(value) || (isPresent(value) && value.startsWith(POSTHOG_KEY_PREFIX)); // empty disables PostHog
+}
+
+// Only what every app needs is required; an app checks the values only it requires
 const RUNTIME_CONFIG_CHECKS: RuntimeConfigCheck[] = [
   { path: ['api', 'url'], env: 'NUXT_PUBLIC_MERKALY_API_URL', expected: 'an absolute http(s) URL', isValid: isAbsoluteHttpUrl },
-  { path: ['auth0', 'audience'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_AUDIENCE', expected: 'a non-empty string', isValid: isPresent },
-  { path: ['auth0', 'client'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_CLIENT', expected: 'a non-empty string', isValid: isPresent },
-  { path: ['auth0', 'domain'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_DOMAIN', expected: 'a non-empty string', isValid: isPresent },
+  { path: ['auth0', 'audience'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_AUDIENCE', expected: 'empty or a string', isValid: isOptionalString },
+  { path: ['auth0', 'client'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_CLIENT', expected: 'empty or a string', isValid: isOptionalString },
+  { path: ['auth0', 'domain'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_DOMAIN', expected: 'empty or a string', isValid: isOptionalString },
   { path: ['auth0', 'callbackUrl'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_CALLBACK_URL', expected: 'a path or an absolute URL', isValid: isPathOrAbsoluteUrl },
   { path: ['auth0', 'logoutUrl'], env: 'NUXT_PUBLIC_MERKALY_AUTH0_LOGOUT_URL', expected: 'a path or an absolute URL', isValid: isPathOrAbsoluteUrl },
   { path: ['posthog'], env: 'NUXT_PUBLIC_MERKALY_POSTHOG', expected: `empty or a "${POSTHOG_KEY_PREFIX}" key`, isValid: isOptionalPosthogKey },

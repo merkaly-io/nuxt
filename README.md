@@ -29,12 +29,14 @@ The server checks the resolved runtime config when it starts and refuses to boot
 | Option | Runtime variable | Rule |
 |---|---|---|
 | `api.url` | `NUXT_PUBLIC_MERKALY_API_URL` | Required, absolute `http(s)` URL. The apps set it from `BASE_URL`, so a deploy without `BASE_URL` fails here. |
-| `auth0.audience` | `NUXT_PUBLIC_MERKALY_AUTH0_AUDIENCE` | Required, non-empty. |
-| `auth0.client` | `NUXT_PUBLIC_MERKALY_AUTH0_CLIENT` | Required, non-empty. |
-| `auth0.domain` | `NUXT_PUBLIC_MERKALY_AUTH0_DOMAIN` | Required, non-empty. |
-| `auth0.callbackUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_CALLBACK_URL` | Path or absolute URL (default `/auth`). |
-| `auth0.logoutUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_LOGOUT_URL` | Path or absolute URL (default `/`). |
+| `auth0.audience` | `NUXT_PUBLIC_MERKALY_AUTH0_AUDIENCE` | Optional here; the app that logs users in requires it. |
+| `auth0.client` | `NUXT_PUBLIC_MERKALY_AUTH0_CLIENT` | Optional here; the app that logs users in requires it. |
+| `auth0.domain` | `NUXT_PUBLIC_MERKALY_AUTH0_DOMAIN` | Optional here; the app that logs users in requires it. |
+| `auth0.callbackUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_CALLBACK_URL` | Required, path or absolute URL (default `/auth`). |
+| `auth0.logoutUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_LOGOUT_URL` | Required, path or absolute URL (default `/`). |
 | `posthog` | `NUXT_PUBLIC_MERKALY_POSTHOG` | Optional: empty disables PostHog, otherwise a `phc_` key. |
+
+The module only requires what every app needs. A value that only some apps need (for example the Auth0 client of an app with login, or an app's own variables such as `APP_WWW_URL`) is checked by that app.
 
 The strings `"undefined"` and `"null"` count as missing, since `String(process.env.X)` produces them when the variable is not set at build time.
 
