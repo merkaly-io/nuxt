@@ -412,9 +412,17 @@ function configureTypeCheck(nuxt: Nuxt) {
   nuxt.options.typescript.typeCheck = defu(appTypescript, { typeCheck: 'dev' as const }).typeCheck;
 }
 
+// client and server build in parallel; parallelBuild stays on its default (true)
+function configureViteEnvironmentApi(nuxt: Nuxt) {
+  const appExperimental = nuxt.options._layers[0]?.config.experimental; // raw app config, options.experimental is already resolved (false)
+
+  nuxt.options.experimental.viteEnvironmentApi = defu(appExperimental, { viteEnvironmentApi: true }).viteEnvironmentApi;
+}
+
 function configureNuxtOptions(nuxt: Nuxt, options: MerkalyModuleOptions) {
   configureNotivue(nuxt);
   configureTypeCheck(nuxt);
+  configureViteEnvironmentApi(nuxt);
   configureRuntimeConfig(nuxt, options);
   configurePlausible(nuxt, options);
 
