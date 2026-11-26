@@ -22,6 +22,24 @@ A Nuxt module that provides Auth0 authentication integration and API utilities f
 
 Install the module to your Nuxt application:
 
+## Required configuration
+
+The server checks the resolved runtime config when it starts and refuses to boot with one error listing every missing or invalid value, instead of serving an app that only breaks later (e.g. the API proxy failing on `new URL("undefined")`). Values come from `merkaly` in `nuxt.config` at build time and can be overridden at runtime with the `NUXT_PUBLIC_MERKALY_*` variables.
+
+| Option | Runtime variable | Rule |
+|---|---|---|
+| `api.url` | `NUXT_PUBLIC_MERKALY_API_URL` | Required, absolute `http(s)` URL. The apps set it from `BASE_URL`, so a deploy without `BASE_URL` fails here. |
+| `auth0.audience` | `NUXT_PUBLIC_MERKALY_AUTH0_AUDIENCE` | Required, non-empty. |
+| `auth0.client` | `NUXT_PUBLIC_MERKALY_AUTH0_CLIENT` | Required, non-empty. |
+| `auth0.domain` | `NUXT_PUBLIC_MERKALY_AUTH0_DOMAIN` | Required, non-empty. |
+| `auth0.callbackUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_CALLBACK_URL` | Path or absolute URL (default `/auth`). |
+| `auth0.logoutUrl` | `NUXT_PUBLIC_MERKALY_AUTH0_LOGOUT_URL` | Path or absolute URL (default `/`). |
+| `posthog` | `NUXT_PUBLIC_MERKALY_POSTHOG` | Optional: empty disables PostHog, otherwise a `phc_` key. |
+
+The strings `"undefined"` and `"null"` count as missing, since `String(process.env.X)` produces them when the variable is not set at build time.
+
+Nuxt 4.7 runtime config schemas are not used for this: a schema declared by a module (`updateRuntimeConfig()`) only logs a warning and keeps its default, and refinements such as URL format are not checked, so they cannot stop the boot.
+
 ## Authentication and tenant boot
 
 Every surface can sign in; `auth0.requiresAuth` only decides whether pages require a login (globally, or per page with `definePageMeta({ requiresAuth: true })`). `auth0.requiresTenant` decides whether API calls require a tenant (`global: true` adapters bypass it).
