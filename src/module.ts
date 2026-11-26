@@ -405,8 +405,16 @@ function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
   });
 }
 
+// type errors in dev only; the production build skips type checking
+function configureTypeCheck(nuxt: Nuxt) {
+  const appTypescript = nuxt.options._layers[0]?.config.typescript; // raw app config, options.typescript is already resolved (false)
+
+  nuxt.options.typescript.typeCheck = defu(appTypescript, { typeCheck: 'dev' as const }).typeCheck;
+}
+
 function configureNuxtOptions(nuxt: Nuxt, options: MerkalyModuleOptions) {
   configureNotivue(nuxt);
+  configureTypeCheck(nuxt);
   configureRuntimeConfig(nuxt, options);
   configurePlausible(nuxt, options);
 
