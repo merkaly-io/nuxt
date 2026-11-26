@@ -4,6 +4,7 @@ import {
   addPlugin,
   addRouteMiddleware,
   addServerHandler,
+  addServerPlugin,
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
@@ -444,6 +445,9 @@ function registerRuntimeFeatures(options: MerkalyModuleOptions, resolver: Resolv
   if (hasPosthogConfig(options)) {
     addPlugin({ src: resolver.resolve('./runtime/plugins/posthog.client') });
   }
+
+  // Register Server Plugins
+  addServerPlugin(resolver.resolve('./runtime/server/plugins/runtime-config')); // fails the boot when required env vars are missing
 
   // Register Server Handlers
   addServerHandler({
