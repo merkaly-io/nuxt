@@ -405,6 +405,13 @@ function configureVite(nuxt: Nuxt, options: MerkalyModuleOptions) {
   });
 }
 
+// type errors in dev only; the production build skips type checking
+function configureTypeCheck(nuxt: Nuxt) {
+  const appTypescript = nuxt.options._layers[0]?.config.typescript; // raw app config, options.typescript is already resolved (false)
+
+  nuxt.options.typescript.typeCheck = defu(appTypescript, { typeCheck: 'dev' as const }).typeCheck;
+}
+
 // client and server build in parallel; parallelBuild stays on its default (true)
 function configureViteEnvironmentApi(nuxt: Nuxt) {
   const appExperimental = nuxt.options._layers[0]?.config.experimental; // raw app config, options.experimental is already resolved (false)
@@ -414,6 +421,7 @@ function configureViteEnvironmentApi(nuxt: Nuxt) {
 
 function configureNuxtOptions(nuxt: Nuxt, options: MerkalyModuleOptions) {
   configureNotivue(nuxt);
+  configureTypeCheck(nuxt);
   configureViteEnvironmentApi(nuxt);
   configureRuntimeConfig(nuxt, options);
   configurePlausible(nuxt, options);
