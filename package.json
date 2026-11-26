@@ -75,7 +75,7 @@
     "v-money3": "^3.26.1",
     "vite-svg-loader": "^5.1.1",
     "vue": "^3.5.46",
-    "vue-router": "^5.5.1",
+    "vue-router": "^5.5.3",
     "vue-select": "4.0.0-beta.6"
   },
   "devDependencies": {
