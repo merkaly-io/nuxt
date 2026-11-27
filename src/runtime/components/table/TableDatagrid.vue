@@ -161,7 +161,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         </slot>
       </BCardTitle>
 
-      <div class="card-toolbar flex-row-fluid justify-content-end">
+      <div class="card-toolbar flex-row-fluid justify-content-end gap-3 m-0">
         <slot name="toolbar" />
 
         <template v-if="canFilter">
