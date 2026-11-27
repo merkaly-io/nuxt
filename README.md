@@ -452,6 +452,20 @@ const { seconds, text } = useTimeLeft(() => order.payExpiryDate); // ticks every
 const label = formatTimeLeft(3 * 3600); // "3h", pure
 ```
 
+## Recent dates (`formatRecentDate`)
+
+`formatRecentDate(date, options?)` shows a date as relative text while it is recent (`há 3 horas`, `há 5 minutos`,
+`agora`) and in full once it is older than the threshold (`27 de nov. de 2026, 00:33`). Future dates show in full,
+and a missing or invalid date returns `undefined`, so a tooltip bound to it stays hidden. It is a plain function
+(auto-imported), so it works straight in templates:
+
+```vue
+<span v-b-tooltip.hover.top="formatRecentDate(order.createdAt)">...</span>
+```
+
+- `locale`: BCP 47 locale; defaults to the active `@nuxtjs/i18n` locale, else the runtime one.
+- `threshold`: milliseconds under which the date is relative; defaults to 24 hours.
+
 ## Pagination (`usePagination`)
 
 `usePagination({ limit, page })` wraps VueUse `useOffsetPagination` (page, page size, clamping, `prev`/`next`,
