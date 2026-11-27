@@ -144,7 +144,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 
 <template>
   <BCard no-body>
-    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative gap-2 gap-md-5">
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
           <DropdownIcon icon="caret-down" toggle-class="p-2">
@@ -161,7 +161,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         </slot>
       </BCardTitle>
 
-      <div class="card-toolbar flex-row-fluid justify-content-end gap-3">
+      <div class="card-toolbar flex-row-fluid justify-content-end">
         <slot name="toolbar" />
 
         <template v-if="canFilter">
