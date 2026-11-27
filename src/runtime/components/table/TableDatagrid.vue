@@ -143,8 +143,8 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
 </script>
 
 <template>
-  <BCard class="card-flush" no-body>
-    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative py-5 gap-2 gap-md-5">
+  <BCard no-body>
+    <BCardHeader v-if="!props.hideHeader" class="align-items-center position-relative gap-2 gap-md-5">
       <BCardTitle>
         <div v-if="hasBulkSlot && !props.hideSelect && selectionState.selectedCount" class="w-35px">
           <DropdownIcon icon="caret-down" toggle-class="p-2">
@@ -161,7 +161,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         </slot>
       </BCardTitle>
 
-      <div class="card-toolbar flex-row-fluid justify-content-end gap-3 m-0">
+      <div class="card-toolbar flex-row-fluid justify-content-end gap-3">
         <slot name="toolbar" />
 
         <template v-if="canFilter">
@@ -206,7 +206,7 @@ function getRowAttrs(item: G, idx: number): Record<string, unknown> {
         style="bottom: -6px; z-index: 10" />
     </BCardHeader>
 
-    <BCardBody class="pt-0">
+    <BCardBody>
       <BTableSimple
         :class="{ 'h-100': !visibleItems.length || $datagrid.loading }"
         class="mb-0 overflow-auto"
